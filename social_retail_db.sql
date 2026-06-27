@@ -453,3 +453,168 @@ CREATE TABLE IF NOT EXISTS `recommendation_log` (
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_recomm_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='个性化算法推荐结果记录表';
+
+-- ==========================================
+-- 10. 其他
+-- ==========================================
+
+-- Message Template（消息通知模板表）
+CREATE TABLE IF NOT EXISTS `message_template` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '模板ID（主键）',
+  `template_code` VARCHAR(50) DEFAULT NULL COMMENT '模板编码',
+  `template_name` VARCHAR(100) DEFAULT NULL COMMENT '模板名称',
+  `message_type` TINYINT DEFAULT NULL COMMENT '消息类型（1站内信、2短信、3邮件）',
+  `title` VARCHAR(200) DEFAULT NULL COMMENT '消息标题',
+  `content` TEXT COMMENT '消息模板内容',
+  `status` TINYINT DEFAULT NULL COMMENT '启用状态',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息通知模板表';
+
+
+-- User Message（用户站内消息接收表）
+CREATE TABLE IF NOT EXISTS `user_message` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '消息ID（主键）',
+  `user_id` BIGINT DEFAULT NULL COMMENT '用户ID',
+  `template_id` BIGINT DEFAULT NULL COMMENT '消息模板ID',
+  `title` VARCHAR(200) DEFAULT NULL COMMENT '消息标题',
+  `content` TEXT COMMENT '消息内容',
+  `is_read` TINYINT DEFAULT NULL COMMENT '是否已读',
+  `send_time` DATETIME DEFAULT NULL COMMENT '发送时间',
+  `read_time` DATETIME DEFAULT NULL COMMENT '阅读时间',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_user_message_user`
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_message_template`
+    FOREIGN KEY (`template_id`) REFERENCES `message_template`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户站内消息接收表';
+
+
+-- User Binding（用户锁粉推荐关系表）
+CREATE TABLE IF NOT EXISTS `user_binding` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '关系ID（主键）',
+  `user_id` BIGINT DEFAULT NULL COMMENT '当前用户ID',
+  `inviter_id` BIGINT DEFAULT NULL COMMENT '推荐人用户ID',
+  `binding_time` DATETIME DEFAULT NULL COMMENT '锁粉绑定时间',
+  `binding_type` TINYINT DEFAULT NULL COMMENT '绑定方式',
+  `status` TINYINT DEFAULT NULL COMMENT '绑定状态',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_user_binding_user`
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_binding_inviter`
+    FOREIGN KEY (`inviter_id`) REFERENCES `user`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户锁粉推荐关系表';
+
+
+-- User Wallet（用户/分销商虚拟钱包表）
+CREATE TABLE IF NOT EXISTS `user_wallet` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '钱包ID（主键）',
+  `user_id` BIGINT DEFAULT NULL COMMENT '用户ID',
+  `balance` DECIMAL(10,2) DEFAULT NULL COMMENT '可用余额',
+  `frozen_amount` DECIMAL(10,2) DEFAULT NULL COMMENT '冻结金额',
+  `total_income` DECIMAL(10,2) DEFAULT NULL COMMENT '累计收入',
+  `total_expenditure` DECIMAL(10,2) DEFAULT NULL COMMENT '累计支出',
+  `status` TINYINT DEFAULT NULL COMMENT '钱包状态',
+  `update_time` DATETIME DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_user_wallet_user`
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户/分销商虚拟钱包表';
+
+
+-- Withdrawal Apply（提现申请审批表）
+CREATE TABLE IF NOT EXISTS `withdrawal_apply` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '提现申请ID（主键）',
+  `wallet_id` BIGINT DEFAULT NULL COMMENT '钱包ID',
+  `user_id` BIGINT DEFAULT NULL COMMENT '提现用户ID',
+  `apply_amount` DECIMAL(10,2) DEFAULT NULL COMMENT '提现金额',
+  `account_name` VARCHAR(50) DEFAULT NULL COMMENT '收款人姓名',
+  `account_no` VARCHAR(50) DEFAULT NULL COMMENT '收款账号',
+  `bank_name` VARCHAR(100) DEFAULT NULL COMMENT '开户银行',
+  `audit_status` TINYINT DEFAULT NULL COMMENT '审核状态',
+  `audit_time` DATETIME DEFAULT NULL COMMENT '审核时间',
+  `remark` VARCHAR(200) DEFAULT NULL COMMENT '审核备注',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_withdrawal_wallet`
+    FOREIGN KEY (`wallet_id`) REFERENCES `user_wallet`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_withdrawal_user`
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='提现申请审批表';
+
+
+-- Product Comment（商品评价表）
+CREATE TABLE IF NOT EXISTS `product_comment` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '评价ID（主键）',
+  `order_item_id` BIGINT DEFAULT NULL COMMENT '订单明细ID',
+  `product_id` BIGINT DEFAULT NULL COMMENT '商品ID',
+  `user_id` BIGINT DEFAULT NULL COMMENT '用户ID',
+  `score` TINYINT DEFAULT NULL COMMENT '评分（1~5分）',
+  `content` TEXT COMMENT '评价内容',
+  `images` VARCHAR(500) DEFAULT NULL COMMENT '评价图片',
+  `anonymous` TINYINT DEFAULT NULL COMMENT '是否匿名',
+  `create_time` DATETIME DEFAULT NULL COMMENT '评价时间',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_product_comment_order_item`
+    FOREIGN KEY (`order_item_id`) REFERENCES `order_item`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_comment_product`
+    FOREIGN KEY (`product_id`) REFERENCES `product`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_product_comment_user`
+    FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='商品评价表';
+
+
+-- Operation Admin（运营管理员信息表）
+CREATE TABLE IF NOT EXISTS `operation_admin` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '运营管理员ID（主键）',
+  `username` VARCHAR(50) DEFAULT NULL COMMENT '登录账号',
+  `password` VARCHAR(200) DEFAULT NULL COMMENT '登录密码（加密）',
+  `real_name` VARCHAR(50) DEFAULT NULL COMMENT '真实姓名',
+  `phone` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
+  `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
+  `status` TINYINT DEFAULT NULL COMMENT '账号状态',
+  `last_login_time` DATETIME DEFAULT NULL COMMENT '最后登录时间',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='运营管理员信息表';
+
+
+-- System Admin（系统管理员信息表）
+CREATE TABLE IF NOT EXISTS `system_admin` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '系统管理员ID（主键）',
+  `username` VARCHAR(50) DEFAULT NULL COMMENT '登录账号',
+  `password` VARCHAR(200) DEFAULT NULL COMMENT '登录密码（加密）',
+  `real_name` VARCHAR(50) DEFAULT NULL COMMENT '管理员姓名',
+  `phone` VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
+  `email` VARCHAR(100) DEFAULT NULL COMMENT '邮箱',
+  `role` VARCHAR(50) DEFAULT NULL COMMENT '系统角色',
+  `status` TINYINT DEFAULT NULL COMMENT '账号状态',
+  `last_login_time` DATETIME DEFAULT NULL COMMENT '最后登录时间',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统管理员信息表';
+
+
+-- System Config（系统参数配置表）
+CREATE TABLE IF NOT EXISTS `system_config` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '参数ID（主键）',
+  `config_key` VARCHAR(100) DEFAULT NULL COMMENT '参数键（唯一）',
+  `config_name` VARCHAR(100) DEFAULT NULL COMMENT '参数名称',
+  `config_value` VARCHAR(500) DEFAULT NULL COMMENT '参数值',
+  `value_type` VARCHAR(20) DEFAULT NULL COMMENT '参数类型',
+  `description` VARCHAR(255) DEFAULT NULL COMMENT '参数说明',
+  `is_system` TINYINT DEFAULT NULL COMMENT '是否系统内置（0否，1是）',
+  `status` TINYINT DEFAULT NULL COMMENT '参数状态（0禁用，1启用）',
+  `create_time` DATETIME DEFAULT NULL COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT NULL COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统参数配置表';
