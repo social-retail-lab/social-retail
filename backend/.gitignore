@@ -1,0 +1,119 @@
+# =========================
+# Project Help
+# =========================
+HELP.md
+
+
+# =========================
+# Maven / Java
+# =========================
+target/
+**/target/
+*.class
+
+# 保留 src 目录下意外出现的 target/build 目录，如果你不需要可以删掉这几行
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+
+# =========================
+# Maven Wrapper
+# =========================
+# 如果你们打算统一使用 Maven Wrapper，就不要忽略 mvnw、mvnw.cmd、.mvn/wrapper/maven-wrapper.properties
+# 这里只忽略 wrapper 的 jar 文件
+.mvn/wrapper/maven-wrapper.jar
+**/.mvn/wrapper/maven-wrapper.jar
+
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+**/.idea/
+*.iws
+*.iml
+*.ipr
+
+
+# =========================
+# Eclipse / STS
+# =========================
+.apt_generated/
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+
+# =========================
+# NetBeans
+# =========================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+**/build/
+
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+**/.vscode/
+
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+**/logs/
+
+
+# =========================
+# OS Files
+# =========================
+.DS_Store
+Thumbs.db
+
+
+# =========================
+# Node / Frontend
+# 后面 frontend-user / frontend-admin / frontend-merchant 会用到
+# =========================
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+
+
+# =========================
+# Local Environment Config
+# 不提交个人本地配置、密钥、账号密码
+# =========================
+.env
+*.env
+application-local.yml
+application-local.properties
+**/application-local.yml
+**/application-local.properties
+
+
+# =========================
+# Upload / Temp Files
+# =========================
+upload/
+uploads/
+temp/
+tmp/
+**/upload/
+**/uploads/
+**/temp/
+**/tmp/
