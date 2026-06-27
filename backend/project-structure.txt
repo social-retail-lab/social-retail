@@ -1,0 +1,389 @@
+
+
++---src
+|   +---main
+|   |   +---java
+|   |   |   \---com
+|   |   |       \---socialretail
+|   |   |           \---backend
+|   |   |               |   BackendApplication.java
+|   |   |               |   
+|   |   |               +---common
+|   |   |               |       AESUtils.java
+|   |   |               |       Base64Utils.java
+|   |   |               |       BeanCopyUtils.java
+|   |   |               |       CouponCodeUtils.java
+|   |   |               |       DateUtils.java
+|   |   |               |       FileUtils.java
+|   |   |               |       HttpContextUtils.java
+|   |   |               |       IdGenerator.java
+|   |   |               |       ImageUtils.java
+|   |   |               |       IPUtils.java
+|   |   |               |       JsonUtils.java
+|   |   |               |       JwtUtils.java
+|   |   |               |       MD5Utils.java
+|   |   |               |       MoneyUtils.java
+|   |   |               |       OrderNoUtils.java
+|   |   |               |       PageResult.java
+|   |   |               |       PayNoUtils.java
+|   |   |               |       PhoneUtils.java
+|   |   |               |       QrcodeUtils.java
+|   |   |               |       Result.java
+|   |   |               |       RSAUtils.java
+|   |   |               |       SignUtils.java
+|   |   |               |       SkuCodeUtils.java
+|   |   |               |       StringUtils.java
+|   |   |               |       UserAgentUtils.java
+|   |   |               |       ValidatorUtils.java
+|   |   |               |       
+|   |   |               +---config
+|   |   |               |       AliPayConfig.java
+|   |   |               |       AsyncConfig.java
+|   |   |               |       MyBatisPlusConfig.java
+|   |   |               |       RedisConfig.java
+|   |   |               |       SecurityConfig.java
+|   |   |               |       SmsConfig.java
+|   |   |               |       WebConfig.java
+|   |   |               |       
+|   |   |               +---constant
+|   |   |               |       PayConstant.java
+|   |   |               |       SmsConstant.java
+|   |   |               |       
+|   |   |               +---controller
+|   |   |               |   +---admin
+|   |   |               |   |       ActivityConfigController.java
+|   |   |               |   |       AdminAuthController.java
+|   |   |               |   |       AuditController.java
+|   |   |               |   |       NoticeController.java
+|   |   |               |   |       SystemConfigController.java
+|   |   |               |   |       
+|   |   |               |   +---merchant
+|   |   |               |   |       MerchantAuthController.java
+|   |   |               |   |       MerchantGoodsController.java
+|   |   |               |   |       MerchantOrderController.java
+|   |   |               |   |       PickupController.java
+|   |   |               |   |       
+|   |   |               |   +---order
+|   |   |               |   |       OrderController.java
+|   |   |               |   |       
+|   |   |               |   +---pay
+|   |   |               |   |       PayCallbackController.java
+|   |   |               |   |       
+|   |   |               |   \---user
+|   |   |               |           AddressController.java
+|   |   |               |           CartController.java
+|   |   |               |           ProductController.java
+|   |   |               |           SmsController.java
+|   |   |               |           UserController.java
+|   |   |               |           
+|   |   |               +---dto
+|   |   |               |   +---request
+|   |   |               |   |   +---order
+|   |   |               |   |   |       OrderPayRequest.java
+|   |   |               |   |   |       OrderSubmitRequest.java
+|   |   |               |   |   |       
+|   |   |               |   |   \---user
+|   |   |               |   |           SendSmsRequest.java
+|   |   |               |   |           UserRegisterRequest.java
+|   |   |               |   |           VerifySmsRequest.java
+|   |   |               |   |           
+|   |   |               |   \---response
+|   |   |               |       +---order
+|   |   |               |       |       OrderDetailResponse.java
+|   |   |               |       |       OrderListResponse.java
+|   |   |               |       |       OrderPayResponse.java
+|   |   |               |       |       
+|   |   |               |       \---user
+|   |   |               |               SmsSendResponse.java
+|   |   |               |               
+|   |   |               +---entity
+|   |   |               |   +---analysis
+|   |   |               |   +---member
+|   |   |               |   +---order
+|   |   |               |   |       PaymentRecord.java
+|   |   |               |   |       
+|   |   |               |   +---product
+|   |   |               |   +---promotion
+|   |   |               |   +---sms
+|   |   |               |   |       SmsRecord.java
+|   |   |               |   |       
+|   |   |               |   \---social
+|   |   |               +---enums
+|   |   |               |       PayMethodEnum.java
+|   |   |               |       PayStatusEnum.java
+|   |   |               |       SmsSendStatusEnum.java
+|   |   |               |       SmsTypeEnum.java
+|   |   |               |       
+|   |   |               +---handler
+|   |   |               |       GlobalExceptionHandler.java
+|   |   |               |       
+|   |   |               +---infrastructure
+|   |   |               |   +---oss
+|   |   |               |   |   |   OssService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           LocalOssServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---pay
+|   |   |               |   |   |   AliPayConfig.java
+|   |   |               |   |   |   AliPayService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           AliPayServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   \---sms
+|   |   |               |       |   SmsService.java
+|   |   |               |       |   
+|   |   |               |       \---impl
+|   |   |               |               MockSmsServiceImpl.java
+|   |   |               |               
+|   |   |               +---interceptor
+|   |   |               |       AuthInterceptor.java
+|   |   |               |       PermissionInterceptor.java
+|   |   |               |       RateLimitInterceptor.java
+|   |   |               |       
+|   |   |               +---mapper
+|   |   |               |   +---analysis
+|   |   |               |   +---member
+|   |   |               |   +---order
+|   |   |               |   +---product
+|   |   |               |   +---promotion
+|   |   |               |   \---social
+|   |   |               +---service
+|   |   |               |   +---admin
+|   |   |               |   |   |   ActivityConfigService.java
+|   |   |               |   |   |   AuditService.java
+|   |   |               |   |   |   NoticeService.java
+|   |   |               |   |   |   SystemConfigService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           ActivityConfigServiceImpl.java
+|   |   |               |   |           AuditServiceImpl.java
+|   |   |               |   |           NoticeServiceImpl.java
+|   |   |               |   |           SystemConfigServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---analysis
+|   |   |               |   |   |   BehaviorService.java
+|   |   |               |   |   |   RecommendService.java
+|   |   |               |   |   |   StatisticsService.java
+|   |   |               |   |   |   UserTagService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           BehaviorServiceImpl.java
+|   |   |               |   |           RecommendServiceImpl.java
+|   |   |               |   |           StatisticsServiceImpl.java
+|   |   |               |   |           UserTagServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---member
+|   |   |               |   |   |   BenefitService.java
+|   |   |               |   |   |   GrowthService.java
+|   |   |               |   |   |   MemberLevelService.java
+|   |   |               |   |   |   PointsService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           BenefitServiceImpl.java
+|   |   |               |   |           GrowthServiceImpl.java
+|   |   |               |   |           MemberLevelServiceImpl.java
+|   |   |               |   |           PointsServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---merchant
+|   |   |               |   |   |   MerchantGoodsService.java
+|   |   |               |   |   |   MerchantOrderService.java
+|   |   |               |   |   |   PickupService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           MerchantGoodsServiceImpl.java
+|   |   |               |   |           MerchantOrderServiceImpl.java
+|   |   |               |   |           PickupServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---order
+|   |   |               |   |   |   AfterSaleService.java
+|   |   |               |   |   |   CartService.java
+|   |   |               |   |   |   DeliveryService.java
+|   |   |               |   |   |   OrderService.java
+|   |   |               |   |   |   PaymentService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           AfterSaleServiceImpl.java
+|   |   |               |   |           CartServiceImpl.java
+|   |   |               |   |           DeliveryServiceImpl.java
+|   |   |               |   |           OrderServiceImpl.java
+|   |   |               |   |           PaymentServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---pay
+|   |   |               |   |   |   PayCallbackService.java
+|   |   |               |   |   |   PayService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           PayCallbackServiceImpl.java
+|   |   |               |   |           PayServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---product
+|   |   |               |   |   |   BrandService.java
+|   |   |               |   |   |   CategoryService.java
+|   |   |               |   |   |   ProductService.java
+|   |   |               |   |   |   SkuService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           BrandServiceImpl.java
+|   |   |               |   |           CategoryServiceImpl.java
+|   |   |               |   |           ProductServiceImpl.java
+|   |   |               |   |           SkuServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---promotion
+|   |   |               |   |   |   BargainService.java
+|   |   |               |   |   |   CouponService.java
+|   |   |               |   |   |   DiscountService.java
+|   |   |               |   |   |   SeckillService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           BargainServiceImpl.java
+|   |   |               |   |           CouponServiceImpl.java
+|   |   |               |   |           DiscountServiceImpl.java
+|   |   |               |   |           SeckillServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   +---sms
+|   |   |               |   |   |   SmsVerifyService.java
+|   |   |               |   |   |   
+|   |   |               |   |   \---impl
+|   |   |               |   |           SmsVerifyServiceImpl.java
+|   |   |               |   |           
+|   |   |               |   \---social
+|   |   |               |       |   CommissionService.java
+|   |   |               |       |   DistributorService.java
+|   |   |               |       |   PosterService.java
+|   |   |               |       |   ShareService.java
+|   |   |               |       |   
+|   |   |               |       \---impl
+|   |   |               |               CommissionServiceImpl.java
+|   |   |               |               DistributorServiceImpl.java
+|   |   |               |               PosterServiceImpl.java
+|   |   |               |               ShareServiceImpl.java
+|   |   |               |               
+|   |   |               +---task
+|   |   |               |       CommissionSettleTask.java
+|   |   |               |       MemberLevelTask.java
+|   |   |               |       OrderTimeoutTask.java
+|   |   |               |       PayTimeoutTask.java
+|   |   |               |       PointsExpireTask.java
+|   |   |               |       StatisticsTask.java
+|   |   |               |       
+|   |   |               +---vo
+|   |   |               \---websocket
+|   |   |                       MessageHandler.java
+|   |   |                       SessionManager.java
+|   |   |                       SocketIoServer.java
+|   |   |                       
+|   |   \---resources
+|   |       |   application.properties
+|   |       |   logback-spring.xml
+|   |       |   
+|   |       +---db
+|   |       |       data.sql
+|   |       |       schema.sql
+|   |       |       
+|   |       +---lua
+|   |       |       seckill.lua
+|   |       |       
+|   |       +---mapper
+|   |       +---static
+|   |       \---templates
+|   \---test
+|       \---java
+|           \---com
+|               \---socialretail
+|                   \---backend
+|                           BackendApplicationTests.java
+|                           
+\---target
+    +---classes
+    |   |   application.properties
+    |   |   logback-spring.xml
+    |   |   
+    |   +---com
+    |   |   \---socialretail
+    |   |       \---backend
+    |   |           |   BackendApplication.class
+    |   |           |   
+    |   |           +---common
+    |   |           +---config
+    |   |           +---constant
+    |   |           +---controller
+    |   |           |   +---admin
+    |   |           |   +---merchant
+    |   |           |   +---order
+    |   |           |   +---pay
+    |   |           |   \---user
+    |   |           +---dto
+    |   |           |   +---request
+    |   |           |   |   +---order
+    |   |           |   |   \---user
+    |   |           |   \---response
+    |   |           |       +---order
+    |   |           |       \---user
+    |   |           +---entity
+    |   |           |   +---analysis
+    |   |           |   +---member
+    |   |           |   +---order
+    |   |           |   +---product
+    |   |           |   +---promotion
+    |   |           |   +---sms
+    |   |           |   \---social
+    |   |           +---enums
+    |   |           +---handler
+    |   |           +---infrastructure
+    |   |           |   +---oss
+    |   |           |   |   \---impl
+    |   |           |   +---pay
+    |   |           |   |   \---impl
+    |   |           |   \---sms
+    |   |           |       \---impl
+    |   |           +---interceptor
+    |   |           +---mapper
+    |   |           |   +---analysis
+    |   |           |   +---member
+    |   |           |   +---order
+    |   |           |   +---product
+    |   |           |   +---promotion
+    |   |           |   \---social
+    |   |           +---service
+    |   |           |   +---admin
+    |   |           |   |   \---impl
+    |   |           |   +---analysis
+    |   |           |   |   \---impl
+    |   |           |   +---member
+    |   |           |   |   \---impl
+    |   |           |   +---merchant
+    |   |           |   |   \---impl
+    |   |           |   +---order
+    |   |           |   |   \---impl
+    |   |           |   +---pay
+    |   |           |   |   \---impl
+    |   |           |   +---product
+    |   |           |   |   \---impl
+    |   |           |   +---promotion
+    |   |           |   |   \---impl
+    |   |           |   +---sms
+    |   |           |   |   \---impl
+    |   |           |   \---social
+    |   |           |       \---impl
+    |   |           +---task
+    |   |           +---vo
+    |   |           \---websocket
+    |   +---db
+    |   |       data.sql
+    |   |       schema.sql
+    |   |       
+    |   \---lua
+    |           seckill.lua
+    |           
+    +---generated-sources
+    |   \---annotations
+    +---generated-test-sources
+    |   \---test-annotations
+    \---test-classes
+        \---com
+            \---socialretail
+                \---backend
+                        BackendApplicationTests.class
+                        
