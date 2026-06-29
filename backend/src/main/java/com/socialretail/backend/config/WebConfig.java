@@ -1,0 +1,39 @@
+package com.socialretail.backend.config;
+
+import com.socialretail.backend.interceptor.AuthInterceptor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    private final AuthInterceptor authInterceptor;
+
+    public WebConfig(AuthInterceptor authInterceptor) {
+        this.authInterceptor = authInterceptor;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInterceptor)
+                .addPathPatterns("/api/**")
+                .excludePathPatterns(
+                        "/api/merchant/auth/login",
+                        "/api/admin/operation/auth/login",
+                        "/api/admin/system/auth/login",
+                        "/api/user/sms/**"
+                );
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*")
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);
+    }
+}

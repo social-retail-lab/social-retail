@@ -1,0 +1,1206 @@
+06-社交新零售电商平台-接口文档
+第一部分 接口设计总则
+1.1 基础规范
+规范项	说明
+协议	HTTP/1.1，生产环境使用HTTPS
+编码	UTF-8
+数据格式	请求与响应均为 JSON（Content-Type: application/json）
+接口版本	/api/路径前缀
+日期格式	ISO 8601（响应中采用 yyyy-MM-dd HH:mm:ss，系统间调用采用 yyyy-MM-ddTHH:mm:ss+08:00），所有时间均为东八区
+金额单位	元（BigDecimal），前端展示保留两位小数
+1.2 统一响应格式
+所有接口返回统一JSON结构：
+JSON
+{
+  "code": 0,
+  "message": "success",
+  "data": { ... },
+  "timestamp": 1700000000000,
+  "requestId": "req-xxx-xxx"
+}
+字段	类型	说明
+code	Integer	状态码，0=成功，非0=业务异常
+message	String	提示信息
+data	Object/Array/null	响应数据，具体结构因接口而异，无数据时为 null
+timestamp	Long	响应时间戳（毫秒）
+requestId	String	请求唯一标识，链路追踪
+
+data 字段包装规则：
+接口类型	data 格式	说明
+单对象查询（详情/创建/修改）	Object	单个资源对象
+列表查询（分页）	Object { list, total, pages, page, pageSize }	分页对象
+列表查询（非分页，如分类树）	Object { list: [...] }	统一用 list 包裹
+操作类（无返回数据）	null	data 字段存在但值为 null
+
+1.3 错误码规范
+错误码范围	类型	说明
+0	成功	请求处理成功
+40001-40099	参数错误	参数缺失/格式错误/校验失败
+40101-40199	认证错误	Token无效/过期/未登录
+40301-40399	权限错误	角色权限不足/资源不可访问
+40401-40499	资源不存在	商品/订单/用户不存在
+40901-40999	业务冲突	库存不足/优惠券已领/重复操作/价格变动
+42901-42999	限流错误	请求频率超限
+50001-50099	服务器错误	系统内部异常/服务不可用
+
+业务冲突补充错误码：
+错误码	说明
+40901	库存不足
+40902	商品价格已变动，请重新确认
+40903	优惠券已失效，请重新选择
+40904	已超过限购数量
+
+1.4 HTTP 状态码使用规范
+
+HTTP状态码	业务code	使用场景
+200 OK	0	查询成功、修改成功、操作成功
+201 Created	0	创建资源成功（订单/购物车/售后申请）
+204 No Content	0	删除/清空成功（无响应体）
+400 Bad Request	40001-40099	参数校验失败
+401 Unauthorized	40101-40199	Token无效/过期/未登录
+403 Forbidden	40301-40399	权限不足
+404 Not Found	40401-40499	资源不存在
+409 Conflict	40901-40999	业务冲突
+429 Too Many Requests	42901-42999	限流
+1.5 请求头规范
+Header	类型	必填	说明
+Authorization	String	是（除登录/注册等公开接口）	Bearer {token}
+Content-Type	String	是	application/json
+X-Request-Id	String	否	请求唯一标识，用于链路追踪
+X-App-Version	String	否	客户端版本号
+X-Device-Id	String	否	设备唯一标识
+X-Idempotent-Key	String	是（创建类接口）	幂等键，24小时内唯一，格式：{操作类型}_{日期}_{随机串}
+1.6 幂等性规范
+对于创建类接口（订单创建、秒杀下单、优惠券领取、提现申请），客户端必须传入幂等键 X-Idempotent-Key。服务端保证同一幂等键的重复请求返回相同结果，幂等键有效期 24 小时。
+幂等返回时，data 中增加 "idempotent": true 标识。
+1.7 分页规范
+列表类接口统一使用分页参数：
+
+参数	类型	必填	默认值	说明
+page	Integer	否	1	页码，从1开始
+pageSize	Integer	否	10	每页条数，最小值1，最大值100，超过100时返回400错误
+分页响应格式：
+JSON
+{
+  "code": 0,
+  "message": "success",
+  "data": {
+    "list": [...],
+    "total": 100,
+    "pages": 10,
+    "page": 1,
+    "pageSize": 10
+  },
+  "timestamp": 1700000000000,
+  "requestId": "req-xxx-xxx"
+}
+1.8 商品字段命名规范
+全平台商品相关字段统一命名：
+
+商品名称	productName	String	全局
+商品主图	productImage	String	全局
+SKU规格名称	skuSpec	String	全局
+商品售价	price	BigDecimal	全局
+商品原价	originalPrice	BigDecimal	全局
+销量	soldCount	Integer	全局
+1.9 敏感信息脱敏规范
+
+手机号	138****8000	AES-256加密
+身份证号	不返回	AES-256加密
+银行卡号	不返回	AES-256加密
+骑手/收货人电话	139****1234	AES-256加密
+第二部分 各模块接口细则
+ 二、商家端模块接口
+一、商家入驻与登录
+1.1 商家入驻申请
+提交入驻申请，上传身份证、营业执照、食品许可证等。对应表 merchant_apply
+POST  ：/api/merchant/applications
+请求头：
+参数	必填	说明
+Authorization	是	Bearer Token
+请求体：
+个人入驻：
+{
+    "applyType": 1,
+    "companyName": "个体水果摊",
+    "idCardFront": "https://cdn.example.com/id_front.jpg",
+    "idCardBack": "https://cdn.example.com/id_back.jpg",
+    "foodPermitNumber": "JY1110108XXX04",
+    "foodPermitImage": "https://cdn.example.com/food_permit.jpg",
+    "contactName": "赵六",
+    "contactPhone": "13800001004",
+    "shopAddress": "北京市通州区XX小区",
+    "shopName": "小赵水果"
+}
+企业入驻：
+{
+    "applyType": 2,
+    "companyName": "赵六农产品公司",
+    "idCardFront": "https://cdn.example.com/id_front.jpg",
+    "idCardBack": "https://cdn.example.com/id_back.jpg",
+    "licenseNumber": "91110108MA01XXX04",
+    "licenseImage": "https://cdn.example.com/license.jpg",
+    "foodPermitNumber": "JY1110108XXX04",
+    "foodPermitImage": "https://cdn.example.com/food_permit.jpg",
+    "contactName": "赵六",
+    "contactPhone": "13800001004",
+    "shopAddress": "北京市通州区WW路WW号",
+    "shopName": "赵六农产品直营店"
+}
+响应：
+JSON
+{
+  "code": 200,
+  "message": "入驻申请已提交，请等待审核",
+  "data": {
+    "applyId": 10001,
+    "auditStatus": 0,
+    "auditStatusText": "待审核",
+    "applyTime": "2026-06-27 10:30:00"
+  }
+}
+字段说明：
+字段	类型	必填	说明
+字段	类型	必填	说明
+applyType	Integer	否 (默认 1)	1 = 个人，2 = 企业
+companyName	String	是	企业 / 商家名称
+idCardFront	String	是	身份证正面 URL
+idCardBack	String	是	身份证反面 URL
+licenseNumber	String	企业必填	营业执照注册号
+licenseImage	String	企业必填	营业执照图片 URL
+foodPermitNumber	String	否	食品经营许可证号
+foodPermitImage	String	否	食品许可证图片 URL
+contactName	String	是	联系人姓名
+contactPhone	String	是	联系电话
+shopAddress	String	是	店铺地址
+shopName	String	是	店铺名称
+1.2 查询入驻申请状态
+查看当前用户的入驻申请审核状态。对应表 merchant_apply
+GET :/api/merchant/applications/status
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "applyId": 10001,
+    "companyName": "张三生鲜超市",
+    "auditStatus": 1,
+    "auditStatusText": "审核通过",
+    "auditRemark": "资质齐全，予以通过",
+    "applyTime": "2026-06-27 10:30:00",
+    "auditTime": "2026-06-28 14:00:00",
+    "merchantId": 20001
+  }
+}
+
+auditStatus	说明
+0	待审核
+1	审核通过
+2	审核拒绝
+1.3 商家登录
+POST /api/merchant/auth/login
+商家使用手机号+密码+手机验证码登录。对应表 user, merchant，手机验证码为模拟六位数字
+请求体：
+
+{
+    "phone": "13800001004",
+    "password": "123456",
+    "smsCode": "654321"
+}
+响应：
+（商家）：
+{
+  "code": 200,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "merchantInfo": {
+      "merchantId": 20001,
+      "merchantName": "张三生鲜超市（XX路店）",
+      "logo": "https://cdn.example.com/logo.png",
+      "contactName": "张三",
+      "contactPhone": "13800138000",
+      "status": 1,
+      "statusText": "营业中"
+    },
+    "expireTime": 7200000
+  }
+}
+非商家：
+{
+    "code": 0,
+    "data": {
+        "token": "eyJ...",
+        "expireTime": 86400000,
+        "merchantStatus": 0
+    }
+}1.4 商家退出
+POST /api/merchant/auth/logout
+响应：
+Plain Text
+{
+  "code": 200,
+  "message": "已退出登录"
+}
+1.5 当前商家信息
+GET /api/merchant/info
+获取当前登录商家的完整资料。对应表 merchant
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "merchantId": 20001,
+    "merchantName": "张三生鲜超市（XX路店）",
+    "logo": "https://cdn.example.com/logo.png",
+    "contactName": "张三",
+    "contactPhone": "13800138000",
+    "shopAddress": "北京市朝阳区XX路XX号",
+    "status": 1,
+    "statusText": "营业中",
+    "createTime": "2026-06-28 14:00:00"
+  }
+}
+1.6 修改商家信息
+PUT /api/merchant/info
+修改店铺基本资料。对应表 merchant
+请求体：
+JSON
+{
+  "merchantName": "张三生鲜超市（XX路旗舰店）",
+  "logo": "https://cdn.example.com/new_logo.png",
+  "contactName": "张三",
+  "contactPhone": "13900139000",
+  "shopAddress": "北京市朝阳区XX路XX号"
+}
+1.7 上传商家资质
+POST /api/merchant/qualifications
+上传/更新商家资质图片。对应表 merchant_qualification
+请求体：
+JSON
+{
+  "licenseNumber": "91110108MA01XXXXX",
+  "licenseImage": "https://cdn.example.com/license.jpg",
+  "foodPermitNumber": "JY1110108XXXXX",
+  "foodPermitImage": "https://cdn.example.com/food_permit.jpg"
+}
+1.8 商家资质列表
+GET /api/merchant/qualifications
+查看当前商家的资质信息。对应表 merchant_qualification
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "qualificationId": 1,
+    "licenseNumber": "91110108MA01XXXXX",
+    "licenseImage": "https://cdn.example.com/license.jpg",
+    "foodPermitNumber": "JY1110108XXXXX",
+    "foodPermitImage": "https://cdn.example.com/food_permit.jpg"
+  }
+}
+二、商家商品接口
+2.1 商家商品列表
+GET /api/merchant/products?keyword=苹果&categoryId=11&status=1&auditStatus=1&pageNum=1&pageSize=10
+查询本店商品分页列表。对应表 product, sku
+
+参数	类型	必填	说明
+keyword	String	否	商品名称搜索
+categoryId	Long	否	分类ID
+status	Integer	否	0-下架，1-上架
+auditStatus	Integer	否	0-待审核，1-通过，2-拒绝
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 50,
+    "pageNum": 1,
+    "pageSize": 10,
+    "list": [
+      {
+        "productId": 30001,
+        "title": "新疆阿克苏冰糖心苹果 5斤装",
+        "mainImage": "https://cdn.example.com/product_main.jpg",
+        "minPrice": 39.90,
+        "maxPrice": 69.90,
+        "totalStock": 150,
+        "auditStatus": 1,
+        "auditStatusText": "审核通过",
+        "status": 1,
+        "statusText": "已上架",
+        "createTime": "2026-06-27 10:00:00"
+      }
+    ]
+  }
+}
+2.2 发布商品
+POST /api/merchant/products
+商家发布新商品，需平台审核后上架。对应表 product, sku, product_category_relation
+请求体：
+SQL
+{
+  "brandId": 1,
+  "categoryIds": [111, 1],
+  "title": "新疆阿克苏冰糖心苹果 5斤装",
+  "subTitle": "产地直发，脆甜多汁",
+  "mainImage": "https://cdn.example.com/product_main.jpg",
+  "detailImages": [
+    "https://cdn.example.com/detail_1.jpg",
+    "https://cdn.example.com/detail_2.jpg"
+  ],
+  "detailDesc": "<p>商品详情HTML富文本</p>",
+  "saleType": 3,
+  "skuList": [
+    {
+      "specs": "{\"规格\":\"5斤装\",\"果径\":\"80-85mm\"}",
+      "price": 39.90,
+      "stock": 100,
+      "skuCode": "APPLE-5J-80"
+    },
+    {
+      "specs": "{\"规格\":\"10斤装\",\"果径\":\"85-90mm\"}",
+      "price": 69.90,
+      "stock": 50,
+      "skuCode": "APPLE-10J-85"
+    }
+  ]
+}
+
+saleType	说明
+1	仅配送
+2	仅自提
+3	配送+自提均可
+响应：
+JSON
+{
+  "code": 200,
+  "message": "商品发布成功，等待审核",
+  "data": {
+    "productId": 30001,
+    "auditStatus": 0
+  }
+}
+2.3 编辑商品
+PUT /api/merchant/products/{productId}
+修改商品信息。修改后可能需要重新审核
+请求体： 同发布商品格式
+2.4 商品详情
+GET /api/merchant/products/{productId}
+商家查看本店商品详情。对应表 product, sku, product_category_relation, brand
+响应：
+SQL
+{
+  "code": 200,
+  "data": {
+    "productId": 30001,
+    "title": "新疆阿克苏冰糖心苹果 5斤装",
+    "subTitle": "产地直发，脆甜多汁",
+    "brandId": 1,
+    "brandName": "阿克苏",
+    "categoryIds": [111, 1],
+    "categoryNames": ["苹果", "生鲜果蔬"],
+    "mainImage": "https://cdn.example.com/product_main.jpg",
+    "detailImages": ["...", "..."],
+    "detailDesc": "<p>商品详情HTML</p>",
+    "saleType": 3,
+    "saleTypeText": "配送+自提",
+    "auditStatus": 1,
+    "auditRemark": null,
+    "status": 1,
+    "skuList": [
+      {
+        "skuId": 35001,
+        "specs": "{\"规格\":\"5斤装\",\"果径\":\"80-85mm\"}",
+        "specsText": "规格:5斤装,果径:80-85mm",
+        "price": 39.90,
+        "stock": 100,
+        "skuCode": "APPLE-5J-80"
+      }
+    ],
+    "createTime": "2026-06-27 10:00:00",
+    "updateTime": "2026-06-28 15:00:00"
+  }
+}
+2.5 上架/下架
+PATCH /api/merchant/products/{productId}/status
+修改商品上下架状态。仅审核通过的商品可操作
+请求体：
+Plain Text
+{  "status": 1}
+
+status	说明
+0	下架
+1	上架
+2.6 修改SKU库存
+PATCH /api/merchant/skus/{skuId}/stock
+调整SKU库存数量。对应表 sku
+请求体：
+Plain Text
+{
+  "stock": 200,
+  "remark": "进货补仓"
+}
+响应：
+JSON
+{
+  "code": 200,
+  "message": "库存更新成功",
+  "data": {
+    "skuId": 35001,
+    "productName": "新疆阿克苏冰糖心苹果 5斤装",
+    "oldStock": 100,
+    "newStock": 200
+  }
+}
+2.7 修改SKU价格
+PATCH /api/merchant/skus/{skuId}/price
+调整SKU销售价格。对应表 sku
+请求体：
+Plain Text
+{
+  "price": 45.90
+}
+响应：
+JSON
+{
+  "code": 200,
+  "message": "价格更新成功",
+  "data": {
+    "skuId": 35001,
+    "oldPrice": 39.90,
+    "newPrice": 45.90
+  }
+}
+2.8 查询商品审核状态
+GET /api/merchant/products/{productId}/audit-status
+查看商品的平台审核结果。对应表 product
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "productId": 30001,
+    "title": "新疆阿克苏冰糖心苹果 5斤装",
+    "auditStatus": 1,
+    "auditStatusText": "审核通过",
+    "auditRemark": null,
+    "auditTime": "2026-06-27 15:00:00",
+    "submitTime": "2026-06-27 10:00:00"
+  }
+}
+七、商家门店
+7.1 门店信息
+GET /api/merchant/store
+查看门店完整资料。对应表 merchant
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "merchantId": 20001,
+    "merchantName": "张三生鲜超市（XX路店）",
+    "logo": "https://cdn.example.com/logo.png",
+    "contactName": "张三",
+    "contactPhone": "13800138000",
+    "shopAddress": "北京市朝阳区XX路XX号",
+    "businessHours": "08:00-22:00",
+    "introduction": "本店主营新鲜水果蔬菜",
+    "status": 1,
+    "statusText": "营业中"
+  }
+}
+7.2 修改门店信息
+PUT /api/merchant/store
+修改门店地址、电话、营业时间等。对应表 merchant
+请求体：
+JSON
+{
+  "shopAddress": "北京市朝阳区XX路XX号",
+  "contactPhone": "010-12345678",
+  "businessHours": "08:00-22:00",
+  "introduction": "本店主营新鲜水果蔬菜"
+}
+7.3 自提点列表
+GET /api/merchant/pickup-points
+查询当前商家的所有自提点。对应表 pickup_point
+响应：
+JSON
+{
+  "code": 200,
+  "data": [
+    {
+      "pointId": 1,
+      "name": "XX路自提点",
+      "address": "北京市朝阳区XX路XX号",
+      "contactPhone": "010-12345678",
+      "businessHours": "09:00-21:00",
+      "status": 1,
+      "statusText": "营业中"
+    }
+  ]
+}
+7.4 新增自提点
+POST /api/merchant/pickup-points
+为商家新增自提点。对应表 pickup_point
+请求体：
+JSON
+{
+  "name": "YY路自提点",
+  "address": "北京市朝阳区YY路YY号",
+  "contactPhone": "010-87654321",
+  "businessHours": "08:00-22:00"
+}
+7.5 编辑自提点
+PUT /api/merchant/pickup-points/{pickupPointId}
+修改自提点信息
+请求体：
+JSON
+{
+  "name": "YY路自提点（装修升级）",
+  "address": "北京市朝阳区YY路ZZ号",
+  "contactPhone": "010-99999999",
+  "businessHours": "09:00-21:00"
+}
+7.6 启用/停用自提点
+PATCH /api/merchant/pickup-points/{pickupPointId}/status
+请求体：
+Plain Text
+{
+  "status": 0
+}
+7.7 删除自提点
+DELETE /api/merchant/pickup-points/{pickupPointId}
+删除指定的自提点。对应表 pickup_point
+请求头：
+
+点击图片可查看完整电子表格
+路径参数：
+
+点击图片可查看完整电子表格
+响应（成功）：
+JSON
+{
+  "code": 200,
+  "message": "自提点删除成功",
+  "data": null,
+  "timestamp": 1719475200000
+}
+响应（失败 - 有关联订单）：
+JSON
+{
+  "code": 409,
+  "message": "该自提点存在进行中的订单，无法删除",
+  "data": null,
+  "timestamp": 1719475200000
+}
+业务校验规则：
+
+点击图片可查看完整电子表格
+八、商家数据看板
+九、商家消息中心
+9.1 商家消息列表
+GET /api/merchant/messages?isRead=0&type=1&pageNum=1&pageSize=10
+新订单通知、审核结果、售后通知等。对应表 user_message
+
+参数	类型	必填	说明
+isRead	Integer	否	0-未读，1-已读
+type	Integer	否	1-系统通知，2-订单，3-售后，4-审核
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 20,
+    "unreadCount": 5,
+    "list": [
+      {
+        "messageId": 80001,
+        "title": "新订单通知",
+        "content": "您有一个新的订单SN20260627100001，金额109.80元",
+        "type": 2,
+        "typeText": "订单通知",
+        "isRead": 0,
+        "sendTime": "2026-06-27 10:30:00"
+      }
+    ]
+  }
+}
+9.2 商家消息详情
+GET /api/merchant/messages/{messageId}
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "messageId": 80001,
+    "title": "新订单通知",
+    "content": "您有一个新的订单SN20260627100001，金额109.80元，请及时处理。",
+    "type": 2,
+    "typeText": "订单通知",
+    "isRead": 0,
+    "sendTime": "2026-06-27 10:30:00",
+    "readTime": null,
+    "relatedOrderId": 40001
+  }
+}
+9.3 商家消息已读
+PATCH /api/merchant/messages/{messageId}/read
+标记单条消息为已读。对应表 user_message
+
+9.4 商家消息全部已读
+PATCH /api/merchant/messages/read-all
+一键标记所有未读消息为已读
+响应：
+Plain Text
+{
+  "code": 200,
+  "message": "已全部标记为已读，共5条"
+}
+
+
+
+
+
+三、运营管理后台模块接口
+一、运营账号与登录
+1.1 运营管理员登录
+POST /api/admin/operation/auth/login
+运营人员登录。对应表 operation_admin
+请求体：
+Plain Text
+{
+  "username": "operator01",
+  "password": "********"
+}
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "adminInfo": {
+      "adminId": 1,
+      "username": "operator01",
+      "realName": "运营张三",
+      "phone": "13800138000",
+      "email": "zhangsan@example.com",
+      "role": "商品运营",
+      "status": 1,
+      "lastLoginTime": "2026-06-28 09:00:00"
+    },
+    "expireTime": 7200000
+  }
+}
+1.2 运营管理员退出
+POST /api/admin/operation/auth/logout
+
+1.3 当前运营管理员信息
+GET /api/admin/operation/info
+二、商家管理
+2.1 商家入驻审核列表
+GET /api/admin/operation/merchant/applications?auditStatus=0&keyword=张三&pageNum=1&pageSize=10
+查询待审核的商家入驻申请。对应表 merchant_apply
+参数	类型	必填	说明
+auditStatus	Integer	否	0-待审核，1-通过，2-拒绝
+keyword	String	否	商家名称/联系人搜索
+startDate	String	否	申请开始日期
+endDate	String	否	申请结束日期
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 20,
+    "list": [
+      {
+        "applyId": 10001,
+        "companyName": "张三生鲜超市",
+        "shopName": "张三生鲜超市（XX路店）",
+        "contactName": "张三",
+        "contactPhone": "13800138000",
+        "licenseNumber": "91110108MA01XXXXX",
+        "licenseImage": "https://cdn.example.com/license.jpg",
+        "foodPermitNumber": "JY1110108XXXXX",
+        "foodPermitImage": "https://cdn.example.com/food_permit.jpg",
+        "idCardFront": "https://cdn.example.com/id_front.jpg",
+        "idCardBack": "https://cdn.example.com/id_back.jpg",
+        "auditStatus": 0,
+        "auditStatusText": "待审核",
+        "applyTime": "2026-06-27 10:30:00"
+      }
+    ]
+  }
+}
+2.2 商家入驻审核
+POST /api/admin/operation/merchant/applications/{applyId}/audit
+审核商家入驻申请。对应表 merchant_apply，通过后创建 merchant 记录
+请求体：
+Plain Text
+{
+  "auditStatus": 1,
+  "auditRemark": "资质齐全，予以通过"
+}
+
+auditStatus	说明
+1	审核通过
+2	审核拒绝
+响应：
+JSON
+{
+  "code": 200,
+  "message": "审核完成",
+  "data": {
+    "applyId": 10001,
+    "auditStatus": 1,
+    "auditStatusText": "审核通过",
+    "merchantId": 20001
+  }
+}
+2.3 商家列表
+GET /api/admin/operation/merchants?keyword=生鲜&status=1&pageNum=1&pageSize=10
+查看所有商家。对应表 merchant
+
+参数	类型	必填	说明
+keyword	String	否	商家名称搜索
+status	Integer	否	1-营业，2-休息，3-下线
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 200,
+    "list": [
+      {
+        "merchantId": 20001,
+        "merchantName": "张三生鲜超市（XX路店）",
+        "logo": "https://cdn.example.com/logo.png",
+        "contactName": "张三",
+        "contactPhone": "13800138000",
+        "shopAddress": "北京市朝阳区XX路XX号",
+        "status": 1,
+        "statusText": "营业中",
+        "productCount": 50,
+        "totalOrders": 680,
+        "totalAmount": 72500.00,
+        "createTime": "2026-06-28 14:00:00"
+      }
+    ]
+  }
+}
+2.4 商家详情
+GET /api/admin/operation/merchants/{merchantId}
+查看商家详细信息。对应表 merchant, merchant_qualification
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "merchantId": 20001,
+    "merchantName": "张三生鲜超市（XX路店）",
+    "logo": "https://cdn.example.com/logo.png",
+    "contactName": "张三",
+    "contactPhone": "13800138000",
+    "shopAddress": "北京市朝阳区XX路XX号",
+    "status": 1,
+    "statusText": "营业中",
+    "qualification": {
+      "licenseNumber": "91110108MA01XXXXX",
+      "licenseImage": "https://cdn.example.com/license.jpg",
+      "foodPermitNumber": "JY1110108XXXXX",
+      "foodPermitImage": "https://cdn.example.com/food_permit.jpg"
+    },
+    "stats": {
+      "productCount": 50,
+      "totalOrders": 680,
+      "totalAmount": 72500.00,
+      "afterSaleCount": 12
+    },
+    "createTime": "2026-06-28 14:00:00"
+  }
+}
+2.5 商家状态管理
+PATCH /api/admin/operation/merchants/{merchantId}/status
+强制修改商家营业状态
+请求体：
+Plain Text
+{
+  "status": 3,
+  "reason": "多次违规，强制下线"
+}
+
+status	说明
+1	正常营业
+2	休息中
+3	强制下线
+
+三、商品管理
+3.1 分类管理
+3.1.1 分类列表
+GET /api/admin/operation/categories
+查询商品分类树。对应表 category
+响应：
+JSON
+{
+  "code": 200,
+  "data": [
+    {
+      "categoryId": 1,
+      "name": "生鲜果蔬",
+      "level": 1,
+      "sortOrder": 1,
+      "children": [
+        {
+          "categoryId": 11,
+          "name": "新鲜水果",
+          "level": 2,
+          "sortOrder": 1,
+          "children": [
+            { "categoryId": 111, "name": "苹果", "level": 3, "sortOrder": 1, "children": [] }
+          ]
+        }
+      ]
+    }
+  ]
+}
+3.1.2 新增分类
+POST /api/admin/operation/categories
+请求体：
+Plain Text
+{
+  "parentId": 0,
+  "name": "生鲜果蔬",
+  "sortOrder": 1
+}
+3.1.3 编辑分类
+PUT /api/admin/operation/categories/{categoryId}
+请求体：
+Plain Text
+{
+  "name": "时令生鲜",
+  "sortOrder": 2
+}
+3.1.4 删除分类
+DELETE /api/admin/operation/categories/{categoryId}
+校验：有关联商品的分类不可删除
+
+3.2 品牌管理
+3.2.1 品牌列表
+GET /api/admin/operation/brands?keyword=阿克苏&pageNum=1&pageSize=10
+对应表 brand
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 50,
+    "list": [
+      {
+        "brandId": 1,
+        "name": "阿克苏",
+        "logo": "https://cdn.example.com/brand.png",
+        "description": "新疆阿克苏苹果品牌",
+        "productCount": 15,
+        "createTime": "2026-01-01 10:00:00"
+      }
+    ]
+  }
+}
+3.2.2 新增品牌
+POST /api/admin/operation/brands
+请求体：
+JSON
+{
+  "name": "阿克苏",
+  "logo": "https://cdn.example.com/brand.png",
+  "description": "新疆阿克苏苹果品牌"
+}
+3.2.3 编辑品牌
+PUT /api/admin/operation/brands/{brandId}
+
+3.2.4 删除品牌
+DELETE /api/admin/operation/brands/{brandId}
+校验：有关联商品的品牌不可删除
+
+3.3 商品审核
+3.3.1 商品审核列表
+GET /api/admin/operation/products/audits?auditStatus=0&keyword=苹果&pageNum=1&pageSize=10
+查看待审核商品。对应表 product
+
+参数	类型	必填	说明
+auditStatus	Integer	否	0-待审核，1-通过，2-拒绝
+keyword	String	否	商品名称搜索
+merchantId	Long	否	商家筛选
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 10,
+    "list": [
+      {
+        "productId": 30001,
+        "title": "新疆阿克苏冰糖心苹果 5斤装",
+        "mainImage": "https://cdn.example.com/product.jpg",
+        "merchantName": "张三生鲜超市",
+        "minPrice": 39.90,
+        "auditStatus": 0,
+        "auditStatusText": "待审核",
+        "submitTime": "2026-06-27 10:00:00"
+      }
+    ]
+  }
+}
+3.3.2 商品审核
+POST /api/admin/operation/products/{productId}/audit
+审核通过或拒绝。对应表 product
+请求体：
+Plain Text
+{
+  "auditStatus": 1,
+  "auditRemark": "商品信息合规，予以通过"
+}
+
+auditStatus	说明
+1	审核通过
+2	审核拒绝
+
+3.3.3 强制下架商品
+PATCH /api/admin/operation/products/{productId}/off-shelf
+请求体：
+Plain Text
+{
+  "reason": "商品违规"
+}
+3.4 全平台商品列表
+GET /api/admin/operation/products?keyword=苹果&merchantId=20001&categoryId=11&status=1&pageNum=1&pageSize=10
+查看所有商家商品
+
+四、系统后台模块接口
+一、系统管理员认证
+1.1 系统管理员登录
+POST /api/admin/system/auth/login
+对应表 system_admin
+请求体：
+Plain Text
+{
+  "username": "superadmin",
+  "password": "********"
+}
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiJ9...",
+    "adminInfo": {
+      "adminId": 1,
+      "username": "superadmin",
+      "realName": "系统管理员",
+      "role": "SUPER_ADMIN",
+      "status": 1,
+      "lastLoginTime": "2026-06-28 08:00:00"
+    },
+    "expireTime": 7200000
+  }
+}
+1.2 系统管理员退出
+POST /api/admin/system/auth/logout
+
+1.3 当前管理员信息
+GET /api/admin/system/info
+
+二、系统账号管理
+2.1 管理员列表
+GET /api/admin/system/accounts?role=OPERATOR&status=1&pageNum=1&pageSize=10
+管理所有运营管理员和系统管理员账号。对应表 operation_admin、system_admin
+
+参数	类型	必填	说明
+role	String	否	SUPER_ADMIN-系统管理员，OPERATOR-运营管理员
+status	Integer	否	0-禁用，1-正常
+keyword	String	否	用户名/姓名搜索
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 15,
+    "list": [
+      {
+        "adminId": 1,
+        "username": "operator01",
+        "realName": "运营张三",
+        "phone": "13800138000",
+        "email": "zhangsan@example.com",
+        "role": "OPERATOR",
+        "roleText": "运营管理员",
+        "status": 1,
+        "statusText": "正常",
+        "lastLoginTime": "2026-06-28 09:00:00",
+        "createTime": "2026-01-01 00:00:00"
+      }
+    ]
+  }
+}
+2.2 新增管理员
+POST /api/admin/system/accounts
+创建运营管理员账号。对应表 operation_admin
+请求体：
+JSON
+{
+  "username": "operator02",
+  "password": "********",
+  "realName": "运营李四",
+  "phone": "13900139000",
+  "email": "lisi@example.com",
+  "role": "商品运营"
+}
+2.3 编辑管理员
+PUT /api/admin/system/accounts/{adminId}
+请求体：
+JSON
+{
+  "realName": "运营李四（已调岗）",
+  "phone": "13900139001",
+  "email": "lisi_new@example.com",
+  "role": "订单运营"
+}
+2.4 启用/禁用管理员
+PATCH /api/admin/system/accounts/{adminId}/status
+请求体：
+Plain Text
+{
+  "status": 0
+}
+2.5 重置管理员密码
+PATCH /api/admin/system/accounts/{adminId}/password
+请求体：
+Plain Text
+{
+  "newPassword": "newPassword123"
+}
+三、系统参数配置
+3.1 系统参数列表
+GET /api/admin/system/configs?configKey=order&pageNum=1&pageSize=10
+对应表 system_config
+
+参数	类型	必填	说明
+configKey	String	否	参数键搜索
+status	Integer	否	0-禁用，1-启用
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 30,
+    "list": [
+      {
+        "configId": 1,
+        "configKey": "order.auto.cancel.timeout",
+        "configName": "订单自动取消超时时间",
+        "configValue": "30",
+        "valueType": "INTEGER",
+        "description": "未支付订单超时自动取消，单位：分钟",
+        "isSystem": 1,
+        "status": 1,
+        "updateTime": "2026-06-01 10:00:00"
+      }
+    ]
+  }
+}
+3.2 新增系统参数
+POST /api/admin/system/configs
+请求体：
+JSON
+{
+  "configKey": "order.auto.complete.timeout",
+  "configName": "订单自动完成超时时间",
+  "configValue": "7",
+  "valueType": "INTEGER",
+  "description": "发货后自动确认收货天数",
+  "isSystem": 0
+}
+3.3 编辑系统参数
+PUT /api/admin/system/configs/{configId}
+请求体：
+Plain Text
+{
+  "configValue": "15",
+  "description": "未支付订单超时自动取消，单位：分钟"
+}
+3.4 删除系统参数
+DELETE /api/admin/system/configs/{configId}
+校验：系统内置参数（isSystem=1）不可删除
+
+四、操作日志
+4.1 操作日志列表
+GET /api/admin/system/operation-logs?adminId=1&actionType=audit&startDate=2026-06-01&endDate=2026-06-27&pageNum=1&pageSize=10
+对应表 user_behavior_log（系统操作记录）或独立的操作日志表
+
+参数	类型	必填	说明
+adminId	Long	否	操作人筛选
+actionType	String	否	操作类型：audit-审核，config-配置，user-用户管理
+module	String	否	操作模块
+startDate	String	否	开始日期
+endDate	String	否	结束日期
+pageNum	Integer	是	页码
+pageSize	Integer	是	每页条数
+响应：
+JSON
+{
+  "code": 200,
+  "data": {
+    "total": 500,
+    "list": [
+      {
+        "logId": 1,
+        "adminId": 1,
+        "adminUsername": "operator01",
+        "adminRealName": "运营张三",
+        "actionType": "audit",
+        "actionTypeText": "审核操作",
+        "module": "商品审核",
+        "detail": "审核通过商品：新疆阿克苏冰糖心苹果 [30001]",
+        "targetId": 30001,
+        "ipAddress": "192.168.1.100",
+        "operateTime": "2026-06-27 15:00:00"
+      }
+    ]
+  }
+}
+4.2 操作日志详情
+GET /api/admin/system/operation-logs/{logId}
+响应：
+SQL
+{
+  "code": 200,
+  "data": {
+    "logId": 1,
+    "adminId": 1,
+    "adminUsername": "operator01",
+    "adminRealName": "运营张三",
+    "actionType": "audit",
+    "module": "商品审核",
+    "detail": "审核通过商品：新疆阿克苏冰糖心苹果 [30001]",
+    "beforeData": "{\"auditStatus\":0}",
+    "afterData": "{\"auditStatus\":1}",
+    "targetId": 30001,
+    "ipAddress": "192.168.1.100",
+    "userAgent": "Mozilla/5.0...",
+    "operateTime": "2026-06-27 15:00:00"
+  }
+}
+
