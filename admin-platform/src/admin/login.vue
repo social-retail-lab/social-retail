@@ -1,30 +1,21 @@
 <template>
-  <div class="login-container">
-    <div class="login-box">
+  <div class="login-wrap">
+    <div class="login-card">
       <h2>社交新零售管理后台</h2>
-      <!-- 管理员身份下拉 -->
       <div class="form-item">
-        <label>管理员类型</label>
-        <select v-model="loginForm.adminType" class="select-input">
+        <label>管理员身份</label>
+        <select v-model="adminType" class="select-input">
           <option value="SYSTEM">系统管理员</option>
           <option value="OPERATION">运营管理员</option>
         </select>
       </div>
-      <!-- 账号 -->
       <div class="form-item">
-        <input
-          v-model="loginForm.username"
-          placeholder="请输入账号"
-          type="text"
-        />
+        <label>账号</label>
+        <input v-model="username" placeholder="请输入管理员账号" />
       </div>
-      <!-- 密码 -->
       <div class="form-item">
-        <input
-          v-model="loginForm.password"
-          placeholder="请输入密码"
-          type="password"
-        />
+        <label>密码</label>
+        <input v-model="password" type="password" placeholder="请输入登录密码" />
       </div>
       <button class="login-btn" @click="handleLogin">登录</button>
     </div>
@@ -34,60 +25,51 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-// 导入两个身份的登录接口
 import { systemAdminLogin, operationAdminLogin } from '@/api/admin'
 
 const router = useRouter()
+const adminType = ref('SYSTEM')
+const username = ref('')
+const password = ref('')
 
-// 表单数据
-const loginForm = ref({
-  adminType: 'SYSTEM',
-  username: '',
-  password: ''
-})
-
-// 登录逻辑
 const handleLogin = async () => {
-  const { adminType, username, password } = loginForm.value
-  if (!username || !password) {
+  if (!username.value || !password.value) {
     alert('账号密码不能为空')
     return
   }
   let res
-  // 根据身份调用对应接口
-  if (adminType === 'SYSTEM') {
-    res = await systemAdminLogin({ username, password })
+  if (adminType.value === 'SYSTEM') {
+    res = await systemAdminLogin({ username: username.value, password: password.value })
   } else {
-    res = await operationAdminLogin({ username, password })
+    res = await operationAdminLogin({ username: username.value, password: password.value })
   }
-
-  // 判断登录成功（统一code=0为成功）
-  if (res.code === 0) {
-    // 本地存储token + 管理员身份，全局权限判断用
-    localStorage.setItem('adminToken', res.data.token)
-    localStorage.setItem('adminType', adminType)
-    localStorage.setItem('adminInfo', JSON.stringify(res.data.adminInfo))
-    // 跳首页
-    router.push('/dashboard')
-  } else {
-    alert(res.message || '登录失败')
-  }
+  localStorage.setItem('adminToken', res.data.token)
+  localStorage.setItem('adminType', adminType.value)
+  router.push('/dashboard')
 }
 </script>
 
 <style scoped>
-.login-container {
+.login-wrap {
   width: 100vw;
   height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: background: #f5f5f5;
+  justify-content: center;
+  background: #F2F3F5;
 }
-.login-box {
-  width: 400px;
-  padding: 40px;
-  background: #fff;
+.login-card {
+  width: 380px;
+  padding: 36px;
+  background: #FFFFFF;
   border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+h2 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #1D2129;
+  font-size: 22px;
 }
 .form-item {
   margin-bottom: 16px;
@@ -95,21 +77,33 @@ const handleLogin = async () => {
 .form-item label {
   display: block;
   margin-bottom: 6px;
+  font-size: 14px;
+  color: #4E5969;
 }
 .form-item input, .select-input {
   width: 100%;
-  padding: 10px;
   box-sizing: border-box;
-  border: 1px #ddd solid;
+  padding: 10px 12px;
+  border: 1px solid #dcdcdc;
   border-radius: 4px;
+  font-size: 14px;
+}
+.form-item input:focus, .select-input:focus {
+  outline: none;
+  border-color: #165DFF;
 }
 .login-btn {
   width: 100%;
-  padding: 12px;
-  background: #409eff;
+  padding: 11px;
+  background: #165DFF;
   color: #fff;
   border: none;
   border-radius: 4px;
+  margin-top: 8px;
   cursor: pointer;
+  font-size: 15px;
+}
+.login-btn:hover {
+  opacity: 0.92;
 }
 </style>

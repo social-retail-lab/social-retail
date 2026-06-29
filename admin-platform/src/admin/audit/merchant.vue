@@ -1,190 +1,178 @@
 <template>
-<div class="audit-page">
-  <h2>商家入驻审核</h2>
-  <!-- 搜索栏 -->
-  <div class="search-bar">
-    <input v-model="keyword" placeholder="搜索店铺名称/联系人" />
-    <select v-model="auditStatus">
-      <option value="">全部状态</option>
-      <option value="0">待审核</option>
-      <option value="1">审核通过</option>
-      <option value="2">审核驳回</option>
-    </select>
-    <button @click="getMerchantList">查询</button>
-  </div>
-
-  <!-- 表格 -->
-  <table border="1" width="100%" style="margin:16px 0;">
-    <thead>
-      <tr>
-        <th>申请ID</th>
-        <th>公司名称</th>
-        <th>店铺名</th>
-        <th>联系人</th>
-        <th>联系电话</th>
-        <th>审核状态</th>
-        <th>操作</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="item in list" :key="item.applyId">
-        <td>{{ item.applyId }}</td>
-        <td>{{ item.companyName }}</td>
-        <td>{{ item.shopName }}</td>
-        <td>{{ item.contactName }}</td>
-        <td>{{ item.contactPhone }}</td>
-        <td>{{ statusMap[item.auditStatus] }}</td>
-        <td v-if="item.auditStatus === 0">
-          <button @click="openDetail(item)">查看资质</button>
-          <button @click="handleAudit(item.applyId, 1)">通过</button>
-          <button @click="openReject(item.applyId)">驳回</button>
-        </td>
-        <td v-else>已处理</td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- 分页 -->
-  <div class="page">
-    <button :disabled="page === 1" @click="page--;getMerchantList">上一页</button>
-    <span>第{{page}} / {{pages}} 页</span>
-    <button :disabled="page >= pages" @click="page++;getMerchantList">下一页</button>
-  </div>
-
-  <!-- 资质弹窗 -->
-  <div v-if="showDetail" class="mask" @click.self="showDetail=false">
-    <div class="dialog">
-      <h3>商家资质详情</h3>
-      <p>营业执照号：{{ detail.licenseNumber }}</p>
-      <img :src="detail.licenseImage" width="300" />
-      <p>食品经营许可证：{{ detail.foodPermitNumber }}</p>
-      <img :src="detail.foodPermitImage" width="300" />
-      <button @click="showDetail=false">关闭</button>
+  <div class="register-box">
+    <h2>商家入驻审核列表</h2>
+    <div class="search-bar">
+      <input placeholder="店铺名称/联系人" v-model="keyword" />
+      <select v-model="auditStatus">
+        <option value="">全部状态</option>
+        <option value="0">待审核</option>
+        <option value="1">审核通过</option>
+        <option value="2">审核驳回</option>
+      </select>
+      <button @click="getList">查询</button>
     </div>
-  </div>
+    <table border="1">
+      <thead>
+        <tr>
+          <th>申请ID</th>
+          <th>店铺名</th>
+          <th>商家类型</th>
+          <th>联系人</th>
+          <th>手机号</th>
+          <th>审核状态</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="item in tableList" :key="item.applyId">
+          <td>{{ item.applyId }}</td>
+          <td>{{ item.shopName }}</td>
+          <td>{{ item.merchantType === 'PERSON' ? '个人商家' : '企业商家' }}</td>
+          <td>{{ item.contactName }}</td>
+          <td>{{ item.contactPhone }}</td>
+          <td>{{ auditMap[item.auditStatus] }}</td>
+          <td>
+            <button @click="openDialog(item)">审核</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="page">
+      <button :disabled="page === 1" @click="page--">上一页</button>
+      <span>第{{page}}页</span>
+      <button @click="page++">下一页</button>
+    </div>
 
-  <!-- 驳回弹窗 -->
-  <div v-if="showReject" class="mask" @click.self="showReject=false">
-    <div class="dialog">
-      <h3>填写驳回理由</h3>
-      <textarea v-model="rejectReason" rows="4" style="width:100%"></textarea>
-      <div style="margin-top:10px;">
-        <button @click="submitReject">确认驳回</button>
-        <button @click="showReject=false">取消</button>
+    <!-- 审核弹窗 -->
+    <div v-if="showMask" class="mask" @click.self="showMask = false">
+      <div class="dialog">
+        <h3>商家资质审核</h3>
+        <div class="form-item">
+          <label>审核结果</label>
+          <select v-model="curAuditStatus">
+            <option value="1">审核通过</option>
+            <option value="2">驳回申请</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label>审核备注</label>
+          <input v-model="remark" placeholder="填写审核意见" />
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:20px">
+          <button @click="showMask = false">取消</button>
+          <button style="background:#165DFF;color:#fff" @click="submitAudit">确认提交</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { getMerchantAuditList, getMerchantDetail, auditMerchant } from '@/api/admin'
-
-// 筛选条件
+import { ref } from 'vue'
+import { getMerchantAuditList, auditMerchant } from '@/api/admin'
 const keyword = ref('')
 const auditStatus = ref('')
 const page = ref(1)
-const pageSize = ref(10)
-const list = ref<any[]>([])
-const total = ref(0)
-const pages = ref(0)
-const statusMap: Record<number, string> = {
-  0: '待审核',
-  1: '审核通过',
-  2: '审核驳回'
+const tableList = ref([
+  {applyId:1001,shopName:"鲜果小店",merchantType:"PERSON",contactName:"张三",contactPhone:"13800138000",auditStatus:0}
+])
+const auditMap:Record<string,string> = {'0':'待审核','1':'通过','2':'驳回'}
+const showMask = ref(false)
+const curApplyId = ref(0)
+const curAuditStatus = ref(1)
+const remark = ref('')
+
+const getList = async ()=>{
+  const res = await getMerchantAuditList({keyword,auditStatus,page})
+  tableList.value = res.data
 }
-
-// 弹窗控制
-const showDetail = ref(false)
-const showReject = ref(false)
-const detail = ref({})
-const currentApplyId = ref(0)
-const rejectReason = ref('')
-
-// 获取列表
-const getMerchantList = async () => {
-  const res = await getMerchantAuditList({
-    keyword: keyword.value,
-    auditStatus: auditStatus.value,
-    pageNum: page.value,
-    pageSize: pageSize.value
-  })
-  if (res.code === 0) {
-    list.value = res.data.list
-    total.value = res.data.total
-    pages.value = Math.ceil(total.value / pageSize.value)
-  }
+const openDialog = (row:any)=>{
+  curApplyId.value = row.applyId
+  showMask.value = true
 }
-
-// 查看资质详情
-const openDetail = async (row: any) => {
-  const res = await getMerchantDetail(row.applyId)
-  if (res.code === 0) {
-    detail.value = res.data
-    showDetail.value = true
-  }
+const submitAudit = async ()=>{
+  await auditMerchant({applyId:curApplyId.value,auditStatus:curAudit.value,auditRemark:remark.value})
+  alert('审核完成')
+  showMask.value = false
+  getList()
 }
-
-// 通过审核
-const handleAudit = async (applyId: number, auditStatus: number) => {
-  await auditMerchant({ applyId, auditStatus, auditRemark: '资质齐全，准予入驻' })
-  alert('审核通过')
-  getMerchantList()
-}
-
-// 打开驳回弹窗
-const openReject = (id: number) => {
-  currentApplyId.value = id
-  rejectReason.value = ''
-  showReject.value = true
-}
-
-// 提交驳回
-const submitReject = async () => {
-  if (!rejectReason.value) {
-    alert('请填写驳回理由')
-    return
-  }
-  await auditMerchant({
-    applyId: currentApplyId.value,
-    auditStatus: 2,
-    auditRemark: rejectReason.value
-  })
-  alert('已驳回')
-  showReject.value = false
-  getMerchantList()
-}
-
-// 页面加载自动查询
-getMerchantList()
+getList()
 </script>
 
 <style scoped>
+.register-box {
+  width: 900px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #1D2129;
+}
 .search-bar {
   display: flex;
   gap: 10px;
   margin-bottom: 12px;
 }
 input, select, button {
-  padding: 6px 10px;
+  padding: 7px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+button {
+  background: #165DFF;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+table th, table td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #eee;
+  color: #4E5969;
+}
+.page {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  color: #4E5969;
 }
 .mask {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .dialog {
   background: #fff;
-  padding: 20px;
-  width: 500px;
+  padding: 24px;
+  border-radius: 8px;
+  min-width: 500px;
 }
-.page {
-  display: flex;
-  gap:10px;
-  align-items: center;
+.form-item {
+  margin-bottom: 16px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  color: #4E5969;
+}
+input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 </style>

@@ -1,11 +1,8 @@
 <template>
-  <!-- 路由出口，所有页面都会渲染在这里 -->
   <router-view />
 </template>
 
-<script setup>
-// 空脚本，不需要额外逻辑
-</script>
+<script setup></script>
 
 <style>
 * {
@@ -14,9 +11,9 @@
   box-sizing: border-box;
 }
 body {
-  background: #F7F7F9;
+  background: #F2F3F5;
   font-family: system-ui, -apple-system, sans-serif;
-  color: #2D2D2D;
+  color: #1D2129;
 }
 input, button, select, textarea {
   font-family: inherit;
