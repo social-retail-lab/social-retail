@@ -1,51 +1,40 @@
 package com.socialretail.backend.vo;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
 public class UserInfoVO {
 
     private Long userId;
-    private String nickName;
     private String phone;
-    private String memberLevel;
+    private String nickname;
+    private String avatar;
+    private String status;
+    private Object memberInfo;
+    private Object distributorInfo;
 
-    public UserInfoVO() {
-    }
-
-    public UserInfoVO(Long userId, String nickName, String phone, String memberLevel) {
+    public UserInfoVO(Long userId,
+                      String phone,
+                      String nickname,
+                      String avatar,
+                      String status,
+                      Object memberInfo,
+                      Object distributorInfo) {
         this.userId = userId;
-        this.nickName = nickName;
         this.phone = phone;
-        this.memberLevel = memberLevel;
+        this.nickname = nickname;
+        this.avatar = avatar;
+        this.status = status;
+        this.memberInfo = memberInfo;
+        this.distributorInfo = distributorInfo;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getNickName() {
-        return nickName;
-    }
-
-    public void setNickName(String nickName) {
-        this.nickName = nickName;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getMemberLevel() {
-        return memberLevel;
-    }
-
-    public void setMemberLevel(String memberLevel) {
-        this.memberLevel = memberLevel;
+    /**
+     * 保留测试控制器的旧构造方式。
+     */
+    public UserInfoVO(Long userId, String nickname, String phone, String ignoredMemberLevel) {
+        this(userId, phone, nickname, null, "NORMAL", null, null);
     }
 }
