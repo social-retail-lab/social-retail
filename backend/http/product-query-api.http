@@ -1,0 +1,10 @@
+@baseUrl = http://localhost:8081
+
+### 商品列表（分页、分类、排序）
+GET {{baseUrl}}/api/products?categoryId=1&page=1&size=10&sort=price_asc
+
+### 商品详情
+GET {{baseUrl}}/api/products/1001
+
+### 商品搜索
+GET {{baseUrl}}/api/products/search?keyword=苹果&categoryId=1&page=1&size=10
