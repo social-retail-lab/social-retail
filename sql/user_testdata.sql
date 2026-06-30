@@ -1,0 +1,36 @@
+INSERT INTO user (
+    id,
+    phone,
+    password,
+    nickname,
+    avatar,
+    status,
+    create_time
+) VALUES
+(
+    10001,
+    '13800138000',
+    '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Jf9e1l9eQ8bK5v1z5b6zQ1yqQG2',
+    '张三',
+    'https://example.com/avatar1.jpg',
+    1,
+    NOW()
+),
+(
+    10002,
+    '13900139000',
+    '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Jf9e1l9eQ8bK5v1z5b6zQ1yqQG2',
+    '李四',
+    'https://example.com/avatar2.jpg',
+    1,
+    NOW()
+),
+(
+    10003,
+    '13700137000',
+    '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Jf9e1l9eQ8bK5v1z5b6zQ1yqQG2',
+    '测试用户',
+    'https://example.com/avatar3.jpg',
+    0,
+    NOW()
+);
