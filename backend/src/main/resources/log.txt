@@ -1,0 +1,140 @@
+2026-06-30 09:02:18.027 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-06-30 09:02:18.608 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=9001
+2026-06-30 09:03:34.158 [http-nio-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=0, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-06-30 09:03:34.277 [http-nio-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=2, pageSize=2
+2026-06-30 09:04:45.918 [http-nio-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [入驻审核] applyId=4002, 请求体: auditStatus=1, auditRemark=资质齐全，经营地址真实，予以通过
+2026-06-30 09:04:46.015 [http-nio-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [入驻审核] 成功, applyId=4002, result=1
+2026-06-30 09:05:30.396 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商家详情] merchantId=2004
+2026-06-30 09:05:30.457 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商家详情] 成功, merchantId=2004, merchantName=绿色田园（大兴店）
+2026-06-30 09:05:51.927 [http-nio-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=0, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-06-30 09:05:52.031 [http-nio-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=4, pageSize=4
+2026-06-30 09:06:49.173 [http-nio-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核] productId=6006, 请求体: auditStatus=1, auditRemark=商品信息完整，图片清晰，价格合理，予以通过
+2026-06-30 09:06:49.185 [http-nio-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核] 成功, productId=6006, result=1
+2026-06-30 09:07:55.615 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核] productId=6007, 请求体: auditStatus=2, auditRemark=商品主图与实物不符，且SKU价格设置有误
+2026-06-30 09:07:55.652 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核] 成功, productId=6007, result=2
+2026-06-30 09:09:32.489 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001001, smsCode=654321
+2026-06-30 09:09:32.528 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=13800001001, merchantStatus=1
+2026-06-30 09:10:15.810 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001009, smsCode=654321
+2026-06-30 09:10:15.832 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=13800001009, merchantStatus=0
+2026-06-30 09:57:13.313 [http-nio-8080-exec-8] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-06-30 09:57:14.232 [http-nio-8080-exec-8] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=9001
+2026-06-30 10:33:56.530 [http-nio-8080-exec-4] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-06-30 10:33:56.610 [http-nio-8080-exec-4] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=9001
+2026-06-30 10:33:56.687 [http-nio-8080-exec-6] INFO  c.s.b.c.admin.AdminAuthController - [获取管理员信息] adminId=9001
+2026-06-30 10:33:56.693 [http-nio-8080-exec-6] INFO  c.s.b.c.admin.AdminAuthController - [获取管理员信息] 成功, adminId=9001, username=operator01
+2026-06-30 10:33:59.228 [http-nio-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-06-30 10:33:59.327 [http-nio-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=2, pageSize=2
+2026-06-30 10:34:18.110 [http-nio-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [入驻审核] applyId=4002, 请求体: auditStatus=1, auditRemark=333
+2026-06-30 10:34:18.137 [http-nio-8080-exec-8] WARN  c.s.b.c.admin.AuditController - [入驻审核] 失败, applyId=4002, 原因: 该申请已审核过
+2026-06-30 10:34:35.205 [http-nio-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-06-30 10:34:35.309 [http-nio-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=7, pageSize=7
+2026-06-30 10:34:46.230 [http-nio-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核] productId=6004, 请求体: auditStatus=2, auditRemark=不通过
+2026-06-30 10:34:46.252 [http-nio-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核] 成功, productId=6004, result=2
+2026-06-30 10:34:52.787 [http-nio-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-06-30 10:34:52.881 [http-nio-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=7, pageSize=7
+2026-06-30 10:34:57.504 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-06-30 10:34:57.515 [http-nio-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=2, pageSize=2
+2026-06-30 10:36:41.700 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001001, smsCode=123456
+2026-06-30 10:36:41.719 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=13800001001, merchantStatus=1
+2026-06-30 10:36:41.931 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:36:41.953 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:37:43.412 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [发布商品] merchantId=null, 请求体: title=测试, saleType=1, skuCount=1, brandId=122
+2026-06-30 10:37:43.417 [http-nio-8080-exec-4] WARN  c.s.b.c.m.MerchantGoodsController - [发布商品] 失败, merchantId=null, 原因: 商家信息不存在
+2026-06-30 10:37:49.897 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [发布商品] merchantId=null, 请求体: title=测试, saleType=1, skuCount=1, brandId=122
+2026-06-30 10:37:49.903 [http-nio-8080-exec-6] WARN  c.s.b.c.m.MerchantGoodsController - [发布商品] 失败, merchantId=null, 原因: 商家信息不存在
+2026-06-30 10:39:07.782 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:39:07.829 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:39:08.629 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:39:08.639 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:39:13.854 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:39:13.863 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:42:45.037 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=0, pageNum=1, pageSize=10
+2026-06-30 10:42:45.050 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:42:47.498 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=1, auditStatus=0, pageNum=1, pageSize=10
+2026-06-30 10:42:47.509 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:43:15.592 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=新疆阿克苏冰糖心苹果 5斤装【特级果】, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:43:15.612 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:43:16.158 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=新疆阿克苏冰糖心苹果 5斤装【特级果】, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:43:16.163 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:48:27.949 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:48:28.747 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:48:37.912 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=null, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:48:37.923 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=null, total=0, pageSize=0
+2026-06-30 10:49:15.343 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001001, smsCode=111111
+2026-06-30 10:49:15.391 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=13800001001, merchantStatus=1
+2026-06-30 10:49:15.445 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:49:15.497 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-06-30 10:49:22.018 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品详情] merchantId=2001, productId=6001
+2026-06-30 10:49:22.160 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品详情] 成功, productId=6001, title=新疆阿克苏冰糖心苹果 5斤装【特级果】
+2026-06-30 10:49:28.062 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [编辑商品] merchantId=2001, productId=6001, 请求体: title=新疆阿克苏冰糖心苹果 5斤装【特级果】, saleType=3, skuCount=3
+2026-06-30 10:49:28.171 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [编辑商品] 成功, productId=6001, auditStatus reset to 0
+2026-06-30 10:49:29.571 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 10:49:29.605 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-06-30 11:02:29.356 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品详情] merchantId=2001, productId=6006
+2026-06-30 11:02:29.415 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品详情] 成功, productId=6006, title=都乐菲律宾凤梨 1个装
+2026-06-30 11:02:36.765 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [库存维护] merchantId=2001, skuId=8011, 请求体: stock=4, remark=null
+2026-06-30 11:02:36.795 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [库存维护] 成功, skuId=8011, oldStock=80, newStock=4
+2026-06-30 11:02:41.471 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 11:02:41.505 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-06-30 11:05:17.367 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品详情] merchantId=2001, productId=6006
+2026-06-30 11:05:17.394 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品详情] 成功, productId=6006, title=都乐菲律宾凤梨 1个装
+2026-06-30 11:05:20.002 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [库存维护] merchantId=2001, skuId=8011, 请求体: stock=7, remark=null
+2026-06-30 11:05:20.027 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [库存维护] 成功, skuId=8011, oldStock=4, newStock=7
+2026-06-30 11:14:06.352 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001001, smsCode=11111
+2026-06-30 11:14:06.352 [http-nio-8080-exec-1] WARN  c.s.b.c.m.MerchantAuthController - [商家登录] 失败, phone=13800001001, 原因: 短信验证码错误
+2026-06-30 11:14:07.583 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001001, smsCode=111111
+2026-06-30 11:14:08.361 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=13800001001, merchantStatus=1
+2026-06-30 11:14:08.593 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表]
+2026-06-30 11:14:08.603 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=3
+2026-06-30 11:14:27.425 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=null
+2026-06-30 11:14:27.437 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=4
+2026-06-30 11:14:28.260 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=都
+2026-06-30 11:14:28.270 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=1
+2026-06-30 11:15:15.110 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] fileName=植物1.jpg, size=3526540
+2026-06-30 11:15:15.151 [http-nio-8080-exec-7] ERROR c.s.b.c.m.MerchantGoodsController - [图片上传] 失败, 原因: java.io.FileNotFoundException: C:\Users\hp\AppData\Local\Temp\tomcat.8080.144288124923125044\work\Tomcat\localhost\ROOT\.\uploads\images\20260630\0005fdf38e174ee29aa9c87e0626b296.jpg (系统找不到指定的路径。)
+2026-06-30 11:15:21.358 [http-nio-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] fileName=植物1.jpg, size=3526540
+2026-06-30 11:15:21.390 [http-nio-8080-exec-8] ERROR c.s.b.c.m.MerchantGoodsController - [图片上传] 失败, 原因: java.io.FileNotFoundException: C:\Users\hp\AppData\Local\Temp\tomcat.8080.144288124923125044\work\Tomcat\localhost\ROOT\.\uploads\images\20260630\7ce945361cbf4693b9d371e586bd2e2a.jpg (系统找不到指定的路径。)
+2026-06-30 11:24:24.493 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表]
+2026-06-30 11:24:24.548 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=3
+2026-06-30 11:28:12.465 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表]
+2026-06-30 11:28:12.487 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 11:28:13.264 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=3
+2026-06-30 11:28:13.304 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-06-30 11:28:30.474 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=13800001001, smsCode=111111
+2026-06-30 11:28:30.515 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=13800001001, merchantStatus=1
+2026-06-30 11:28:30.577 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表]
+2026-06-30 11:28:30.577 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 11:28:30.590 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=3
+2026-06-30 11:28:30.623 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-06-30 11:28:37.213 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] fileName=植物1.jpg, size=3526540
+2026-06-30 11:28:37.260 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] 成功, url=http://192.168.169.141:8080/uploads/images/20260630/454fd3bfa5fd473aa9eb2d241bd6450b.jpg
+2026-06-30 11:28:45.804 [http-nio-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=null
+2026-06-30 11:28:45.818 [http-nio-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=4
+2026-06-30 11:28:46.167 [http-nio-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=白
+2026-06-30 11:28:46.173 [http-nio-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=0
+2026-06-30 11:28:47.221 [http-nio-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=null
+2026-06-30 11:28:47.230 [http-nio-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=4
+2026-06-30 11:28:58.003 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] fileName=植物1.jpg, size=3526540
+2026-06-30 11:28:58.056 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] 成功, url=http://192.168.169.141:8080/uploads/images/20260630/a2dfe622c92b4e249b338f290b214e63.jpg
+2026-06-30 11:34:17.024 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表]
+2026-06-30 11:34:17.028 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 11:34:17.056 [http-nio-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=3
+2026-06-30 11:34:17.110 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-06-30 11:34:28.131 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=null
+2026-06-30 11:34:28.151 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=4
+2026-06-30 11:34:28.591 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=白
+2026-06-30 11:34:28.595 [http-nio-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=0
+2026-06-30 11:34:29.926 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=null
+2026-06-30 11:34:29.937 [http-nio-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=4
+2026-06-30 11:34:31.018 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=null
+2026-06-30 11:34:31.026 [http-nio-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=4
+2026-06-30 11:34:31.327 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] keyword=阿克苏
+2026-06-30 11:34:31.334 [http-nio-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [品牌搜索] 成功, count=1
+2026-06-30 11:34:38.898 [http-nio-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] fileName=植物1.jpg, size=3526540
+2026-06-30 11:34:38.940 [http-nio-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] 成功, url=http://192.168.169.141:8080/uploads/images/20260630/99fe53bcbdcb47399668ad5fb91189c9.jpg
+2026-06-30 11:34:41.509 [http-nio-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] fileName=植物1.jpg, size=3526540
+2026-06-30 11:34:41.555 [http-nio-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [图片上传] 成功, url=http://192.168.169.141:8080/uploads/images/20260630/d9d5ceabd3584768b0dc686b1f4d9e34.jpg
+2026-06-30 11:34:47.280 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [发布商品] merchantId=2001, 请求体: title=2, saleType=1, skuCount=1, brandId=5001
+2026-06-30 11:34:47.386 [http-nio-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [发布商品] 成功, merchantId=2001, productId=6008, auditStatus=0
+2026-06-30 11:34:47.405 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-06-30 11:34:47.448 [http-nio-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=5, pageSize=5

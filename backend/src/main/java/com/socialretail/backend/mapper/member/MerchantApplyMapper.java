@@ -1,0 +1,9 @@
+package com.socialretail.backend.mapper.member;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.socialretail.backend.entity.member.MerchantApply;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface MerchantApplyMapper extends BaseMapper<MerchantApply> {
+}
