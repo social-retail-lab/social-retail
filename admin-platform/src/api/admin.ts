@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 // ========== 管理员登录接口 ==========
 /**
- * 运营管理员登录
+ * 统一管理员登录（自动识别运营/系统管理员）
  * POST /api/admin/operation/auth/login
  */
 export const adminLogin = (data: { username: string; password: string }) => {
@@ -18,6 +18,7 @@ export const adminLogin = (data: { username: string; password: string }) => {
       role: string
       status: number
       lastLoginTime: string
+      adminType: string
     }
   }>
 }
@@ -109,4 +110,47 @@ export function auditProduct(productId: number, data: { auditStatus: number; aud
     auditStatus: number
     auditStatusText: string
   }>
+}
+
+// ========== 商品管理接口 ==========
+export function getAllProducts(params: {
+  keyword?: string
+  categoryId?: number
+  status?: number
+  auditStatus?: number
+  pageNum?: number
+  pageSize?: number
+}) {
+  return request.get('/admin/operation/products', { params }) as Promise<{ list: any[]; total: number; pageNum: number; pageSize: number }>
+}
+
+export function getProductDetailForAdmin(productId: number) {
+  return request.get(`/admin/operation/products/${productId}`)
+}
+
+export function offShelfProduct(productId: number, data: { reason?: string }) {
+  return request.patch(`/admin/operation/products/${productId}/off-shelf`, data)
+}
+
+export function getAdminCategories() {
+  return request.get('/admin/operation/categories')
+}
+
+// ========== 商家信息变更审核接口 ==========
+export function getInfoChanges(params: {
+  auditStatus?: number
+  keyword?: string
+  pageNum?: number
+  pageSize?: number
+}) {
+  return request.get('/admin/operation/info-changes', { params }) as Promise<{
+    list: any[]
+    total: number
+    pageNum: number
+    pageSize: number
+  }>
+}
+
+export function auditInfoChange(changeId: number, data: { auditStatus: number; remark: string }) {
+  return request.post(`/admin/operation/info-changes/${changeId}/audit`, data)
 }

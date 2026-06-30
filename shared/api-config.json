@@ -1,0 +1,5 @@
+{
+  "backendIp": "192.168.0.179",
+  "backendPort": 8080,
+  "backendUrl": "http://192.168.0.179:8080"
+}

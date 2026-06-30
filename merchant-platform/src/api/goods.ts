@@ -191,7 +191,7 @@ export const getProductDetail = (productId: number) => {
     categoryIds: number[]
     categoryNames: string[]
     mainImage: string
-    detailImages: string
+    detailImages: any  // string[] after backend parsing
     detailDesc: string
     saleType: number
     saleTypeText: string

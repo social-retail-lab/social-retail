@@ -32,7 +32,8 @@
           <td>{{ item.contactPhone }}</td>
           <td>{{ auditMap[item.auditStatus] || '待审核' }}</td>
           <td>
-            <button @click="openDialog(item)">审核</button>
+            <button v-if="item.auditStatus === 0" @click="openDialog(item)">审核</button>
+            <button v-else class="btn-done" disabled>已审核</button>
           </td>
         </tr>
       </tbody>
@@ -166,6 +167,11 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
+}
+.btn-done {
+  background: #C9CDD4 !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
 }
 table {
   width: 100%;

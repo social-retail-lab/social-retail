@@ -31,7 +31,10 @@
           <td>{{ item.merchantName }}</td>
           <td>¥{{ item.minPrice }}</td>
           <td>{{ auditMap[item.auditStatus] || '待审核' }}</td>
-          <td><button @click="openAudit(item)">审核</button></td>
+          <td>
+            <button v-if="item.auditStatus === 0" @click="openAudit(item)">审核</button>
+            <button v-else class="btn-done" disabled>已审核</button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -145,6 +148,11 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
+}
+.btn-done {
+  background: #C9CDD4 !important;
+  color: #fff !important;
+  cursor: not-allowed !important;
 }
 table {
   width: 100%;

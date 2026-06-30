@@ -8,15 +8,18 @@
       </div>
     </div>
     <div class="nav">
-      <router-link to="/dashboard">工作台</router-link>
-      <router-link to="/merchant-audit">商家审核</router-link>
+      <router-link to="/dashboard" end>工作台</router-link>
+      <router-link to="/merchant-audit">商家入驻审核</router-link>
       <router-link to="/product-audit">商品审核</router-link>
+      <router-link to="/info-change">信息审核</router-link>
+      <router-link to="/merchant-list">商家列表</router-link>
+      <router-link to="/product-list">商品列表</router-link>
     </div>
     <div class="content">
       <router-view />
       <div v-if="$route.path === '/dashboard'" class="welcome">
         <h3>欢迎使用管理系统</h3>
-        <p>请使用左侧导航进入功能模块</p>
+        <p>请使用上方导航进入功能模块</p>
       </div>
     </div>
   </div>
@@ -97,7 +100,7 @@ const handleLogout = async () => {
   border-radius: 4px;
   font-size: 14px;
 }
-.nav a:hover, .nav a.router-link-active {
+.nav a:hover, .nav a.router-link-active, .nav a.router-link-exact-active {
   background: #165DFF;
   color: #fff;
 }

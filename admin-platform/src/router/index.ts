@@ -26,6 +26,21 @@ const routes = [
         path: '/product-audit',
         name: '商品审核',
         component: () => import('@/admin/audit/goods.vue')
+      },
+      {
+        path: '/info-change',
+        name: '信息审核',
+        component: () => import('@/admin/audit/info-change.vue')
+      },
+      {
+        path: '/merchant-list',
+        name: '商家列表',
+        component: () => import('@/admin/merchant/list.vue')
+      },
+      {
+        path: '/product-list',
+        name: '商品列表',
+        component: () => import('@/admin/product/list.vue')
       }
     ]
   }

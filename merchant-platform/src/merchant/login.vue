@@ -71,7 +71,7 @@ const login = async () => {
     if (res.merchantStatus === 0) {
       router.push('/register')
     } else {
-      router.push('/product-manage')
+      router.push('/store-info')
     }
   } catch {}
 }

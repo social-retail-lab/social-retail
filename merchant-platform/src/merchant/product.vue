@@ -33,6 +33,7 @@
           <th>最高价</th>
           <th>总库存</th>
           <th>审核</th>
+          <th>商品状态</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -46,10 +47,19 @@
           <td>{{ item.totalStock }}</td>
           <td>{{ item.auditStatusText }}</td>
           <td>
-            <button v-if="item.status === 1" @click="toggleShelf(item.productId, 0)">下架</button>
-            <button v-else @click="toggleShelf(item.productId, 1)">上架</button>
-            <button @click="openEdit(item.productId)">编辑</button>
-            <button @click="openStock(item)">库存</button>
+            <span v-if="item.status === 1" class="status-on">上架</span>
+            <span v-else class="status-off">下架</span>
+          </td>
+          <td>
+            <!-- 审核拒绝：显示重新提交按钮 -->
+            <button v-if="item.auditStatus === 2" class="btn-resubmit" @click="openEdit(item.productId)">重新提交审核</button>
+            <!-- 审核通过：正常操作按钮 -->
+            <template v-if="item.auditStatus === 1">
+              <button v-if="item.status === 1" @click="toggleShelf(item.productId, 0)">下架</button>
+              <button v-else @click="toggleShelf(item.productId, 1)">上架</button>
+              <button @click="openEdit(item.productId)">编辑</button>
+              <button @click="openStock(item)">库存</button>
+            </template>
           </td>
         </tr>
       </tbody>
@@ -91,13 +101,19 @@
           </div>
         </div>
 
-        <!-- 分类：下拉列表 -->
+        <!-- 分类：两级选择 -->
         <div class="form-item">
           <label>分类</label>
           <div class="category-row">
-            <select v-model.number="editForm.categoryId1" @change="onCategory1Change">
-              <option :value="0">选择分类</option>
+            <select v-model.number="editFormCategoryId1" @change="onCategory1Change">
+              <option :value="0">一级分类</option>
               <option v-for="c in categoryList" :key="c.categoryId" :value="c.categoryId">
+                {{ c.categoryName }}
+              </option>
+            </select>
+            <select v-model.number="editFormCategoryId2" @change="onCategory2Change">
+              <option :value="0">二级分类</option>
+              <option v-for="c in categoryList2" :key="c.categoryId" :value="c.categoryId">
                 {{ c.categoryName }}
               </option>
             </select>
@@ -272,12 +288,15 @@ const selectBrand = (b: any) => {
 
 // ---------- 分类 ----------
 const categoryList = ref<any[]>([]) // 一级分类列表
-const editFormCategoryId1 = ref(0) // 绑定到editForm.categoryId1
+const categoryList2 = ref<any[]>([]) // 二级分类列表
+const editFormCategoryId1 = ref(0)
+const editFormCategoryId2 = ref(0)
 
 const loadCategories = async () => {
   try {
     const res = await request.get('/merchant/categories')
-    categoryList.value = (res as any).list || res || []
+    const list = (res as any).list || res || []
+    categoryList.value = Array.isArray(list) ? list : []
   } catch {
     categoryList.value = [
       { categoryId: -1, categoryName: '测试分类1' },
@@ -286,9 +305,41 @@ const loadCategories = async () => {
   }
 }
 
+const loadSubCategories = async (parentId: number) => {
+  categoryList2.value = []
+  editFormCategoryId2.value = 0
+  if (!parentId) return
+  try {
+    const res = await request.get('/merchant/categories', { params: { parentId } })
+    const list = (res as any).list || res || []
+    categoryList2.value = Array.isArray(list) ? list : []
+  } catch {
+    categoryList2.value = [
+      { categoryId: -101, categoryName: '测试子分类1' },
+      { categoryId: -102, categoryName: '测试子分类2' }
+    ]
+  }
+}
+
 const onCategory1Change = () => {
-  // 一级分类变更
-  editForm.value.categoryIds = editFormCategoryId1.value ? [editFormCategoryId1.value] : []
+  if (editFormCategoryId1.value) {
+    loadSubCategories(editFormCategoryId1.value)
+  } else {
+    categoryList2.value = []
+    editFormCategoryId2.value = 0
+  }
+  updateCategoryIds()
+}
+
+const onCategory2Change = () => {
+  updateCategoryIds()
+}
+
+const updateCategoryIds = () => {
+  const ids: number[] = []
+  if (editFormCategoryId1.value) ids.push(editFormCategoryId1.value)
+  if (editFormCategoryId2.value) ids.push(editFormCategoryId2.value)
+  editForm.value.categoryIds = ids
 }
 
 // ---------- 图片上传 ----------
@@ -404,6 +455,7 @@ const openCreate = () => {
       skuList: [{ specs: '', price: 0, stock: 0, skuCode: '' }]
     }
   editFormCategoryId1.value = 0
+  editFormCategoryId2.value = 0
   showEdit.value = true
 }
 
@@ -415,14 +467,21 @@ const openEdit = async (productId: number) => {
     brandSearch.value = detail.brandName || ''
     brandOptions.value = []
     // 回填分类
-    const cid = detail.categoryIds?.[0] || 0
-    editFormCategoryId1.value = cid
+    const cids = detail.categoryIds || []
+    if (cids.length >= 1) {
+      editFormCategoryId1.value = cids[0]
+      if (cids[0] > 0) await loadSubCategories(cids[0])
+    }
+    if (cids.length >= 2) {
+      editFormCategoryId2.value = cids[1]
+    }
+    updateCategoryIds()
     // 回填图片
     detailUploadUrls.value = Array.isArray(detail.detailImages) ? detail.detailImages : []
     editForm.value = {
       brandId: detail.brandId,
       categoryIds: detail.categoryIds || [],
-      categoryId1: cid,
+      categoryId1: cids.length >= 1 ? cids[0] : 0,
       title: detail.title,
       subTitle: detail.subTitle || '',
       mainImage: detail.mainImage || '',
@@ -446,7 +505,7 @@ const submitEdit = async () => {
 
   const payload = {
     brandId: f.brandId,
-    categoryIds,
+    categoryIds: f.categoryIds.length > 0 ? f.categoryIds : undefined,
     title: f.title,
     subTitle: f.subTitle || undefined,
     mainImage: f.mainImage,
@@ -517,6 +576,7 @@ input, select, button { padding: 7px 10px; border-radius: 4px; border: 1px solid
 button { cursor: pointer; }
 table { width: 100%; border-collapse: collapse; background: #fff; }
 table th, table td { padding: 8px; text-align: center; border: 1px solid #eee; color: #595959; }
+td button { margin: 0 4px; }
 .page-wrap { display: flex; gap: 12px; align-items: center; margin-top: 10px; color: #595959; }
 
 /* ---------- 弹窗 ---------- */
@@ -530,6 +590,11 @@ input, select { width: 100%; box-sizing: border-box; padding: 9px; border: 1px s
 .form-row .item input { width: 100%; }
 .btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
 .save { background: #E66100; color: white; border: none; cursor: pointer; }
+
+/* ---------- 商品状态 ---------- */
+.status-on { color: #00B42A; font-weight: 600; font-size: 13px; }
+.status-off { color: #F53F3F; font-weight: 600; font-size: 13px; }
+.btn-resubmit { padding: 4px 12px; background: #FF7D00; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; white-space: nowrap; }
 
 /* ---------- 品牌搜索 ---------- */
 .autocomplete-wrap { position: relative; }

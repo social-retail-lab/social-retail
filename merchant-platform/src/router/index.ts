@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import MainLayout from '@/merchant/MainLayout.vue'
 
 const routes = [
   {
@@ -12,13 +13,36 @@ const routes = [
     component: () => import('@/merchant/register.vue')
   },
   {
-    path: '/product-manage',
-    name: '商品管理',
-    component: () => import('@/merchant/product.vue')
-  },
-  {
     path: '/',
-    redirect: '/login'
+    component: MainLayout,
+    redirect: '/store-info',
+    children: [
+      {
+        path: '/store-info',
+        name: '商家信息',
+        component: () => import('@/merchant/StoreInfo.vue')
+      },
+      {
+        path: '/product-manage',
+        name: '商品列表',
+        component: () => import('@/merchant/product.vue')
+      },
+      {
+        path: '/orders',
+        name: '订单处理',
+        component: () => import('@/merchant/Orders.vue')
+      },
+      {
+        path: '/business-data',
+        name: '经营数据',
+        component: () => import('@/merchant/BusinessData.vue')
+      },
+      {
+        path: '/audit-requests',
+        name: '审核请求',
+        component: () => import('@/merchant/AuditRequests.vue')
+      }
+    ]
   }
 ]
 
@@ -34,7 +58,7 @@ router.beforeEach((to, from, next) => {
   if (to.path === '/login' || to.path === '/register') {
     return next()
   }
-  // 商品管理需要登录
+  // 其他页面需要登录
   if (!token) {
     return next('/login')
   }
