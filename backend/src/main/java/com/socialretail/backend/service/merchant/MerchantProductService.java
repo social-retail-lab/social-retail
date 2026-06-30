@@ -38,7 +38,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -468,6 +470,41 @@ public class MerchantProductService {
             vo.setSubmitTime(product.getCreateTime().format(FORMATTER));
         }
         return vo;
+    }
+
+    // ========== 品牌搜索 ==========
+    public List<Map<String, Object>> searchBrands(String keyword) {
+        LambdaQueryWrapper<Brand> wrapper = new LambdaQueryWrapper<>();
+        if (keyword != null && !keyword.isEmpty()) {
+            wrapper.like(Brand::getName, keyword);
+        }
+        wrapper.orderByAsc(Brand::getId);
+        wrapper.last("LIMIT 20");
+        List<Brand> brands = brandMapper.selectList(wrapper);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Brand b : brands) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("brandId", b.getId());
+            item.put("brandName", b.getName());
+            result.add(item);
+        }
+        return result;
+    }
+
+    // ========== 一级分类列表 ==========
+    public List<Map<String, Object>> getTopCategories() {
+        LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Category::getLevel, 1)
+                .orderByAsc(Category::getSortOrder);
+        List<Category> categories = categoryMapper.selectList(wrapper);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Category c : categories) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("categoryId", c.getId());
+            item.put("categoryName", c.getName());
+            result.add(item);
+        }
+        return result;
     }
 
     // Helper methods

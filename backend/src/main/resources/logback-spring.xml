@@ -2,9 +2,7 @@
 <configuration>
 
     <!-- ==================== 全局参数 ==================== -->
-    <!-- 日志存放目录 -->
     <property name="LOG_HOME" value="logs"/>
-    <!-- 日志输出格式（含 traceId） -->
     <property name="LOG_PATTERN"
               value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId}] %-5level %logger{50} - %msg%n"/>
 
@@ -16,13 +14,21 @@
         </encoder>
     </appender>
 
+    <!-- ==================== API接口日志 -> resources/log.txt ==================== -->
+    <appender name="API_LOG" class="ch.qos.logback.core.FileAppender">
+        <file>src/main/resources/log.txt</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
     <!-- ==================== 文件输出（所有日志） ==================== -->
     <appender name="FILE_ALL" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_HOME}/social-retail.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- 每天滚动 -->
             <fileNamePattern>${LOG_HOME}/social-retail.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <!-- 保留 30 天 -->
             <maxHistory>30</maxHistory>
         </rollingPolicy>
         <encoder>
@@ -31,46 +37,32 @@
         </encoder>
     </appender>
 
-    <!-- ==================== 文件输出（仅错误日志） ==================== -->
-    <appender name="FILE_ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_HOME}/error.log</file>
-        <!-- 只记录 ERROR 级别 -->
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
-            <maxHistory>90</maxHistory>
-        </rollingPolicy>
-        <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
-            <charset>UTF-8</charset>
-        </encoder>
-    </appender>
-
     <!-- ==================== 日志级别控制 ==================== -->
-    <!-- 你的业务代码：开发阶段打印 DEBUG -->
-    <logger name="com.platform" level="DEBUG"/>
 
-    <!-- MyBatis SQL 打印（需要看 SQL 时改为 DEBUG） -->
-    <logger name="com.platform.mapper" level="DEBUG"/>
+    <!-- 接口层：DEBUG 级别，输出到 log.txt -->
+    <logger name="com.socialretail.backend.controller" level="DEBUG" additivity="false">
+        <appender-ref ref="API_LOG"/>
+    </logger>
+    <logger name="com.socialretail.backend.service.merchant" level="DEBUG" additivity="false">
+        <appender-ref ref="API_LOG"/>
+    </logger>
+    <logger name="com.socialretail.backend.service.admin" level="DEBUG" additivity="false">
+        <appender-ref ref="API_LOG"/>
+    </logger>
 
-    <!-- Spring 框架：只打印 WARN 以上，减少噪音 -->
+    <!-- MyBatis SQL 打印 -->
+    <logger name="com.socialretail.backend.mapper" level="DEBUG"/>
+
+    <!-- Spring 框架 -->
     <logger name="org.springframework" level="WARN"/>
 
     <!-- MyBatis 框架日志 -->
     <logger name="org.mybatis" level="WARN"/>
 
-    <!-- Netty-SocketIO 日志 -->
-    <logger name="com.corundum studio.socketio" level="WARN"/>
-
     <!-- ==================== 根配置 ==================== -->
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE_ALL"/>
-        <appender-ref ref="FILE_ERROR"/>
     </root>
 
 </configuration>

@@ -135,17 +135,18 @@ public class MerchantService {
             }
         }
 
-        // 生成JWT令牌
-        String token = jwtUtils.generateToken(user.getId(), phone, "user");
+        // 检查是否为商家（在生成token之前查，以便将merchantId写入JWT）
+        LambdaQueryWrapper<Merchant> merchantWrapper = new LambdaQueryWrapper<>();
+        merchantWrapper.eq(Merchant::getUserId, user.getId());
+        Merchant merchant = merchantMapper.selectOne(merchantWrapper);
+
+        // 生成JWT令牌（如果已是商家则携带merchantId）
+        Long merchantId = (merchant != null && merchant.getStatus() != null && merchant.getStatus() >= 1) ? merchant.getId() : null;
+        String token = jwtUtils.generateToken(user.getId(), merchantId, phone, "user");
 
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(token);
         loginVO.setExpireTime(jwtUtils.getExpireTime());
-
-        // 检查是否为商家
-        LambdaQueryWrapper<Merchant> merchantWrapper = new LambdaQueryWrapper<>();
-        merchantWrapper.eq(Merchant::getUserId, user.getId());
-        Merchant merchant = merchantMapper.selectOne(merchantWrapper);
 
         if (merchant == null || merchant.getStatus() == null || merchant.getStatus() == 0) {
             // 非商家用户，跳转到入驻申请页

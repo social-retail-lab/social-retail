@@ -34,10 +34,17 @@ public class JwtUtils {
     }
 
     public String generateToken(Long userId, String phone, String userType) {
+        return generateToken(userId, null, phone, userType);
+    }
+
+    public String generateToken(Long userId, Long merchantId, String phone, String userType) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("phone", phone);
         claims.put("userType", userType);
+        if (merchantId != null) {
+            claims.put("merchantId", merchantId);
+        }
         
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);

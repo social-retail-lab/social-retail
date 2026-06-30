@@ -1,15 +1,23 @@
 package com.socialretail.backend.config;
 
 import com.socialretail.backend.interceptor.AuthInterceptor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     private final AuthInterceptor authInterceptor;
+
+    @Value("${upload.path:}")
+    private String uploadPath;
 
     public WebConfig(AuthInterceptor authInterceptor) {
         this.authInterceptor = authInterceptor;
@@ -35,5 +43,18 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 映射上传目录为静态资源，使用绝对路径避免 Tomcat temp 目录问题
+        Path basePath;
+        if (uploadPath != null && !uploadPath.isEmpty()) {
+            basePath = Paths.get(uploadPath).toAbsolutePath();
+        } else {
+            basePath = Paths.get(System.getProperty("user.dir"), "uploads").toAbsolutePath();
+        }
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:" + basePath.toString().replace("\\", "/") + "/");
     }
 }
