@@ -51,7 +51,7 @@ public class MerchantGoodsController {
     @Value("${upload.path:}")
     private String uploadPath;
 
-    @Value("${upload.base-url:http://192.168.169.141:8080}")
+    @Value("${upload.base-url:http://192.168.0.179:8080}")
     private String baseUrl;
 
     // ========== 品牌搜索（支持模糊匹配） ==========
@@ -68,12 +68,17 @@ public class MerchantGoodsController {
         }
     }
 
-    // ========== 分类列表（一级分类） ==========
+    // ========== 分类列表（一级分类 / 二级分类，通过 parentId 区分） ==========
     @GetMapping("/categories")
-    public Result<List<Map<String, Object>>> getCategories() {
-        log.info("[分类列表]");
+    public Result<List<Map<String, Object>>> getCategories(@RequestParam(required = false) Long parentId) {
+        log.info("[分类列表] parentId={}", parentId);
         try {
-            List<Map<String, Object>> categories = merchantProductService.getTopCategories();
+            List<Map<String, Object>> categories;
+            if (parentId != null) {
+                categories = merchantProductService.getSubCategories(parentId);
+            } else {
+                categories = merchantProductService.getTopCategories();
+            }
             log.info("[分类列表] 成功, count={}", categories.size());
             return Result.ok(categories);
         } catch (RuntimeException e) {

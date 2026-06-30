@@ -1,15 +1,27 @@
 package com.socialretail.backend.service.merchant;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.socialretail.backend.common.JwtUtils;
 import com.socialretail.backend.common.MD5Utils;
+import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.member.MerchantApply;
+import com.socialretail.backend.entity.member.MerchantInfoChange;
 import com.socialretail.backend.entity.member.MerchantQualification;
 import com.socialretail.backend.entity.member.User;
+import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.mapper.member.MerchantApplyMapper;
+import com.socialretail.backend.mapper.member.MerchantInfoChangeMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.mapper.member.MerchantQualificationMapper;
 import com.socialretail.backend.mapper.member.UserMapper;
+import com.socialretail.backend.mapper.product.ProductMapper;
+import com.socialretail.backend.vo.AuditRequestVO;
+import com.socialretail.backend.vo.InfoChangeRequest;
 import com.socialretail.backend.vo.LoginVO;
 import com.socialretail.backend.vo.MerchantApplyRequest;
 import com.socialretail.backend.vo.MerchantApplyVO;
@@ -17,12 +29,15 @@ import com.socialretail.backend.vo.MerchantInfoVO;
 import com.socialretail.backend.vo.MerchantUpdateRequest;
 import com.socialretail.backend.vo.QualificationRequest;
 import com.socialretail.backend.vo.QualificationVO;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class MerchantService {
@@ -41,6 +56,14 @@ public class MerchantService {
 
     @Resource
     private JwtUtils jwtUtils;
+
+    @Resource
+    private MerchantInfoChangeMapper merchantInfoChangeMapper;
+
+    @Resource
+    private ProductMapper productMapper;
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -148,9 +171,13 @@ public class MerchantService {
         loginVO.setToken(token);
         loginVO.setExpireTime(jwtUtils.getExpireTime());
 
-        if (merchant == null || merchant.getStatus() == null || merchant.getStatus() == 0) {
-            // 非商家用户，跳转到入驻申请页
+        if (merchant == null) {
+            // 无商家记录，非商家用户
             loginVO.setMerchantStatus(0);
+        } else if (merchant.getStatus() == null || merchant.getStatus() == 0) {
+            // 商家记录存在但状态异常，视为正常商家
+            loginVO.setMerchantStatus(1);
+            loginVO.setMerchantInfo(buildMerchantInfoVO(merchant));
         } else if (merchant.getStatus() == 1) {
             // 正常商家
             loginVO.setMerchantStatus(1);
@@ -271,6 +298,328 @@ public class MerchantService {
         return buildQualificationVO(qualification);
     }
 
+    // ==================== 商家申诉 ====================
+
+    public Map<String, Object> appeal(Long userId, String reason) {
+        LambdaQueryWrapper<Merchant> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Merchant::getUserId, userId);
+        Merchant merchant = merchantMapper.selectOne(wrapper);
+        if (merchant == null) {
+            throw new RuntimeException("商家信息不存在");
+        }
+        if (merchant.getStatus() == null || merchant.getStatus() != 4) {
+            throw new RuntimeException("当前账号未被封禁，无需申诉");
+        }
+
+        // 申诉：恢复为正常状态
+        merchant.setStatus(1);
+        merchantMapper.updateById(merchant);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("merchantId", merchant.getId());
+        result.put("status", 1);
+        result.put("statusText", "营业中");
+        result.put("reason", reason);
+        result.put("message", "申诉成功，账号已恢复");
+        return result;
+    }
+
+    // ==================== 商家信息变更审核请求 ====================
+
+    public Map<String, Object> requestInfoChange(Long userId, InfoChangeRequest req) {
+        Merchant merchant = getMerchantByUserId(userId);
+
+        // 检查是否有待审核的信息变更
+        LambdaQueryWrapper<MerchantInfoChange> checkWrapper = new LambdaQueryWrapper<>();
+        checkWrapper.eq(MerchantInfoChange::getMerchantId, merchant.getId())
+                .eq(MerchantInfoChange::getRequestType, "INFO_CHANGE")
+                .eq(MerchantInfoChange::getAuditStatus, 0);
+        if (merchantInfoChangeMapper.selectOne(checkWrapper) != null) {
+            throw new RuntimeException("已有待审核的信息修改申请");
+        }
+
+        try {
+            // 旧数据
+            Map<String, Object> oldData = new HashMap<>();
+            oldData.put("merchantName", merchant.getMerchantName());
+            oldData.put("contactName", merchant.getContactName());
+            oldData.put("contactPhone", merchant.getContactPhone());
+            oldData.put("shopAddress", merchant.getShopAddress());
+            oldData.put("businessHours", merchant.getBusinessHours());
+            oldData.put("introduction", merchant.getIntroduction());
+
+            // 新数据
+            Map<String, Object> newData = new HashMap<>();
+            newData.put("merchantName", req.getMerchantName());
+            newData.put("contactName", req.getContactName());
+            newData.put("contactPhone", req.getContactPhone());
+            newData.put("shopAddress", req.getShopAddress());
+            newData.put("businessHours", req.getBusinessHours());
+            newData.put("introduction", req.getIntroduction());
+
+            MerchantInfoChange change = new MerchantInfoChange();
+            change.setMerchantId(merchant.getId());
+            change.setRequestType("INFO_CHANGE");
+            change.setOldData(OBJECT_MAPPER.writeValueAsString(oldData));
+            change.setNewData(OBJECT_MAPPER.writeValueAsString(newData));
+            change.setAuditStatus(0);
+            change.setCreateTime(LocalDateTime.now());
+            merchantInfoChangeMapper.insert(change);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("changeId", change.getId());
+            result.put("requestType", "INFO_CHANGE");
+            result.put("auditStatus", 0);
+            result.put("message", "信息修改申请已提交，等待审核");
+            return result;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("数据序列化失败");
+        }
+    }
+
+    public Map<String, Object> requestQualificationUpgrade(Long userId, MerchantApplyRequest req) {
+        Merchant merchant = getMerchantByUserId(userId);
+
+        // 检查是否是个体商家
+        LambdaQueryWrapper<MerchantApply> applyWrapper = new LambdaQueryWrapper<>();
+        applyWrapper.eq(MerchantApply::getUserId, userId)
+                .eq(MerchantApply::getAuditStatus, 1)
+                .orderByDesc(MerchantApply::getApplyTime)
+                .last("LIMIT 1");
+        MerchantApply lastApply = merchantApplyMapper.selectOne(applyWrapper);
+        if (lastApply == null || (lastApply.getApplyType() != null && lastApply.getApplyType() != 1)) {
+            throw new RuntimeException("仅个体商家可申请升级企业资质");
+        }
+
+        // 检查是否有待审核的升级申请
+        LambdaQueryWrapper<MerchantInfoChange> checkWrapper = new LambdaQueryWrapper<>();
+        checkWrapper.eq(MerchantInfoChange::getMerchantId, merchant.getId())
+                .eq(MerchantInfoChange::getRequestType, "QUALIFICATION_UPGRADE")
+                .eq(MerchantInfoChange::getAuditStatus, 0);
+        if (merchantInfoChangeMapper.selectOne(checkWrapper) != null) {
+            throw new RuntimeException("已有待审核的升级企业资质申请");
+        }
+
+        // 企业资质必须提供营业执照
+        if (req.getLicenseNumber() == null || req.getLicenseNumber().isEmpty()
+                || req.getLicenseImage() == null || req.getLicenseImage().isEmpty()) {
+            throw new RuntimeException("企业资质必须提供营业执照");
+        }
+
+        try {
+            Map<String, Object> newData = new HashMap<>();
+            newData.put("companyName", req.getCompanyName());
+            newData.put("licenseNumber", req.getLicenseNumber());
+            newData.put("licenseImage", req.getLicenseImage());
+            newData.put("foodPermitNumber", req.getFoodPermitNumber());
+            newData.put("foodPermitImage", req.getFoodPermitImage());
+            newData.put("contactName", req.getContactName());
+            newData.put("contactPhone", req.getContactPhone());
+            newData.put("shopAddress", req.getShopAddress());
+            newData.put("shopName", req.getShopName());
+
+            MerchantInfoChange change = new MerchantInfoChange();
+            change.setMerchantId(merchant.getId());
+            change.setRequestType("QUALIFICATION_UPGRADE");
+            change.setNewData(OBJECT_MAPPER.writeValueAsString(newData));
+            change.setAuditStatus(0);
+            change.setCreateTime(LocalDateTime.now());
+            merchantInfoChangeMapper.insert(change);
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("changeId", change.getId());
+            result.put("requestType", "QUALIFICATION_UPGRADE");
+            result.put("auditStatus", 0);
+            result.put("message", "升级企业资质申请已提交，等待审核");
+            return result;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("数据序列化失败");
+        }
+    }
+
+    // ==================== 暂时歇业/重新营业 ====================
+
+    public Map<String, Object> togglePause(Long userId) {
+        Merchant merchant = getMerchantByUserId(userId);
+
+        if (merchant.getStatus() == null) {
+            throw new RuntimeException("商家状态异常");
+        }
+
+        if (merchant.getStatus() == 5) {
+            // 暂时歇业 → 恢复营业
+            merchant.setStatus(1);
+            merchantMapper.updateById(merchant);
+            Map<String, Object> result = new HashMap<>();
+            result.put("merchantId", merchant.getId());
+            result.put("status", 1);
+            result.put("statusText", "营业中");
+            result.put("message", "已重新营业");
+            return result;
+        } else if (merchant.getStatus() == 1) {
+            // 营业中 → 暂时歇业
+            merchant.setStatus(5);
+            merchantMapper.updateById(merchant);
+            Map<String, Object> result = new HashMap<>();
+            result.put("merchantId", merchant.getId());
+            result.put("status", 5);
+            result.put("statusText", "暂时歇业");
+            result.put("message", "已暂时歇业");
+            return result;
+        } else {
+            throw new RuntimeException("当前状态不支持此操作");
+        }
+    }
+
+    // ==================== 审核请求列表（聚合） ====================
+
+    public PageResult<AuditRequestVO> getAuditRequests(Long userId, int pageNum, int pageSize) {
+        Merchant merchant = getMerchantByUserId(userId);
+
+        // 查商品审核（product表中audit_status不为null的记录）
+        LambdaQueryWrapper<Product> productWrapper = new LambdaQueryWrapper<>();
+        productWrapper.eq(Product::getMerchantId, merchant.getId())
+                .isNotNull(Product::getAuditStatus)
+                .orderByDesc(Product::getCreateTime);
+        List<Product> products = productMapper.selectList(productWrapper);
+
+        // 查信息变更审核
+        LambdaQueryWrapper<MerchantInfoChange> changeWrapper = new LambdaQueryWrapper<>();
+        changeWrapper.eq(MerchantInfoChange::getMerchantId, merchant.getId())
+                .orderByDesc(MerchantInfoChange::getCreateTime);
+        List<MerchantInfoChange> changes = merchantInfoChangeMapper.selectList(changeWrapper);
+
+        // 合并排序
+        List<AuditRequestVO> allList = new ArrayList<>();
+
+        for (Product p : products) {
+            AuditRequestVO vo = new AuditRequestVO();
+            vo.setRequestId(p.getId());
+            vo.setRequestType("PRODUCT_PUBLISH");
+            vo.setRequestTypeText("商品发布");
+            vo.setProductId(p.getId());
+            vo.setProductTitle(p.getTitle());
+            vo.setImageUrl(p.getMainImage());
+            vo.setAuditStatus(p.getAuditStatus());
+            vo.setAuditStatusText(getAuditStatusText(p.getAuditStatus()));
+            vo.setAuditRemark(p.getAuditRemark());
+            vo.setCreateTime(p.getCreateTime() != null ? p.getCreateTime().format(FORMATTER) : null);
+            vo.setAuditTime(p.getAuditTime() != null ? p.getAuditTime().format(FORMATTER) : null);
+            vo.setWithdrawable(p.getAuditStatus() != null && p.getAuditStatus() == 0);
+            allList.add(vo);
+        }
+
+        for (MerchantInfoChange c : changes) {
+            AuditRequestVO vo = new AuditRequestVO();
+            vo.setRequestId(c.getId());
+            vo.setRequestType(c.getRequestType());
+            vo.setRequestTypeText("INFO_CHANGE".equals(c.getRequestType()) ? "商家信息修改" : "升级企业资质");
+            vo.setAuditStatus(c.getAuditStatus());
+            vo.setAuditStatusText(getAuditStatusText(c.getAuditStatus()));
+            vo.setAuditRemark(c.getAuditRemark());
+            vo.setCreateTime(c.getCreateTime() != null ? c.getCreateTime().format(FORMATTER) : null);
+            vo.setAuditTime(c.getAuditTime() != null ? c.getAuditTime().format(FORMATTER) : null);
+            vo.setWithdrawable(c.getAuditStatus() != null && c.getAuditStatus() == 0);
+            // 解析新旧数据
+            try {
+                if (c.getOldData() != null) vo.setOldData(OBJECT_MAPPER.readValue(c.getOldData(), Map.class));
+                if (c.getNewData() != null) vo.setNewData(OBJECT_MAPPER.readValue(c.getNewData(), Map.class));
+            } catch (JsonProcessingException ignored) {}
+            allList.add(vo);
+        }
+
+        allList.sort((a, b) -> {
+            String t1 = a.getCreateTime() != null ? a.getCreateTime() : "";
+            String t2 = b.getCreateTime() != null ? b.getCreateTime() : "";
+            return t2.compareTo(t1);
+        });
+
+        // 手动分页
+        int total = allList.size();
+        int from = (pageNum - 1) * pageSize;
+        int to = Math.min(from + pageSize, total);
+        List<AuditRequestVO> pageList = from < total ? allList.subList(from, to) : new ArrayList<>();
+
+        PageResult<AuditRequestVO> result = new PageResult<>();
+        result.setList(pageList);
+        result.setTotal(total);
+        result.setPageNum(pageNum);
+        result.setPageSize(pageSize);
+        return result;
+    }
+
+    public Map<String, Object> getAuditRequestDetail(Long requestId, String requestType) {
+        if ("INFO_CHANGE".equals(requestType) || "QUALIFICATION_UPGRADE".equals(requestType)) {
+            MerchantInfoChange change = merchantInfoChangeMapper.selectById(requestId);
+            if (change == null) throw new RuntimeException("审核请求不存在");
+            Map<String, Object> detail = new HashMap<>();
+            detail.put("requestId", change.getId());
+            detail.put("requestType", change.getRequestType());
+            detail.put("requestTypeText", "INFO_CHANGE".equals(change.getRequestType()) ? "商家信息修改" : "升级企业资质");
+            detail.put("auditStatus", change.getAuditStatus());
+            detail.put("auditStatusText", getAuditStatusText(change.getAuditStatus()));
+            detail.put("auditRemark", change.getAuditRemark());
+            detail.put("createTime", change.getCreateTime() != null ? change.getCreateTime().format(FORMATTER) : null);
+            detail.put("auditTime", change.getAuditTime() != null ? change.getAuditTime().format(FORMATTER) : null);
+            try {
+                if (change.getOldData() != null) detail.put("oldData", OBJECT_MAPPER.readValue(change.getOldData(), Map.class));
+                if (change.getNewData() != null) detail.put("newData", OBJECT_MAPPER.readValue(change.getNewData(), Map.class));
+            } catch (JsonProcessingException ignored) {}
+            return detail;
+        } else {
+            // Product
+            Product product = productMapper.selectById(requestId);
+            if (product == null) throw new RuntimeException("商品不存在");
+            Map<String, Object> detail = new HashMap<>();
+            detail.put("requestId", product.getId());
+            detail.put("requestType", "PRODUCT_PUBLISH");
+            detail.put("requestTypeText", "商品发布");
+            detail.put("productId", product.getId());
+            detail.put("productTitle", product.getTitle());
+            detail.put("imageUrl", product.getMainImage());
+            detail.put("auditStatus", product.getAuditStatus());
+            detail.put("auditStatusText", getAuditStatusText(product.getAuditStatus()));
+            detail.put("auditRemark", product.getAuditRemark());
+            detail.put("createTime", product.getCreateTime() != null ? product.getCreateTime().format(FORMATTER) : null);
+            detail.put("auditTime", product.getAuditTime() != null ? product.getAuditTime().format(FORMATTER) : null);
+            detail.put("newData", product); // 当前商品数据作为新版本
+            return detail;
+        }
+    }
+
+    public Map<String, Object> withdrawAuditRequest(Long userId, Long requestId, String requestType) {
+        if ("INFO_CHANGE".equals(requestType) || "QUALIFICATION_UPGRADE".equals(requestType)) {
+            MerchantInfoChange change = merchantInfoChangeMapper.selectById(requestId);
+            if (change == null) throw new RuntimeException("审核请求不存在");
+            Merchant merchant = getMerchantByUserId(userId);
+            if (!change.getMerchantId().equals(merchant.getId())) throw new RuntimeException("无权操作");
+            if (change.getAuditStatus() != null && change.getAuditStatus() != 0) throw new RuntimeException("只有待审核的请求可以撤回");
+            merchantInfoChangeMapper.deleteById(requestId);
+        } else {
+            Product product = productMapper.selectById(requestId);
+            if (product == null) throw new RuntimeException("商品不存在");
+            Merchant merchant = getMerchantByUserId(userId);
+            if (!product.getMerchantId().equals(merchant.getId())) throw new RuntimeException("无权操作");
+            if (product.getAuditStatus() == null || product.getAuditStatus() != 0) throw new RuntimeException("只有待审核的请求可以撤回");
+            product.setAuditStatus(null);
+            product.setAuditRemark(null);
+            productMapper.updateById(product);
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("message", "撤回成功");
+        return result;
+    }
+
+    // ==================== 辅助方法 ====================
+
+    private Merchant getMerchantByUserId(Long userId) {
+        LambdaQueryWrapper<Merchant> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Merchant::getUserId, userId);
+        Merchant merchant = merchantMapper.selectOne(wrapper);
+        if (merchant == null) throw new RuntimeException("商家信息不存在");
+        return merchant;
+    }
+
     // Helper methods
 
     private MerchantInfoVO buildMerchantInfoVO(Merchant m) {
@@ -338,6 +687,8 @@ public class MerchantService {
             case 1: return "营业中";
             case 2: return "休息中";
             case 3: return "已关店";
+            case 4: return "已封禁";
+            case 5: return "暂时歇业";
             default: return "未知";
         }
     }

@@ -507,6 +507,23 @@ public class MerchantProductService {
         return result;
     }
 
+    // ========== 二级分类列表 ==========
+    public List<Map<String, Object>> getSubCategories(Long parentId) {
+        LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Category::getParentId, parentId)
+                .eq(Category::getLevel, 2)
+                .orderByAsc(Category::getSortOrder);
+        List<Category> categories = categoryMapper.selectList(wrapper);
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Category c : categories) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("categoryId", c.getId());
+            item.put("categoryName", c.getName());
+            result.add(item);
+        }
+        return result;
+    }
+
     // Helper methods
 
     private String getProductStatusText(Integer status) {
