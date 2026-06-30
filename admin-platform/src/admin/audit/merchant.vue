@@ -3,7 +3,7 @@
     <h2>商家入驻审核列表</h2>
     <div class="search-bar">
       <input placeholder="店铺名称/联系人" v-model="keyword" />
-      <select v-model="auditStatus">
+      <select v-model="auditStatusFilter">
         <option value="">全部状态</option>
         <option value="0">待审核</option>
         <option value="1">审核通过</option>
@@ -16,7 +16,7 @@
         <tr>
           <th>申请ID</th>
           <th>店铺名</th>
-          <th>商家类型</th>
+          <th>入驻类型</th>
           <th>联系人</th>
           <th>手机号</th>
           <th>审核状态</th>
@@ -27,10 +27,10 @@
         <tr v-for="item in tableList" :key="item.applyId">
           <td>{{ item.applyId }}</td>
           <td>{{ item.shopName }}</td>
-          <td>{{ item.merchantType === 'PERSON' ? '个人商家' : '企业商家' }}</td>
+          <td>{{ item.applyTypeText || (item.applyType === 1 ? '个人' : '企业') }}</td>
           <td>{{ item.contactName }}</td>
           <td>{{ item.contactPhone }}</td>
-          <td>{{ auditMap[item.auditStatus] }}</td>
+          <td>{{ auditMap[item.auditStatus] || '待审核' }}</td>
           <td>
             <button @click="openDialog(item)">审核</button>
           </td>
@@ -38,15 +38,27 @@
       </tbody>
     </table>
     <div class="page">
-      <button :disabled="page === 1" @click="page--">上一页</button>
-      <span>第{{page}}页</span>
-      <button @click="page++">下一页</button>
+      <button :disabled="page === 1" @click="page--; getList()">上一页</button>
+      <span>第{{ page }}页 / 共{{ total }}条</span>
+      <button :disabled="page * pageSize >= total" @click="page++; getList()">下一页</button>
     </div>
 
     <!-- 审核弹窗 -->
     <div v-if="showMask" class="mask" @click.self="showMask = false">
       <div class="dialog">
         <h3>商家资质审核</h3>
+        <div v-if="currentItem">
+          <p><b>申请ID：</b>{{ currentItem.applyId }}</p>
+          <p><b>店铺名：</b>{{ currentItem.shopName }}</p>
+          <p><b>入驻类型：</b>{{ currentItem.applyTypeText || (currentItem.applyType === 1 ? '个人' : '企业') }}</p>
+          <p><b>联系人：</b>{{ currentItem.contactName }}</p>
+          <p><b>联系电话：</b>{{ currentItem.contactPhone }}</p>
+          <p><b>店铺地址：</b>{{ currentItem.shopAddress }}</p>
+          <p><b>身份证正面：</b><a :href="currentItem.idCardFront" target="_blank">查看</a></p>
+          <p><b>身份证反面：</b><a :href="currentItem.idCardBack" target="_blank">查看</a></p>
+          <p v-if="currentItem.licenseImage"><b>营业执照：</b><a :href="currentItem.licenseImage" target="_blank">查看</a></p>
+          <p v-if="currentItem.foodPermitImage"><b>食品许可证：</b><a :href="currentItem.foodPermitImage" target="_blank">查看</a></p>
+        </div>
         <div class="form-item">
           <label>审核结果</label>
           <select v-model="curAuditStatus">
@@ -70,38 +82,64 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { getMerchantAuditList, auditMerchant } from '@/api/admin'
+
 const keyword = ref('')
-const auditStatus = ref('')
+const auditStatusFilter = ref('')
 const page = ref(1)
-const tableList = ref([
-  {applyId:1001,shopName:"鲜果小店",merchantType:"PERSON",contactName:"张三",contactPhone:"13800138000",auditStatus:0}
-])
-const auditMap:Record<string,string> = {'0':'待审核','1':'通过','2':'驳回'}
+const pageSize = 10
+const total = ref(0)
+const tableList = ref<any[]>([])
+const auditMap: Record<string, string> = { '0': '待审核', '1': '通过', '2': '驳回' }
+
 const showMask = ref(false)
+const currentItem = ref<any>(null)
 const curApplyId = ref(0)
 const curAuditStatus = ref(1)
 const remark = ref('')
 
-const getList = async ()=>{
-  const res = await getMerchantAuditList({keyword,auditStatus,page})
-  tableList.value = res.data
+const getList = async () => {
+  try {
+    const data = await getMerchantAuditList({
+      keyword: keyword.value || undefined,
+      auditStatus: auditStatusFilter.value !== '' ? Number(auditStatusFilter.value) : undefined,
+      pageNum: page.value,
+      pageSize
+    })
+    tableList.value = data.list || []
+    total.value = data.total || 0
+  } catch (e: any) {
+    alert(e.message)
+  }
 }
-const openDialog = (row:any)=>{
+
+const openDialog = (row: any) => {
+  currentItem.value = row
   curApplyId.value = row.applyId
+  remark.value = ''
+  curAuditStatus.value = 1
   showMask.value = true
 }
-const submitAudit = async ()=>{
-  await auditMerchant({applyId:curApplyId.value,auditStatus:curAudit.value,auditRemark:remark.value})
-  alert('审核完成')
-  showMask.value = false
-  getList()
+
+const submitAudit = async () => {
+  try {
+    await auditMerchant(curApplyId.value, {
+      auditStatus: curAuditStatus.value,
+      auditRemark: remark.value
+    })
+    alert('审核完成')
+    showMask.value = false
+    getList()
+  } catch (e: any) {
+    alert(e.message)
+  }
 }
+
 getList()
 </script>
 
 <style scoped>
 .register-box {
-  width: 900px;
+  width: 1000px;
   margin: 40px auto;
   padding: 30px;
   background: #FFFFFF;

@@ -3,7 +3,7 @@
     <h2>商品审核管理</h2>
     <div class="search-bar">
       <input placeholder="商品名称" v-model="keyword" />
-      <select v-model="auditStatus">
+      <select v-model="auditStatusFilter">
         <option value="">全部</option>
         <option value="0">待审核</option>
         <option value="1">审核通过</option>
@@ -18,6 +18,7 @@
           <th>商品图</th>
           <th>商品名称</th>
           <th>所属商家</th>
+          <th>最低价</th>
           <th>审核状态</th>
           <th>操作</th>
         </tr>
@@ -27,25 +28,26 @@
           <td>{{ item.productId }}</td>
           <td><img width="60" :src="item.mainImage" /></td>
           <td>{{ item.title }}</td>
-          <td>{{ item.shopName }}</td>
-          <td>{{ auditMap[item.auditStatus] }}</td>
+          <td>{{ item.merchantName }}</td>
+          <td>¥{{ item.minPrice }}</td>
+          <td>{{ auditMap[item.auditStatus] || '待审核' }}</td>
           <td><button @click="openAudit(item)">审核</button></td>
         </tr>
       </tbody>
     </table>
     <div class="page-wrap">
-      <button :disabled="page ===1" @click="page--">上一页</button>
-      <span>第{{page}}页</span>
-      <button @click="page++">下一页</button>
+      <button :disabled="page === 1" @click="page--; getList()">上一页</button>
+      <span>第{{ page }}页 / 共{{ total }}条</span>
+      <button :disabled="page * pageSize >= total" @click="page++; getList()">下一页</button>
     </div>
 
     <!-- 审核弹窗 -->
-    <div v-if="showMask" class="mask" @click.self="showMask=false">
+    <div v-if="showMask" class="mask" @click.self="showMask = false">
       <div class="dialog">
         <h3>商品审核操作</h3>
         <div class="form-item">
           <label>审核结果</label>
-          <select v-model="status">
+          <select v-model="auditStatus">
             <option value="1">通过</option>
             <option value="2">驳回</option>
           </select>
@@ -55,7 +57,7 @@
           <input v-model="remark" />
         </div>
         <div class="btns">
-          <button @click="showMask=false">取消</button>
+          <button @click="showMask = false">取消</button>
           <button class="save" @click="submit">确认</button>
         </div>
       </div>
@@ -66,32 +68,56 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { getProductAuditList, auditProduct } from '@/api/admin'
+
 const keyword = ref('')
-const auditStatus = ref('')
+const auditStatusFilter = ref('')
 const page = ref(1)
-const tableList = ref([
-  {productId:1001,mainImage:"https://picsum.photos/100",title:"精品苹果",shopName:"鲜果店",auditStatus:0}
-])
-const auditMap = {'0':'待审核','1':'通过','2':'驳回'}
+const pageSize = 10
+const total = ref(0)
+const tableList = ref<any[]>([])
+const auditMap: Record<string, string> = { '0': '待审核', '1': '通过', '2': '驳回' }
+
 const showMask = ref(false)
 const pid = ref(0)
-const status = ref(1)
+const auditStatus = ref(1)
 const remark = ref('')
 
-const getList = async ()=>{
-  const res = await getProductAuditList({keyword,auditStatus,page})
-  tableList.value = res.data
+const getList = async () => {
+  try {
+    const data = await getProductAuditList({
+      keyword: keyword.value || undefined,
+      auditStatus: auditStatusFilter.value !== '' ? Number(auditStatusFilter.value) : undefined,
+      pageNum: page.value,
+      pageSize
+    })
+    tableList.value = data.list || []
+    total.value = data.total || 0
+  } catch (e: any) {
+    alert(e.message)
+  }
 }
-const openAudit = (row:any)=>{
+
+const openAudit = (row: any) => {
   pid.value = row.productId
+  auditStatus.value = 1
+  remark.value = ''
   showMask.value = true
 }
-const submit = async ()=>{
-  await auditProduct({productId:pid.value,auditStatus:status.value,auditRemark:remark.value})
-  alert('审核完成')
-  showMask.value = false
-  getList()
+
+const submit = async () => {
+  try {
+    await auditProduct(pid.value, {
+      auditStatus: auditStatus.value,
+      auditRemark: remark.value
+    })
+    alert('审核完成')
+    showMask.value = false
+    getList()
+  } catch (e: any) {
+    alert(e.message)
+  }
 }
+
 getList()
 </script>
 
@@ -140,13 +166,13 @@ table th, table td {
 .mask {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0.45);
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 .dialog {
-  width: 700px;
+  width: 400px;
   background: #fff;
   padding: 24px;
   border-radius: 8px;

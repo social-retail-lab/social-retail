@@ -3,13 +3,6 @@
     <div class="login-card">
       <h2>社交新零售管理后台</h2>
       <div class="form-item">
-        <label>管理员身份</label>
-        <select v-model="adminType" class="select-input">
-          <option value="SYSTEM">系统管理员</option>
-          <option value="OPERATION">运营管理员</option>
-        </select>
-      </div>
-      <div class="form-item">
         <label>账号</label>
         <input v-model="username" placeholder="请输入管理员账号" />
       </div>
@@ -25,10 +18,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { systemAdminLogin, operationAdminLogin } from '@/api/admin'
+import { adminLogin } from '@/api/admin'
 
 const router = useRouter()
-const adminType = ref('SYSTEM')
 const username = ref('')
 const password = ref('')
 
@@ -37,15 +29,14 @@ const handleLogin = async () => {
     alert('账号密码不能为空')
     return
   }
-  let res
-  if (adminType.value === 'SYSTEM') {
-    res = await systemAdminLogin({ username: username.value, password: password.value })
-  } else {
-    res = await operationAdminLogin({ username: username.value, password: password.value })
+  try {
+    const res = await adminLogin({ username: username.value, password: password.value })
+    localStorage.setItem('adminToken', res.token)
+    localStorage.setItem('adminInfo', JSON.stringify(res.adminInfo))
+    router.push('/dashboard')
+  } catch (e: any) {
+    alert(e.message || '登录失败')
   }
-  localStorage.setItem('adminToken', res.data.token)
-  localStorage.setItem('adminType', adminType.value)
-  router.push('/dashboard')
 }
 </script>
 
@@ -80,7 +71,7 @@ h2 {
   font-size: 14px;
   color: #4E5969;
 }
-.form-item input, .select-input {
+.form-item input {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
@@ -88,7 +79,7 @@ h2 {
   border-radius: 4px;
   font-size: 14px;
 }
-.form-item input:focus, .select-input:focus {
+.form-item input:focus {
   outline: none;
   border-color: #165DFF;
 }
