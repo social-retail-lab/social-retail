@@ -16,7 +16,6 @@ import com.socialretail.backend.mapper.member.MerchantApplyMapper;
 import com.socialretail.backend.mapper.member.MerchantInfoChangeMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.mapper.member.MerchantQualificationMapper;
-import com.socialretail.backend.mapper.member.UserMapper;
 import com.socialretail.backend.mapper.product.BrandMapper;
 import com.socialretail.backend.mapper.product.CategoryMapper;
 import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
@@ -60,9 +59,6 @@ public class AuditService {
 
     @Resource
     private ProductMapper productMapper;
-
-    @Resource
-    private UserMapper userMapper;
 
     @Resource
     private SkuMapper skuMapper;
@@ -553,11 +549,11 @@ public class AuditService {
         for (MerchantInfoChange c : resultPage.getRecords()) {
             Merchant merchant = merchantMapper.selectById(c.getMerchantId());
             Map<String, Object> item = new HashMap<>();
-            item.put("changeId", c.getId());
+            item.put("id", c.getId());
             item.put("merchantId", c.getMerchantId());
             item.put("merchantName", merchant != null ? merchant.getMerchantName() : "未知");
-            item.put("requestType", c.getRequestType());
-            item.put("requestTypeText", infoChangeRequestTypeText(c.getRequestType()));
+            item.put("changeType", c.getRequestType());
+            item.put("changeTypeText", infoChangeRequestTypeText(c.getRequestType()));
             item.put("auditStatus", c.getAuditStatus());
             item.put("auditStatusText", auditStatusText(c.getAuditStatus()));
             item.put("auditRemark", c.getAuditRemark());

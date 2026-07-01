@@ -18,7 +18,7 @@ import com.socialretail.backend.mapper.member.MerchantApplyMapper;
 import com.socialretail.backend.mapper.member.MerchantInfoChangeMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.mapper.member.MerchantQualificationMapper;
-import com.socialretail.backend.mapper.member.UserMapper;
+import com.socialretail.backend.mapper.member.MemberUserMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.vo.AuditRequestVO;
 import com.socialretail.backend.vo.InfoChangeRequest;
@@ -43,7 +43,7 @@ import java.util.Map;
 public class MerchantService {
 
     @Resource
-    private UserMapper userMapper;
+    private MemberUserMapper memberUserMapper;
 
     @Resource
     private MerchantMapper merchantMapper;
@@ -139,7 +139,7 @@ public class MerchantService {
         // 检查用户是否存在，不存在则自动注册
         LambdaQueryWrapper<User> userWrapper = new LambdaQueryWrapper<>();
         userWrapper.eq(User::getPhone, phone);
-        User user = userMapper.selectOne(userWrapper);
+        User user = memberUserMapper.selectOne(userWrapper);
 
         if (user == null) {
             // 自动注册，生成随机用户名: 用户 + 8位随机字符
@@ -150,7 +150,7 @@ public class MerchantService {
             user.setNickname(nickname);
             user.setPassword(MD5Utils.encrypt(password));
             user.setStatus(1);
-            userMapper.insert(user);
+            memberUserMapper.insert(user);
         } else {
             // 验证密码
             if (!MD5Utils.verify(password, user.getPassword())) {

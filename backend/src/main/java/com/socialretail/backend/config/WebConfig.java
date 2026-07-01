@@ -52,9 +52,9 @@ public class WebConfig implements WebMvcConfigurer {
         if (uploadPath != null && !uploadPath.isEmpty()) {
             basePath = Paths.get(uploadPath).toAbsolutePath();
         } else {
-            basePath = Paths.get(System.getProperty("user.dir"), "uploads").toAbsolutePath();
+            basePath = Paths.get(System.getProperty("user.dir"), "static").toAbsolutePath();
         }
-        registry.addResourceHandler("/uploads/**")
+        registry.addResourceHandler("/static/**")
                 .addResourceLocations("file:" + basePath.toString().replace("\\", "/") + "/");
     }
 }

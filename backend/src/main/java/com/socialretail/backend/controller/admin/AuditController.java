@@ -3,6 +3,7 @@ package com.socialretail.backend.controller.admin;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.Result;
 import com.socialretail.backend.service.admin.AuditService;
+import com.socialretail.backend.service.merchant.PickupPointService;
 import com.socialretail.backend.vo.AdminProductDetailVO;
 import com.socialretail.backend.vo.AdminProductListVO;
 import com.socialretail.backend.vo.AuditRequest;
@@ -31,6 +32,9 @@ public class AuditController {
 
     @Resource
     private AuditService auditService;
+
+    @Resource
+    private PickupPointService pickupPointService;
 
     // ==================== 商家审核 ====================
 
@@ -246,6 +250,40 @@ public class AuditController {
             return Result.ok(result);
         } catch (RuntimeException e) {
             log.warn("[信息变更审核] 失败, changeId={}, 原因: {}", changeId, e.getMessage());
+            throw e;
+        }
+    }
+
+    // ==================== 自提点审核 ====================
+
+    @GetMapping("/pickup-points")
+    public Result<PageResult<Map<String, Object>>> getPendingPickupPoints(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        log.info("[自提点审核列表] pageNum={}, pageSize={}", pageNum, pageSize);
+        try {
+            PageResult<Map<String, Object>> result = pickupPointService.getPendingPoints(pageNum, pageSize);
+            log.info("[自提点审核列表] 成功, total={}", result.getTotal());
+            return Result.ok(result);
+        } catch (RuntimeException e) {
+            log.warn("[自提点审核列表] 失败, 原因: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    @PostMapping("/pickup-points/{pointId}/audit")
+    public Result<Map<String, Object>> auditPickupPoint(
+            @PathVariable Long pointId,
+            @RequestBody Map<String, Object> body) {
+        Integer auditStatus = (Integer) body.get("auditStatus");
+        String auditRemark = (String) body.get("auditRemark");
+        log.info("[自提点审核] pointId={}, auditStatus={}, auditRemark={}", pointId, auditStatus, auditRemark);
+        try {
+            Map<String, Object> result = pickupPointService.auditPickupPoint(pointId, auditStatus, auditRemark);
+            log.info("[自提点审核] 成功, pointId={}, auditedStatus={}", pointId, auditStatus);
+            return Result.ok(result);
+        } catch (RuntimeException e) {
+            log.warn("[自提点审核] 失败, pointId={}, 原因: {}", pointId, e.getMessage());
             throw e;
         }
     }

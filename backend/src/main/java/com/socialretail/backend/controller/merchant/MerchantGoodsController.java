@@ -87,10 +87,12 @@ public class MerchantGoodsController {
         }
     }
 
-    // ========== 图片上传 ==========
+    // ========== 图片上传（支持分文件夹保存） ==========
+    // folder可选值: product(默认), id_card, business_license, food_permit, avatar, evidence
     @PostMapping("/upload/image")
-    public Result<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
-        log.info("[图片上传] fileName={}, size={}", file.getOriginalFilename(), file.getSize());
+    public Result<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file,
+                                                    @RequestParam(defaultValue = "product") String folder) {
+        log.info("[图片上传] fileName={}, size={}, folder={}", file.getOriginalFilename(), file.getSize(), folder);
         try {
             if (file.isEmpty()) {
                 throw new RuntimeException("上传文件为空");
@@ -108,15 +110,15 @@ public class MerchantGoodsController {
             if (uploadPath != null && !uploadPath.isEmpty()) {
                 basePath = Paths.get(uploadPath).toAbsolutePath();
             } else {
-                basePath = Paths.get(System.getProperty("user.dir"), "uploads").toAbsolutePath();
+                basePath = Paths.get(System.getProperty("user.dir"), "static").toAbsolutePath();
             }
-            Path dirPath = basePath.resolve("images").resolve(dateDir);
+            Path dirPath = basePath.resolve(folder).resolve(dateDir);
             Files.createDirectories(dirPath);
 
             File dest = dirPath.resolve(newFileName).toFile();
             file.transferTo(dest);
 
-            String url = baseUrl + "/uploads/images/" + dateDir + "/" + newFileName;
+            String url = baseUrl + "/static/" + folder + "/" + dateDir + "/" + newFileName;
             Map<String, String> result = Map.of("url", url, "fileName", newFileName);
             log.info("[图片上传] 成功, url={}", url);
             return Result.ok("上传成功", result);
