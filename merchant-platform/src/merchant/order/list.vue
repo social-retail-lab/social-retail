@@ -16,7 +16,6 @@
         @click="activeTab = tab.value"
       >
         {{ tab.label }}
-        <span v-if="tab.count > 0" class="badge">{{ tab.count }}</span>
       </button>
     </div>
 
@@ -32,12 +31,12 @@
 
         <div class="order-items">
           <div v-for="item in order.orderItems" :key="item.id" class="order-item">
-            <img :src="item.productImage" class="product-image" />
+            <img :src="item.productImage || 'https://via.placeholder.com/80'" class="product-image" />
             <div class="product-info">
               <div class="product-name">{{ item.productName }}</div>
               <div class="product-spec">{{ item.skuSpecs }}</div>
               <div class="product-price">
-                <span class="price">¥{{ item.price.toFixed(2) }}</span>
+                <span class="price">¥{{ (item.price || 0).toFixed(2) }}</span>
                 <span class="quantity">x{{ item.quantity }}</span>
               </div>
             </div>
@@ -46,7 +45,7 @@
 
         <div class="order-footer">
           <div class="order-total">
-            共{{ order.itemCount }}件商品，合计: <span class="total-price">¥{{ order.payAmount.toFixed(2) }}</span>
+            共{{ order.itemCount || 0 }}件商品，合计: <span class="total-price">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
             <span class="delivery-type">{{ order.deliveryTypeText }}</span>
           </div>
           <div class="order-actions">
@@ -76,7 +75,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getOrderList, getOrderDetail, acceptOrder, prepareOrder, confirmDelivery, confirmPickup, cancelOrder as cancelOrderApi } from '@/api/order'
+import { getOrderList, getOrderDetail, acceptOrder, prepareOrder, cancelOrder as cancelOrderApi } from '@/api/order'
+import { verifyPickup } from '@/api/pickup'
 
 interface OrderItem {
   id: number
@@ -113,13 +113,13 @@ const totalCount = ref(0)
 const pageSize = ref(10)
 
 const tabs = [
-  { label: '全部', value: 'ALL', count: 0 },
-  { label: '待接单', value: 'WAIT_ACCEPT', count: 0 },
-  { label: '已接单', value: 'ACCEPTED', count: 0 },
-  { label: '配送中', value: 'SHIPPING', count: 0 },
-  { label: '待自提', value: 'WAIT_PICKUP', count: 0 },
-  { label: '已完成', value: 'COMPLETED', count: 0 },
-  { label: '已取消', value: 'CANCELLED', count: 0 }
+  { label: '全部', value: 'ALL', status: undefined, deliveryType: undefined },
+  { label: '待接单', value: 'WAIT_ACCEPT', status: 1, deliveryType: undefined },
+  { label: '已接单', value: 'ACCEPTED', status: 2, deliveryType: undefined },
+  { label: '配送中', value: 'SHIPPING', status: 3, deliveryType: 1 },
+  { label: '待自提', value: 'WAIT_PICKUP', status: 3, deliveryType: 2 },
+  { label: '已完成', value: 'COMPLETED', status: 4, deliveryType: undefined },
+  { label: '已取消', value: 'CANCELLED', status: 5, deliveryType: undefined }
 ]
 
 const orderList = ref<Order[]>([])
@@ -134,21 +134,35 @@ const getStatusClass = (status: number) => {
 }
 
 const loadData = async () => {
+  const tab = tabs.find(t => t.value === activeTab.value)
   const params: any = {
-    page: currentPage.value,
+    pageNum: currentPage.value,
     pageSize: pageSize.value
   }
-  if (activeTab.value !== 'ALL') {
-    params.status = activeTab.value
+  if (tab && tab.status !== undefined) {
+    params.status = tab.status
+  }
+  if (tab && tab.deliveryType !== undefined) {
+    params.deliveryType = tab.deliveryType
   }
   if (searchKeyword.value) {
-    params.keyword = searchKeyword.value
+    params.orderSn = searchKeyword.value
   }
-  const res = await getOrderList(params)
-  if (res.code === 0) {
-    orderList.value = res.data.list || res.data || []
-    totalCount.value = res.data.total || orderList.value.length
-    totalPages.value = Math.ceil(totalCount.value / pageSize.value)
+  try {
+    const res = await getOrderList(params)
+    console.log('[订单列表] 原始响应:', JSON.stringify(res))
+    if (res.code === 0) {
+      const list = res.data?.list || res.data?.records || (Array.isArray(res.data) ? res.data : [])
+      console.log('[订单列表] 解析后 list count=', list.length, 'total=', res.data?.total)
+      orderList.value = list
+      totalCount.value = res.data?.total || list.length
+      totalPages.value = Math.max(1, Math.ceil(totalCount.value / pageSize.value))
+    } else {
+      console.error('[订单列表] 接口错误:', res.code, res.message)
+      alert('获取订单列表失败: ' + (res.message || '未知错误'))
+    }
+  } catch (e: any) {
+    console.error('[订单列表] 请求异常:', e.message || e)
   }
 }
 
@@ -198,19 +212,25 @@ const viewDetail = async (order: Order) => {
 }
 
 const handleConfirmPickup = async (order: Order) => {
-  if (confirm(`确认订单 ${order.orderSn} 已被自提吗？`)) {
-    const res = await confirmPickup(order.orderId)
-    if (res.code === 0) {
-      alert(`订单 ${order.orderSn} 已完成自提`)
-      loadData()
-    }
+  const pickupCode = prompt(`请输入订单 ${order.orderSn} 的自提码（6位数字）：`)
+  if (!pickupCode) return
+  if (!/^\d{6}$/.test(pickupCode)) {
+    alert('请输入6位数字自提码')
+    return
+  }
+  const res = await verifyPickup({ pickupCode })
+  if (res.code === 0) {
+    alert(`订单 ${order.orderSn} 已完成自提`)
+    loadData()
+  } else {
+    alert(res.message || '自提码验证失败')
   }
 }
 
 const handleCancelOrder = async (order: Order) => {
   const reason = prompt('请输入取消原因：')
   if (reason) {
-    const res = await cancelOrderApi(order.orderId, { reason })
+    const res = await cancelOrderApi(order.orderId, reason)
     if (res.code === 0) {
       alert(`订单 ${order.orderSn} 已取消，原因：${reason}`)
       loadData()

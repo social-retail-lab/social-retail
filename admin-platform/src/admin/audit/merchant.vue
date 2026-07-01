@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getMerchantAuditList, auditMerchant } from '@/api/audit'
+import { getMerchantApplies, auditMerchantApply } from '@/api/audit'
 const keyword = ref('')
 const auditStatus = ref('')
 const page = ref(1)
@@ -82,16 +82,16 @@ const remark = ref('')
 
 const getList = async ()=>{
   const params: any = {
-    page: page.value,
+    pageNum: page.value,
     pageSize: 10
   }
   if (keyword.value) {
     params.keyword = keyword.value
   }
-  if (auditStatus.value) {
-    params.status = auditStatus.value
+  if (auditStatus.value !== '') {
+    params.auditStatus = Number(auditStatus.value)
   }
-  const res = await getMerchantAuditList(params)
+  const res = await getMerchantApplies(params)
   if (res.code === 0) {
     tableList.value = res.data.list || res.data || []
   }
@@ -103,7 +103,7 @@ const openDialog = (row:any)=>{
   showMask.value = true
 }
 const submitAudit = async ()=>{
-  const res = await auditMerchant(curApplyId.value, {
+  const res = await auditMerchantApply(curApplyId.value, {
     auditStatus: Number(curAuditStatus.value),
     auditRemark: remark.value
   })

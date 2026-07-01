@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const service = axios.create({
-  baseURL: 'http://192.168.169.141:8080/api',
+  baseURL: '/api',
   timeout: 10000
 })
 
@@ -10,7 +10,6 @@ service.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
-  config.headers['Content-Type'] = 'application/json'
   return config
 })
 

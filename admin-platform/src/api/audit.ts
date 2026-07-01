@@ -1,41 +1,45 @@
 import request from '@/utils/request'
 
-export const getMerchantAuditList = (params: {
-  status?: string
-  page?: number
-  pageSize?: number
-  keyword?: string
-}) => {
-  return request.get('/admin/merchant/applications', { params })
+// ========== 商家入驻审核 ==========
+export const getMerchantApplies = (params: { auditStatus?: number; keyword?: string; pageNum?: number; pageSize?: number }) => {
+  return request.get('/admin/operation/merchant/applications', { params })
 }
 
-export const getMerchantDetail = (applyId: number) => {
-  return request.get(`/admin/merchant/applications/${applyId}`)
+export const getMerchantApplyDetail = (applyId: number) => {
+  return request.get(`/admin/operation/merchant/applications/${applyId}`)
 }
 
-export const auditMerchant = (applyId: number, data: {
-  auditStatus: number
-  auditRemark?: string
-}) => {
-  return request.post(`/admin/merchant/applications/${applyId}/audit`, data)
+export const auditMerchantApply = (applyId: number, data: { auditStatus: number; auditRemark?: string }) => {
+  return request.post(`/admin/operation/merchant/applications/${applyId}/audit`, data)
 }
 
-export const getProductAuditList = (params: {
-  status?: string
-  page?: number
-  pageSize?: number
-  keyword?: string
-}) => {
-  return request.get('/admin/products/audits', { params })
+// ========== 商品审核 ==========
+export const getProductAuditList = (params: { auditStatus?: number; keyword?: string; pageNum?: number; pageSize?: number }) => {
+  return request.get('/admin/operation/products/audits', { params })
 }
 
-export const getProductDetail = (productId: number) => {
-  return request.get(`/admin/products/${productId}`)
+export const getProductAuditDetail = (productId: number) => {
+  return request.get(`/admin/operation/products/${productId}`)
 }
 
-export const auditProduct = (productId: number, data: {
-  auditStatus: number
-  auditRemark?: string
-}) => {
-  return request.post(`/admin/products/${productId}/audit`, data)
+export const auditProduct = (productId: number, data: { auditStatus: number; auditRemark?: string }) => {
+  return request.post(`/admin/operation/products/${productId}/audit`, data)
+}
+
+// ========== 信息变更审核 ==========
+export const getInfoChanges = (params: { auditStatus?: number; keyword?: string; pageNum?: number; pageSize?: number }) => {
+  return request.get('/admin/operation/info-changes', { params })
+}
+
+export const auditInfoChange = (changeId: number, data: { auditStatus: number; auditRemark?: string }) => {
+  return request.post(`/admin/operation/info-changes/${changeId}/audit`, data)
+}
+
+// ========== 自提点审核 ==========
+export const getPendingPickupPoints = (params: { pageNum?: number; pageSize?: number }) => {
+  return request.get('/admin/operation/pickup-points', { params })
+}
+
+export const auditPickupPoint = (pointId: number, data: { auditStatus: number; auditRemark?: string }) => {
+  return request.post(`/admin/operation/pickup-points/${pointId}/audit`, data)
 }

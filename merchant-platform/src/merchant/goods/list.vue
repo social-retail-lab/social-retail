@@ -2,20 +2,29 @@
   <div class="goods-page">
     <div class="page-header">
       <h2>商品管理</h2>
-      <button class="add-btn" @click="showAddModal = true">+ 添加商品</button>
+      <button class="add-btn" @click="openAddModal">+ 添加商品</button>
     </div>
 
     <div class="filter-bar">
       <input v-model="keyword" placeholder="商品名称搜索" class="search-input" @keyup.enter="searchGoods" />
-      <select v-model="categoryId" class="filter-select">
-        <option value="">全部分类</option>
-        <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+      <select v-model="categoryId1" class="filter-select" @change="onFilterLevel1Change">
+        <option value="">一级分类</option>
+        <option v-for="cat in level1Categories" :key="cat.categoryId" :value="cat.categoryId">{{ cat.categoryName }}</option>
       </select>
-      <select v-model="status" class="filter-select">
+      <select v-model="categoryId2" class="filter-select">
+        <option value="">二级分类</option>
+        <option v-for="cat in level2Categories" :key="cat.categoryId" :value="cat.categoryId">{{ cat.categoryName }}</option>
+      </select>
+      <select v-model="filterStatus" class="filter-select">
         <option value="">全部状态</option>
-        <option value="ON_SHELF">上架中</option>
-        <option value="OFF_SHELF">已下架</option>
-        <option value="WAIT_AUDIT">审核中</option>
+        <option value="1">上架中</option>
+        <option value="0">已下架</option>
+      </select>
+      <select v-model="filterAuditStatus" class="filter-select">
+        <option value="">全部审核</option>
+        <option value="0">待审核</option>
+        <option value="1">已通过</option>
+        <option value="2">已驳回</option>
       </select>
       <button class="search-btn" @click="searchGoods">搜索</button>
     </div>
@@ -27,24 +36,38 @@
         </div>
         <div class="goods-info">
           <h3 class="goods-title">{{ goods.title }}</h3>
-          <p class="goods-desc">{{ goods.description }}</p>
           <div class="goods-price">
-            <span class="price">¥{{ goods.price.toFixed(2) }}</span>
-            <span v-if="goods.originalPrice" class="original-price">¥{{ goods.originalPrice.toFixed(2) }}</span>
+            <span class="price">¥{{ (goods.minPrice || 0).toFixed(2) }}</span>
           </div>
           <div class="goods-meta">
-            <span class="meta-item">库存: {{ goods.stock }}</span>
-            <span class="meta-item">销量: {{ goods.sales }}</span>
-            <span :class="['status-tag', goods.status]">{{ getStatusText(goods.status) }}</span>
+            <span class="meta-item">库存: {{ goods.totalStock || 0 }}</span>
+            <span class="meta-item">销量: 0</span>
+            <span :class="['status-tag', getStatusTag(goods).class]">{{ getStatusTag(goods).text }}</span>
+          </div>
+          <div v-if="goods.auditStatus === 2 && goods.auditRemark" class="audit-remark">
+            驳回原因：{{ goods.auditRemark }}
           </div>
           <div class="goods-actions">
-            <button class="action-btn edit" @click="editGoods(goods)">编辑</button>
-            <button v-if="goods.status === 'ON_SHELF'" class="action-btn off" @click="toggleShelf(goods, 'OFF_SHELF')">下架</button>
-            <button v-else-if="goods.status === 'OFF_SHELF'" class="action-btn on" @click="toggleShelf(goods, 'ON_SHELF')">上架</button>
-            <button class="action-btn delete" @click="deleteGoods(goods)">删除</button>
+            <template v-if="goods.auditStatus === 0">
+              <!-- 审核中：无按钮 -->
+            </template>
+            <template v-else-if="goods.auditStatus === 2">
+              <button class="action-btn edit" @click="editGoods(goods)">重新提交审核</button>
+            </template>
+            <template v-else>
+              <button v-if="goods.status === 1" class="action-btn off" @click="toggleShelf(goods)">下架</button>
+              <button v-else class="action-btn on" @click="toggleShelf(goods)">上架</button>
+              <button class="action-btn edit" @click="editGoods(goods)">编辑</button>
+            </template>
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-if="totalCount > pageSize" class="pagination">
+      <button :disabled="currentPage <= 1" @click="prevPage">上一页</button>
+      <span>{{ currentPage }} / {{ totalPages }}</span>
+      <button :disabled="currentPage >= totalPages" @click="nextPage">下一页</button>
     </div>
 
     <div v-if="showAddModal" class="modal-mask" @click.self="closeModal">
@@ -59,34 +82,70 @@
             <input v-model="form.title" placeholder="请输入商品名称" />
           </div>
           <div class="form-item">
-            <label>商品描述</label>
-            <textarea v-model="form.description" placeholder="请输入商品描述"></textarea>
+            <label>副标题</label>
+            <input v-model="form.subTitle" placeholder="请输入副标题" />
           </div>
-          <div class="form-item">
-            <label>商品分类</label>
-            <select v-model="form.categoryId">
-              <option value="">请选择分类</option>
-              <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
+          <div class="form-row">
+            <div class="form-item">
+              <label>一级分类</label>
+              <select v-model="form.categoryId1" @change="onFormLevel1Change">
+                <option :value="0">请选择一级分类</option>
+                <option v-for="cat in level1Categories" :key="cat.categoryId" :value="cat.categoryId">{{ cat.categoryName }}</option>
             </select>
           </div>
-          <div class="form-row">
-            <div class="form-item">
-              <label>商品价格</label>
-              <input v-model.number="form.price" type="number" placeholder="请输入价格" />
-            </div>
-            <div class="form-item">
-              <label>原价</label>
-              <input v-model.number="form.originalPrice" type="number" placeholder="请输入原价" />
+          <div class="form-item">
+            <label>二级分类</label>
+            <select v-model="form.categoryId2">
+              <option :value="0">请选择二级分类</option>
+              <option v-for="cat in formLevel2Categories" :key="cat.categoryId" :value="cat.categoryId">{{ cat.categoryName }}</option>
+              </select>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-item">
-              <label>库存数量</label>
-              <input v-model.number="form.stock" type="number" placeholder="请输入库存" />
+          <div class="form-item">
+            <label>品牌名称</label>
+            <input v-model="form.brandName" placeholder="请输入品牌名称" />
+          </div>
+          <div class="form-item">
+            <label>商品主图</label>
+            <div class="upload-area">
+              <input type="file" accept="image/*" @change="onMainImageChange" />
+              <span v-if="uploadingMainImage" class="upload-tip">上传中...</span>
+              <img v-if="form.mainImage" :src="form.mainImage" class="upload-preview" />
             </div>
-            <div class="form-item">
-              <label>商品图片</label>
-              <input v-model="form.mainImage" placeholder="请输入图片URL" />
+          </div>
+          <div class="form-item">
+            <label>商品详情图</label>
+            <div class="upload-area">
+              <input type="file" accept="image/*" multiple @change="onDetailImagesChange" />
+              <span v-if="uploadingDetailImages" class="upload-tip">上传中...</span>
+              <div class="detail-images-preview">
+                <img v-for="(url, idx) in form.detailImages" :key="idx" :src="url" class="upload-preview" />
+              </div>
+            </div>
+          </div>
+          <div class="form-item">
+            <label>商品详情描述</label>
+            <textarea v-model="form.detailDesc" placeholder="请输入商品详情描述"></textarea>
+          </div>
+          <div class="form-item">
+            <label>销售方式</label>
+            <div class="radio-group">
+              <label><input type="radio" v-model="form.saleType" :value="1" /> 仅自提</label>
+              <label><input type="radio" v-model="form.saleType" :value="2" /> 仅配送</label>
+              <label><input type="radio" v-model="form.saleType" :value="3" /> 均可</label>
+            </div>
+          </div>
+          <div class="form-item">
+            <label>SKU列表</label>
+            <div class="sku-list">
+              <div v-for="(sku, idx) in form.skus" :key="idx" class="sku-row">
+                <input v-model="sku.specs" placeholder="规格" />
+                <input v-model.number="sku.price" type="number" placeholder="价格" />
+                <input v-model.number="sku.stock" type="number" placeholder="库存" />
+                <input v-model="sku.skuCode" placeholder="SKU编码" />
+                <button class="sku-remove-btn" @click="removeSku(idx)">×</button>
+              </div>
+              <button class="sku-add-btn" @click="addSku">+ 添加SKU</button>
             </div>
           </div>
         </div>
@@ -100,197 +159,306 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { getGoodsList, getGoodsDetail, getCategories, createGoods, updateGoods, updateGoodsStatus, uploadImage } from '@/api/goods'
 
+// ---------- filter state ----------
+const keyword = ref('')
+const categoryId1 = ref('')
+const categoryId2 = ref('')
+const filterStatus = ref('')
+const filterAuditStatus = ref('')
+const currentPage = ref(1)
+const pageSize = 10
+const totalCount = ref(0)
+const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
+
+// ---------- data ----------
+const goodsList = ref<any[]>([])
+const level1Categories = ref<any[]>([])
+const level2Categories = ref<any[]>([])
+
+// ---------- modal state ----------
 const showAddModal = ref(false)
 const editingGoods = ref<any>(null)
+const uploadingMainImage = ref(false)
+const uploadingDetailImages = ref(false)
+const formLevel2Categories = ref<any[]>([])
 
-const keyword = ref('')
-const categoryId = ref('')
-const status = ref('')
-
-const categories = ref([
-  { id: 1, name: '生鲜食品' },
-  { id: 2, name: '日用百货' },
-  { id: 3, name: '美妆护肤' },
-  { id: 4, name: '数码电子' },
-  { id: 5, name: '服装鞋帽' }
-])
+const emptySku = () => ({ specs: '', price: 0, stock: 0, skuCode: '' })
 
 const form = reactive({
   title: '',
-  description: '',
-  categoryId: '',
-  price: 0,
-  originalPrice: 0,
-  stock: 0,
-  mainImage: ''
+  subTitle: '',
+  categoryId1: 0,
+  categoryId2: 0,
+  brandName: '',
+  mainImage: '',
+  detailImages: [] as string[],
+  detailDesc: '',
+  saleType: 3,
+  skus: [emptySku()] as { specs: string; price: number; stock: number; skuCode: string }[]
 })
 
-const goodsList = ref([
-  {
-    productId: 1001,
-    title: '精品红富士苹果',
-    description: '新鲜采摘，脆甜多汁，产地直发',
-    categoryId: 1,
-    price: 19.9,
-    originalPrice: 29.9,
-    stock: 200,
-    sales: 1560,
-    status: 'ON_SHELF',
-    mainImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=fresh%20red%20apple%20fruit&image_size=square'
-  },
-  {
-    productId: 1002,
-    title: '进口车厘子5斤装',
-    description: '智利进口，果大饱满，甜度高',
-    categoryId: 1,
-    price: 89.9,
-    originalPrice: 129.9,
-    stock: 50,
-    sales: 890,
-    status: 'ON_SHELF',
-    mainImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=cherries%20fruit%20box&image_size=square'
-  },
-  {
-    productId: 1003,
-    title: '蒙牛纯牛奶24盒',
-    description: '优质奶源，营养健康',
-    categoryId: 1,
-    price: 59.9,
-    originalPrice: 69.9,
-    stock: 100,
-    sales: 2340,
-    status: 'ON_SHELF',
-    mainImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=milk%20carton%20package&image_size=square'
-  },
-  {
-    productId: 1004,
-    title: '维达抽纸24包',
-    description: '四层加厚，柔软亲肤',
-    categoryId: 2,
-    price: 45.9,
-    originalPrice: 59.9,
-    stock: 150,
-    sales: 3120,
-    status: 'OFF_SHELF',
-    mainImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=tissue%20paper%20package&image_size=square'
-  },
-  {
-    productId: 1005,
-    title: '进口牛肉礼盒',
-    description: '澳洲进口，原切牛肉，品质保证',
-    categoryId: 1,
-    price: 199.0,
-    originalPrice: 268.0,
-    stock: 30,
-    sales: 450,
-    status: 'WAIT_AUDIT',
-    mainImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=beef%20meat%20gift%20box&image_size=square'
-  },
-  {
-    productId: 1006,
-    title: '可口可乐24罐',
-    description: '经典口味，畅爽解渴',
-    categoryId: 1,
-    price: 42.0,
-    originalPrice: 49.9,
-    stock: 80,
-    sales: 1890,
-    status: 'ON_SHELF',
-    mainImage: 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=coca%20cola%20cans&image_size=square'
-  }
-])
-
-const getStatusText = (status: string) => {
-  const map: Record<string, string> = {
-    ON_SHELF: '上架中',
-    OFF_SHELF: '已下架',
-    WAIT_AUDIT: '审核中'
-  }
-  return map[status] || status
+// ---------- status tag helper ----------
+const getStatusTag = (product: any) => {
+  if (product.auditStatus === 0) return { text: '待审核', class: 'pending' }
+  if (product.auditStatus === 2) return { text: '审核驳回', class: 'rejected' }
+  if (product.status === 1) return { text: '已上架', class: 'onshelf' }
+  return { text: '已下架', class: 'offshelf' }
 }
 
+// ---------- API calls ----------
+const loadData = async () => {
+  const params: any = { pageNum: currentPage.value, pageSize }
+  if (keyword.value) params.keyword = keyword.value
+  if (categoryId2.value) params.categoryId = categoryId2.value
+  else if (categoryId1.value) params.categoryId = categoryId1.value
+  if (filterStatus.value !== '') params.status = filterStatus.value
+  if (filterAuditStatus.value !== '') params.auditStatus = filterAuditStatus.value
+
+  try {
+    const res = await getGoodsList(params)
+    if (res.code === 0) {
+      goodsList.value = res.data.list || []
+      totalCount.value = res.data.total || 0
+      console.log('[商品列表] 加载成功, count=', goodsList.value.length, 'total=', totalCount.value)
+    } else {
+      console.error('[商品列表] 接口返回错误:', res.message)
+    }
+  } catch (e: any) {
+    console.error('[商品列表] 加载失败:', e.message || e)
+  }
+}
+
+const loadCategories = async (parentId?: number) => {
+  try {
+    const res = await getCategories(parentId)
+    if (res.code === 0) {
+      if (parentId === undefined || parentId === 0) {
+        level1Categories.value = res.data || []
+        console.log('[分类] 一级分类加载成功, count=', level1Categories.value.length)
+      } else {
+        level2Categories.value = res.data || []
+        console.log('[分类] 二级分类加载成功, count=', level2Categories.value.length)
+      }
+    } else {
+      console.error('[分类] 接口返回错误:', res.message)
+    }
+  } catch (e: any) {
+    console.error('[分类] 加载失败:', e.message || e)
+  }
+}
+
+const loadFormLevel2Categories = async (parentId: number) => {
+  if (!parentId) {
+    formLevel2Categories.value = []
+    return
+  }
+  const res = await getCategories(parentId)
+  if (res.code === 0) {
+    formLevel2Categories.value = res.data || []
+  }
+}
+
+// ---------- filter handlers ----------
 const searchGoods = () => {
-  let list = goodsList.value
-  if (keyword.value) {
-    list = list.filter(g => g.title.includes(keyword.value))
-  }
-  if (categoryId.value) {
-    list = list.filter(g => String(g.categoryId) === categoryId.value)
-  }
-  if (status.value) {
-    list = list.filter(g => g.status === status.value)
-  }
-  goodsList.value = list
+  currentPage.value = 1
+  loadData()
 }
 
-const editGoods = (goods: any) => {
-  editingGoods.value = goods
-  form.title = goods.title
-  form.description = goods.description
-  form.categoryId = String(goods.categoryId)
-  form.price = goods.price
-  form.originalPrice = goods.originalPrice || 0
-  form.stock = goods.stock
-  form.mainImage = goods.mainImage
+const onFilterLevel1Change = () => {
+  categoryId2.value = ''
+  if (categoryId1.value) {
+    loadCategories(Number(categoryId1.value))
+  } else {
+    level2Categories.value = []
+  }
+}
+
+const onFormLevel1Change = () => {
+  form.categoryId2 = 0
+  loadFormLevel2Categories(form.categoryId1)
+}
+
+// ---------- pagination ----------
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    loadData()
+  }
+}
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    currentPage.value++
+    loadData()
+  }
+}
+
+// ---------- actions ----------
+const openAddModal = () => {
+  editingGoods.value = null
+  resetForm()
   showAddModal.value = true
 }
 
-const deleteGoods = (goods: any) => {
-  if (confirm(`确定要删除商品「${goods.title}」吗？`)) {
-    const index = goodsList.value.findIndex(g => g.productId === goods.productId)
-    if (index > -1) {
-      goodsList.value.splice(index, 1)
+const editGoods = async (goods: any) => {
+  // 先获取商品详情（包含完整字段）
+  try {
+    const detailRes = await getGoodsDetail(goods.productId)
+    if (detailRes.code === 0) {
+      const detail = detailRes.data
+      editingGoods.value = detail
+      form.title = detail.title || ''
+      form.subTitle = detail.subTitle || ''
+      form.categoryId1 = detail.categoryIds ? detail.categoryIds[0] || 0 : (detail.categoryId1 || 0)
+      form.categoryId2 = detail.categoryIds ? detail.categoryIds[1] || 0 : (detail.categoryId2 || 0)
+      form.brandName = detail.brandName || ''
+      form.mainImage = detail.mainImage || ''
+      form.detailImages = detail.detailImages || []
+      form.detailDesc = detail.detailDesc || ''
+      form.saleType = detail.saleType || 3
+      form.skus = (detail.skuList && detail.skuList.length > 0)
+        ? detail.skuList.map((s: any) => ({ specs: s.specs || '', price: s.price || 0, stock: s.stock || 0, skuCode: s.skuCode || '' }))
+        : [emptySku()]
+
+      if (form.categoryId1) {
+        await loadFormLevel2Categories(form.categoryId1)
+      }
     }
+  } catch (e: any) {
+    console.error('[编辑商品] 获取详情失败:', e.message || e)
+    alert('获取商品详情失败')
+    return
+  }
+
+  showAddModal.value = true
+}
+
+const toggleShelf = async (goods: any) => {
+  const newStatus = goods.status === 1 ? 0 : 1
+  const res = await updateGoodsStatus(goods.productId, newStatus)
+  if (res.code === 0) {
+    goods.status = newStatus
   }
 }
 
-const toggleShelf = (goods: any, newStatus: string) => {
-  goods.status = newStatus
+const submitGoods = async () => {
+  if (!form.title || !form.mainImage) {
+    alert('商品名称和主图不能为空')
+    return
+  }
+  if (!form.categoryId1) {
+    alert('请选择一级分类')
+    return
+  }
+  if (!form.skus || form.skus.length === 0 || !form.skus[0].specs) {
+    alert('请至少添加一个SKU')
+    return
+  }
+
+  const data: any = {
+    title: form.title,
+    subTitle: form.subTitle || undefined,
+    categoryIds: [form.categoryId1, form.categoryId2].filter(Boolean),
+    mainImage: form.mainImage,
+    detailImages: form.detailImages.length > 0 ? form.detailImages : undefined,
+    detailDesc: form.detailDesc || undefined,
+    saleType: form.saleType,
+    skuList: form.skus.filter(s => s.specs).map(s => ({
+      specs: s.specs,
+      price: s.price,
+      stock: s.stock,
+      skuCode: s.skuCode || undefined
+    }))
+  }
+
+  if (editingGoods.value) {
+    const res = await updateGoods(editingGoods.value.productId, data)
+    if (res.code === 0) {
+      closeModal()
+      loadData()
+    }
+  } else {
+    const res = await createGoods(data)
+    if (res.code === 0) {
+      closeModal()
+      loadData()
+    }
+  }
 }
 
 const closeModal = () => {
   showAddModal.value = false
   editingGoods.value = null
-  form.title = ''
-  form.description = ''
-  form.categoryId = ''
-  form.price = 0
-  form.originalPrice = 0
-  form.stock = 0
-  form.mainImage = ''
+  resetForm()
 }
 
-const submitGoods = () => {
-  if (!form.title || !form.price || !form.stock) {
-    alert('商品名称、价格、库存不能为空')
-    return
-  }
-  if (editingGoods.value) {
-    editingGoods.value.title = form.title
-    editingGoods.value.description = form.description
-    editingGoods.value.categoryId = Number(form.categoryId)
-    editingGoods.value.price = form.price
-    editingGoods.value.originalPrice = form.originalPrice
-    editingGoods.value.stock = form.stock
-    editingGoods.value.mainImage = form.mainImage
-  } else {
-    goodsList.value.unshift({
-      productId: Date.now(),
-      title: form.title,
-      description: form.description,
-      categoryId: Number(form.categoryId),
-      price: form.price,
-      originalPrice: form.originalPrice,
-      stock: form.stock,
-      sales: 0,
-      status: 'WAIT_AUDIT',
-      mainImage: form.mainImage || 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=product%20placeholder&image_size=square'
-    })
-  }
-  closeModal()
+const resetForm = () => {
+  form.title = ''
+  form.subTitle = ''
+  form.categoryId1 = 0
+  form.categoryId2 = 0
+  form.brandName = ''
+  form.mainImage = ''
+  form.detailImages = []
+  form.detailDesc = ''
+  form.saleType = 3
+  form.skus = [emptySku()]
+  formLevel2Categories.value = []
 }
+
+// ---------- SKU ----------
+const addSku = () => {
+  form.skus.push(emptySku())
+}
+
+const removeSku = (idx: number) => {
+  if (form.skus.length <= 1) return
+  form.skus.splice(idx, 1)
+}
+
+// ---------- file upload ----------
+const onMainImageChange = async (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  uploadingMainImage.value = true
+  try {
+    const res = await uploadImage(file, 'product')
+    if (res.code === 0) {
+      form.mainImage = res.data.url
+    }
+  } finally {
+    uploadingMainImage.value = false
+    input.value = ''
+  }
+}
+
+const onDetailImagesChange = async (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const files = input.files
+  if (!files || files.length === 0) return
+  uploadingDetailImages.value = true
+  try {
+    for (let i = 0; i < files.length; i++) {
+      const res = await uploadImage(files[i], 'product')
+      if (res.code === 0) {
+        form.detailImages.push(res.data.url)
+      }
+    }
+  } finally {
+    uploadingDetailImages.value = false
+    input.value = ''
+  }
+}
+
+// ---------- init ----------
+onMounted(() => {
+  loadData()
+  loadCategories()
+})
 </script>
 
 <style scoped>
@@ -436,19 +604,33 @@ const submitGoods = () => {
   border-radius: 4px;
 }
 
-.status-tag.ON_SHELF {
+.status-tag.onshelf {
   background: #F6FFED;
   color: #52C41A;
 }
 
-.status-tag.OFF_SHELF {
+.status-tag.offshelf {
   background: #F2F3F5;
   color: #86909C;
 }
 
-.status-tag.WAIT_AUDIT {
+.status-tag.pending {
   background: #FFF7E6;
   color: #FA8C16;
+}
+
+.status-tag.rejected {
+  background: #FFF2F0;
+  color: #FF4D4F;
+}
+
+.audit-remark {
+  font-size: 12px;
+  color: #FF4D4F;
+  margin-bottom: 12px;
+  padding: 4px 8px;
+  background: #FFF2F0;
+  border-radius: 4px;
 }
 
 .goods-actions {
@@ -485,6 +667,35 @@ const submitGoods = () => {
   color: #FF4D4F;
 }
 
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 16px;
+}
+
+.pagination button {
+  padding: 8px 16px;
+  background: #165DFF;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination button:disabled {
+  background: #C9CDD4;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 14px;
+  color: #4E5969;
+}
+
 .modal-mask {
   position: fixed;
   top: 0;
@@ -499,10 +710,11 @@ const submitGoods = () => {
 }
 
 .modal-content {
-  width: 500px;
+  width: 600px;
+  max-height: 80vh;
   background: white;
   border-radius: 8px;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .modal-header {
@@ -511,6 +723,10 @@ const submitGoods = () => {
   align-items: center;
   padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 1;
 }
 
 .modal-header h3 {
@@ -562,12 +778,100 @@ const submitGoods = () => {
   resize: vertical;
 }
 
+.radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-group label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  color: #4E5969;
+  margin-bottom: 0;
+}
+
+.radio-group input[type="radio"] {
+  width: auto;
+}
+
+.upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.upload-tip {
+  font-size: 12px;
+  color: #165DFF;
+}
+
+.upload-preview {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #dcdcdc;
+}
+
+.detail-images-preview {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sku-list {
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.sku-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.sku-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.sku-remove-btn {
+  width: 28px;
+  height: 28px;
+  background: #FFF2F0;
+  color: #FF4D4F;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sku-add-btn {
+  padding: 6px 12px;
+  background: #E6F7FF;
+  color: #1890FF;
+  border: 1px dashed #1890FF;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
 .modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 20px;
   border-top: 1px solid #f0f0f0;
+  position: sticky;
+  bottom: 0;
+  background: white;
 }
 
 .cancel-btn {

@@ -67,6 +67,8 @@ onUnmounted(() => {
 })
 
 const menus = [
+  { path: '/store-info', label: '商家信息', icon: '🏪' },
+  { path: '/audit-requests', label: '审核请求', icon: '📝' },
   { path: '/goods', label: '商品管理', icon: '🛒' },
   { path: '/orders', label: '订单管理', icon: '📋' },
   { path: '/pickup/verify', label: '门店核销', icon: '✅' },

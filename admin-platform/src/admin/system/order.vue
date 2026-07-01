@@ -61,7 +61,7 @@
             </td>
             <td>{{ order.merchantName }}</td>
             <td>{{ order.totalQuantity }}件</td>
-            <td>¥{{ order.payAmount.toFixed(2) }}</td>
+            <td>¥{{ (order.payAmount || 0).toFixed(2) }}</td>
             <td><span :class="['type-tag', order.deliveryType]">{{ order.deliveryType === 'DELIVERY' ? '同城配送' : '门店自提' }}</span></td>
             <td><span :class="['status-tag', order.status]">{{ getStatusText(order.status) }}</span></td>
             <td>{{ order.createTime }}</td>

@@ -28,6 +28,11 @@ const routes = [
         component: () => import('@/admin/audit/goods.vue')
       },
       {
+        path: '/info-change',
+        name: '信息审核',
+        component: () => import('@/admin/audit/info-change.vue')
+      },
+      {
         path: '/users',
         name: '用户管理',
         component: () => import('@/admin/system/user.vue')
@@ -83,7 +88,7 @@ router.beforeEach((to, from, next) => {
     return next('/dashboard')
   }
 
-  if ((to.path.startsWith('/dashboard') || to.path.startsWith('/merchant-audit') || to.path.startsWith('/product-audit') || to.path.startsWith('/orders') || to.path.startsWith('/seckill') || to.path.startsWith('/coupon') || to.path.startsWith('/distribution')) && adminType === 'SYSTEM') {
+  if ((to.path.startsWith('/dashboard') || to.path.startsWith('/merchant-audit') || to.path.startsWith('/product-audit') || to.path.startsWith('/info-change') || to.path.startsWith('/orders') || to.path.startsWith('/seckill') || to.path.startsWith('/coupon') || to.path.startsWith('/distribution')) && adminType === 'SYSTEM') {
     alert('无权限，系统管理员不可访问业务运营功能')
     return next('/users')
   }

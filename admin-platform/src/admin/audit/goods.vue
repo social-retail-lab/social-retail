@@ -78,14 +78,14 @@ const remark = ref('')
 
 const getList = async ()=>{
   const params: any = {
-    page: page.value,
+    pageNum: page.value,
     pageSize: 10
   }
   if (keyword.value) {
     params.keyword = keyword.value
   }
-  if (auditStatus.value) {
-    params.status = auditStatus.value
+  if (auditStatus.value !== '') {
+    params.auditStatus = Number(auditStatus.value)
   }
   const res = await getProductAuditList(params)
   if (res.code === 0) {

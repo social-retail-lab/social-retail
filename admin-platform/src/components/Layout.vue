@@ -97,8 +97,9 @@ const operationMenus = [
     label: '审核管理', 
     icon: '✅',
     children: [
-      { path: '/merchant-audit', label: '商家审核' },
-      { path: '/product-audit', label: '商品审核' }
+      { path: '/merchant-audit', label: '商家入驻审核' },
+      { path: '/product-audit', label: '商品审核' },
+      { path: '/info-change', label: '信息审核' }
     ]
   },
   { 

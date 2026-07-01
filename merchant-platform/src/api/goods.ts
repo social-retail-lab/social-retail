@@ -1,53 +1,66 @@
 import request from '@/utils/request'
 
-export const getGoodsList = (params: {
-  status?: string
-  page?: number
-  pageSize?: number
-  keyword?: string
-  categoryId?: number
-}) => {
+// 商品列表
+export const getGoodsList = (params: { status?: string; auditStatus?: string; pageNum?: number; pageSize?: number; keyword?: string; categoryId?: number }) => {
   return request.get('/merchant/products', { params })
 }
 
+// 商品详情
 export const getGoodsDetail = (productId: number) => {
   return request.get(`/merchant/products/${productId}`)
 }
 
+// 发布商品 - 匹配后端 MerchantGoodsController
 export const createGoods = (data: {
-  productName: string
-  description?: string
-  categoryId: number
+  title: string
+  subTitle?: string
+  categoryId1: number
+  categoryId2?: number
   brandId?: number
-  price: number
-  originalPrice?: number
-  stock: number
-  productImage: string
-  bannerImages?: string[]
+  brandName?: string
+  mainImage: string
   detailImages?: string[]
+  detailDesc?: string
+  saleType?: number
+  skus: { specs: string; price: number; stock: number; skuCode?: string }[]
 }) => {
   return request.post('/merchant/products', data)
 }
 
+// 编辑商品
 export const updateGoods = (productId: number, data: {
-  productName?: string
-  description?: string
-  categoryId?: number
+  title?: string
+  subTitle?: string
+  categoryId1?: number
+  categoryId2?: number
   brandId?: number
-  price?: number
-  originalPrice?: number
-  stock?: number
-  productImage?: string
-  bannerImages?: string[]
+  brandName?: string
+  mainImage?: string
   detailImages?: string[]
+  detailDesc?: string
+  saleType?: number
+  skus?: { id?: number; specs: string; price: number; stock: number; skuCode?: string }[]
 }) => {
   return request.put(`/merchant/products/${productId}`, data)
 }
 
-export const deleteGoods = (productId: number) => {
-  return request.delete(`/merchant/products/${productId}`)
+// 上下架
+export const updateGoodsStatus = (productId: number, status: number) => {
+  return request.patch(`/merchant/products/${productId}/status`, { status })
 }
 
-export const updateGoodsStatus = (productId: number, data: { status: string }) => {
-  return request.patch(`/merchant/products/${productId}/status`, data)
+// 分类列表
+export const getCategories = (parentId?: number) => {
+  const params: any = {}
+  if (parentId != null) params.parentId = parentId
+  return request.get('/merchant/categories', { params })
+}
+
+// 图片上传
+export const uploadImage = (file: File, folder = 'product') => {
+  const form = new FormData()
+  form.append('file', file)
+  return request.post('/merchant/upload/image', form, {
+    params: { folder }
+  })
 }

@@ -34,7 +34,7 @@ const login = async () => {
     alert('手机号和密码不能为空')
     return
   }
-  const res = await merchantLogin(form.value)
+  const res = await merchantLogin({ ...form.value, smsCode: '123456' })
   if (res.code === 0) {
     localStorage.setItem('merchantToken', res.data.token)
     localStorage.setItem('merchantName', res.data.merchantName || '我的店铺')

@@ -18,6 +18,16 @@ const routes = [
     redirect: '/goods',
     children: [
       {
+        path: '/store-info',
+        name: '商家信息',
+        component: () => import('@/merchant/store-info/index.vue')
+      },
+      {
+        path: '/audit-requests',
+        name: '审核请求',
+        component: () => import('@/merchant/audit-requests/index.vue')
+      },
+      {
         path: '/goods',
         name: '商品管理',
         component: () => import('@/merchant/goods/list.vue')
