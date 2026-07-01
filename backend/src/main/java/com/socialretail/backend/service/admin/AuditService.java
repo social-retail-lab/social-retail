@@ -574,7 +574,7 @@ public class AuditService {
 
         PageResult<Map<String, Object>> result = new PageResult<>();
         result.setList(list);
-        result.setTotal(list.size());
+        result.setTotal((long) list.size());
         result.setPageNum(pageNum);
         result.setPageSize(pageSize);
         return result;

@@ -31,7 +31,14 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/merchant/auth/login",
                         "/api/admin/operation/auth/login",
                         "/api/admin/system/auth/login",
-                        "/api/user/sms/**"
+                        "/api/user/sms/**",
+                        "/api/auth/**",
+                        "/api/user/**",
+                        "/api/addresses/**",
+                        "/api/products/**",
+                        "/api/categories/**",
+                        "/api/brands/**",
+                        "/api/cart/**"
                 );
     }
 
