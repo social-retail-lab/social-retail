@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { systemAdminLogin, operationAdminLogin } from '@/api/admin'
+import { adminLogin } from '@/api/admin'
 
 const router = useRouter()
 const adminType = ref('SYSTEM')
@@ -37,15 +37,16 @@ const handleLogin = async () => {
     alert('账号密码不能为空')
     return
   }
-  let res
-  if (adminType.value === 'SYSTEM') {
-    res = await systemAdminLogin({ username: username.value, password: password.value })
+  const res = await adminLogin({ username: username.value, password: password.value })
+  if (res.code === 0) {
+    localStorage.setItem('adminToken', res.data.token)
+    localStorage.setItem('adminType', res.data.role || adminType.value)
+    localStorage.setItem('adminInfo', JSON.stringify(res.data))
+    const role = res.data.role || adminType.value
+    router.push(role === 'SYSTEM' ? '/users' : '/dashboard')
   } else {
-    res = await operationAdminLogin({ username: username.value, password: password.value })
+    alert(res.message)
   }
-  localStorage.setItem('adminToken', res.data.token)
-  localStorage.setItem('adminType', adminType.value)
-  router.push('/dashboard')
 }
 </script>
 

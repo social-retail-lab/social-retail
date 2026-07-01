@@ -64,35 +64,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { getProductAuditList, auditProduct } from '@/api/admin'
+import { ref, onMounted } from 'vue'
+import { getProductAuditList, auditProduct } from '@/api/audit'
 const keyword = ref('')
 const auditStatus = ref('')
 const page = ref(1)
-const tableList = ref([
-  {productId:1001,mainImage:"https://picsum.photos/100",title:"精品苹果",shopName:"鲜果店",auditStatus:0}
-])
-const auditMap = {'0':'待审核','1':'通过','2':'驳回'}
+const tableList = ref<any[]>([])
+const auditMap:Record<string,string> = {'0':'待审核','1':'通过','2':'驳回'}
 const showMask = ref(false)
 const pid = ref(0)
 const status = ref(1)
 const remark = ref('')
 
 const getList = async ()=>{
-  const res = await getProductAuditList({keyword,auditStatus,page})
-  tableList.value = res.data
+  const params: any = {
+    page: page.value,
+    pageSize: 10
+  }
+  if (keyword.value) {
+    params.keyword = keyword.value
+  }
+  if (auditStatus.value) {
+    params.status = auditStatus.value
+  }
+  const res = await getProductAuditList(params)
+  if (res.code === 0) {
+    tableList.value = res.data.list || res.data || []
+  }
 }
 const openAudit = (row:any)=>{
   pid.value = row.productId
+  status.value = 1
+  remark.value = ''
   showMask.value = true
 }
 const submit = async ()=>{
-  await auditProduct({productId:pid.value,auditStatus:status.value,auditRemark:remark.value})
-  alert('审核完成')
+  const res = await auditProduct(pid.value, {
+    auditStatus: Number(status.value),
+    auditRemark: remark.value
+  })
+  if (res.code === 0) {
+    alert('审核完成')
+    getList()
+  }
   showMask.value = false
-  getList()
 }
-getList()
+
+onMounted(() => {
+  getList()
+})
 </script>
 
 <style scoped>

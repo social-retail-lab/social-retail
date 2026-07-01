@@ -1,43 +1,31 @@
-// src/mock/adminMock.ts
-export const mockAdminLogin = (data: {username:string,password:string,adminType:string}) => {
-  const mockSysAdmin = {
-    username:"superadmin",
-    password:"123456",
-    adminType:"SYSTEM",
-    token:"mock-token-123456",
-    adminInfo:{
-      adminId:1,
-      realName:"系统管理员",
-      role:"超级管理员"
+export const mockAdminLogin = (data: { username: string; password: string; adminType: string }) => {
+  const mockAdmins: Record<string, { username: string; password: string; token: string }> = {
+    SYSTEM: {
+      username: 'admin',
+      password: '123456',
+      token: 'admin-system-token-001'
+    },
+    OPERATION: {
+      username: 'operator',
+      password: '123456',
+      token: 'admin-operation-token-001'
     }
   }
-  const mockOpAdmin = {
-    username:"operator01",
-    password:"123456",
-    adminType:"OPERATION",
-    token:"mock-token-789",
-    adminInfo:{
-      adminId:2,
-      realName:"运营管理员",
-      role:"商品运营"
-    }
-  }
-  if(data.adminType === "SYSTEM"){
-    if(data.username === mockSysAdmin.username && data.password === mockSysAdmin.password){
-      return {
-        code:0,
-        message:"success",
-        data:mockSysAdmin
-      }
-    }
-  }else{
-    if(data.username === mockOpAdmin.username && data.password === mockOpAdmin.password){
-      return {
-        code:0,
-        message:"success",
-        data:mockOpAdmin
+
+  const admin = mockAdmins[data.adminType]
+  if (admin && data.username === admin.username && data.password === admin.password) {
+    return {
+      code: 0,
+      message: '登录成功',
+      data: {
+        token: admin.token,
+        adminType: data.adminType,
+        username: admin.username
       }
     }
   }
-  return {code:401,message:"账号密码错误"}
+  return {
+    code: 401,
+    message: '账号或密码错误'
+  }
 }

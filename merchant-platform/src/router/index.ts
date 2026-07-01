@@ -12,13 +12,47 @@ const routes = [
     component: () => import('@/merchant/register.vue')
   },
   {
-    path: '/product-manage',
-    name: '商品管理',
-    component: () => import('@/merchant/product.vue')
-  },
-  {
     path: '/',
-    redirect: '/login'
+    name: '商家首页',
+    component: () => import('@/components/Layout.vue'),
+    redirect: '/goods',
+    children: [
+      {
+        path: '/goods',
+        name: '商品管理',
+        component: () => import('@/merchant/goods/list.vue')
+      },
+      {
+        path: '/goods/edit/:id?',
+        name: '商品编辑',
+        component: () => import('@/merchant/goods/edit.vue')
+      },
+      {
+        path: '/orders',
+        name: '订单管理',
+        component: () => import('@/merchant/order/list.vue')
+      },
+      {
+        path: '/pickup/verify',
+        name: '门店核销',
+        component: () => import('@/merchant/pickup/verify.vue')
+      },
+      {
+        path: '/pickup/manage',
+        name: '自提点管理',
+        component: () => import('@/merchant/pickup/manage.vue')
+      },
+      {
+        path: '/after-sale',
+        name: '售后管理',
+        component: () => import('@/merchant/after-sale/list.vue')
+      },
+      {
+        path: '/earnings',
+        name: '我的收益',
+        component: () => import('@/merchant/earnings/index.vue')
+      }
+    ]
   }
 ]
 
@@ -27,14 +61,11 @@ const router = createRouter({
   routes
 })
 
-// 登录拦截
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('merchantToken')
-  // 不需要登录页面直接放行
   if (to.path === '/login' || to.path === '/register') {
     return next()
   }
-  // 商品管理需要登录
   if (!token) {
     return next('/login')
   }

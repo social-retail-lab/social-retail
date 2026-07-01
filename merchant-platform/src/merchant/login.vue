@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { mockMerchantLogin } from '@/mock/merchantMock'
+import { merchantLogin } from '@/api/order'
 
 const router = useRouter()
 const form = ref({
@@ -34,11 +34,12 @@ const login = async () => {
     alert('手机号和密码不能为空')
     return
   }
-  const res = mockMerchantLogin(form.value)
+  const res = await merchantLogin(form.value)
   if (res.code === 0) {
     localStorage.setItem('merchantToken', res.data.token)
+    localStorage.setItem('merchantName', res.data.merchantName || '我的店铺')
     localStorage.setItem('merchantInfo', JSON.stringify(res.data))
-    router.push('/apply')
+    router.push('/goods')
   } else {
     alert(res.message)
   }

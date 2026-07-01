@@ -7,7 +7,7 @@ export const mockMerchantLogin = (data: {phone:string,password:string}) => {
     merchantId: 20001,
     merchantName: "张三生鲜超市"
   }
-  if (data.phone === mockMerchant.phone && data.password === mockMerchant) {
+  if (data.phone === mockMerchant.phone && data.password === mockMerchant.password) {
     return {
       code: 0,
       message: "登录成功",

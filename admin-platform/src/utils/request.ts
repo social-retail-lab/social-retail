@@ -1,23 +1,34 @@
 import axios from 'axios'
 
 const service = axios.create({
-  baseUrl: '',
+  baseURL: 'http://192.168.169.141:8080/api',
   timeout: 10000
 })
 
-// 请求拦截器自动携带token
 service.interceptors.request.use(config => {
   const token = localStorage.getItem('adminToken')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  config.headers['Content-Type'] = 'application/json'
   return config
 })
 
-// 响应拦截统一处理错误
 service.interceptors.response.use(res => {
-  return res.data
+  const data = res.data
+  if (data.code === 40101 || data.code === 40102) {
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('adminRole')
+    window.location.href = '/login'
+    return Promise.reject(new Error('登录已过期'))
+  }
+  return data
 }, err => {
+  if (err.response && err.response.status === 401) {
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('adminRole')
+    window.location.href = '/login'
+  }
   alert('接口请求失败：' + err.message)
   return Promise.reject(err)
 })
