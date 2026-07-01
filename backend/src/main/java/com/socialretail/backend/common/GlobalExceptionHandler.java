@@ -25,9 +25,9 @@ public class GlobalExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<Result<Void>> handleBusinessException(BusinessException exception) {
+    public ResponseEntity<Result<Object>> handleBusinessException(BusinessException exception) {
         return ResponseEntity.status(exception.getHttpStatus())
-                .body(Result.error(exception.getCode(), exception.getMessage()));
+                .body(new Result<>(exception.getCode(), exception.getMessage(), exception.getData()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

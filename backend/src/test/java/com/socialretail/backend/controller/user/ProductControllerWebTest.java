@@ -7,6 +7,8 @@ import com.socialretail.backend.service.product.ProductService;
 import com.socialretail.backend.utils.JwtUtil;
 import com.socialretail.backend.vo.ProductDetailVO;
 import com.socialretail.backend.vo.ProductListVO;
+import com.socialretail.backend.vo.ProductSkuListVO;
+import com.socialretail.backend.vo.ProductSkuVO;
 import com.socialretail.backend.vo.SkuVO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +85,26 @@ class ProductControllerWebTest {
                 .andExpect(jsonPath("$.data.skuList[0].skuId").value(2001))
                 .andExpect(jsonPath("$.data.skuList[0].spec.重量").value("5斤"))
                 .andExpect(jsonPath("$.data.skuList[0].stock").value(100));
+    }
+
+    @Test
+    void productSkusReturnsCompleteStructure() throws Exception {
+        when(productService.listProductSkus(1001L)).thenReturn(new ProductSkuListVO(
+                1001L,
+                List.of(new ProductSkuVO(
+                        2001L, "5斤装", Map.of("重量", "5斤"),
+                        new BigDecimal("99.90"), new BigDecimal("99.90"),
+                        200, 0, "ON_SALE"
+                ))
+        ));
+
+        mockMvc.perform(get("/api/products/1001/skus"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.productId").value(1001))
+                .andExpect(jsonPath("$.data.skuList[0].skuName").value("5斤装"))
+                .andExpect(jsonPath("$.data.skuList[0].specs.重量").value("5斤"))
+                .andExpect(jsonPath("$.data.skuList[0].lockedStock").value(0))
+                .andExpect(jsonPath("$.data.skuList[0].status").value("ON_SALE"));
     }
 
     @Test

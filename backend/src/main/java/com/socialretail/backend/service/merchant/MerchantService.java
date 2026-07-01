@@ -542,7 +542,7 @@ public class MerchantService {
 
         PageResult<AuditRequestVO> result = new PageResult<>();
         result.setList(pageList);
-        result.setTotal(total);
+        result.setTotal((long) total);
         result.setPageNum(pageNum);
         result.setPageSize(pageSize);
         return result;
