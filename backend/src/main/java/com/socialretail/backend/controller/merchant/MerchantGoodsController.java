@@ -2,6 +2,7 @@ package com.socialretail.backend.controller.merchant;
 
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.result.Result;
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.service.merchant.MerchantProductService;
 import com.socialretail.backend.vo.AuditVO;
 import com.socialretail.backend.vo.PriceUpdateRequest;
@@ -48,11 +49,11 @@ public class MerchantGoodsController {
     @Resource
     private MerchantProductService merchantProductService;
 
+    @Resource
+    private ImageUrlResolver imageUrlResolver;
+
     @Value("${upload.path:}")
     private String uploadPath;
-
-    @Value("${upload.base-url:http://192.168.0.179:8080}")
-    private String baseUrl;
 
     // ========== 品牌搜索（支持模糊匹配） ==========
     @GetMapping("/brands")
@@ -118,7 +119,7 @@ public class MerchantGoodsController {
             File dest = dirPath.resolve(newFileName).toFile();
             file.transferTo(dest);
 
-            String url = baseUrl + "/static/" + folder + "/" + dateDir + "/" + newFileName;
+            String url = imageUrlResolver.resolve(folder + "/" + dateDir + "/" + newFileName);
             Map<String, String> result = Map.of("url", url, "fileName", newFileName);
             log.info("[图片上传] 成功, url={}", url);
             return Result.success("上传成功", result);

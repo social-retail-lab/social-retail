@@ -17,9 +17,11 @@ import com.socialretail.backend.dto.request.payment.MockPayFailDTO;
 import com.socialretail.backend.dto.request.payment.MockPaySuccessDTO;
 import com.socialretail.backend.entity.order.Payment;
 import com.socialretail.backend.entity.order.Order;
+import com.socialretail.backend.entity.order.OrderItem;
 import com.socialretail.backend.entity.order.OrderStatusLog;
 import com.socialretail.backend.mapper.order.PaymentMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
+import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.service.order.impl.OrderServiceImpl;
 import com.socialretail.backend.service.pay.PayService;
 import com.socialretail.backend.vo.payment.AlipayCreatePayVO;
@@ -63,17 +65,20 @@ public class PayServiceImpl implements PayService {
 
     private final PaymentMapper paymentMapper;
     private final OrderMapper orderMapper;
+    private final ProductMapper productMapper;
     private final AlipayClient alipayClient;
     private final AlipayProperties alipayProperties;
     private final ObjectMapper objectMapper;
 
     public PayServiceImpl(PaymentMapper paymentMapper,
                           OrderMapper orderMapper,
+                          ProductMapper productMapper,
                           AlipayClient alipayClient,
                           AlipayProperties alipayProperties,
                           ObjectMapper objectMapper) {
         this.paymentMapper = paymentMapper;
         this.orderMapper = orderMapper;
+        this.productMapper = productMapper;
         this.alipayClient = alipayClient;
         this.alipayProperties = alipayProperties;
         this.objectMapper = objectMapper;
@@ -298,6 +303,14 @@ public class PayServiceImpl implements PayService {
         }
         if (orderMapper.updateStatusAfterPay(order.getId(), nextStatus, payTime, callbackTime) != 1) {
             throw new BusinessException(40924, HttpStatus.CONFLICT, "当前订单状态不允许支付");
+        }
+        for (OrderItem item : orderMapper.selectItemsByOrderId(order.getId())) {
+            if (item.getProductId() == null || item.getQuantity() == null || item.getQuantity() <= 0) {
+                continue;
+            }
+            if (productMapper.incrementSoldCount(item.getProductId(), item.getQuantity()) != 1) {
+                throw new IllegalStateException("支付成功后更新商品销量失败，productId=" + item.getProductId());
+            }
         }
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(order.getId());

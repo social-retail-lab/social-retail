@@ -56,7 +56,7 @@ public class WebConfig implements WebMvcConfigurer {
         } else {
             basePath = Paths.get(System.getProperty("user.dir"), "static").toAbsolutePath();
         }
-        registry.addResourceHandler("/static/**")
+        registry.addResourceHandler("/uploads/**", "/static/**")
                 .addResourceLocations("file:" + basePath.toString().replace("\\", "/") + "/");
     }
 }

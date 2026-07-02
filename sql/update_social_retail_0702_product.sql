@@ -1,0 +1,3 @@
+ALTER TABLE product
+ADD COLUMN sold_count BIGINT NOT NULL DEFAULT 0
+COMMENT '累计销量';

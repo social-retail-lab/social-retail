@@ -1,6 +1,6 @@
 package com.socialretail.backend.vo;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,13 +9,30 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProductDetailVO {
-
     private Long productId;
-    private String title;
+    private String productName;
+    private String productImage;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<String> bannerImages;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    private List<String> detailImages;
+
     private String description;
-    private List<String> images;
+    private Long categoryId;
+    private String categoryName;
+    private Long brandId;
+    private String brandName;
     private BigDecimal price;
+    private BigDecimal originalPrice;
+    private Long soldCount;
+    private Integer stock;
+    private String status;
+    private ProductMerchantInfoVO merchantInfo;
+
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SkuVO> skuList;
 }

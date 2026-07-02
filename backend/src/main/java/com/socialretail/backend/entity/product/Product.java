@@ -41,4 +41,6 @@ public class Product {
     private LocalDateTime createTime;
 
     private LocalDateTime updateTime;
+
+    private Long soldCount;
 }

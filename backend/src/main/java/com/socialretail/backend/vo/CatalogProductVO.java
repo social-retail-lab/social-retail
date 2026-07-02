@@ -16,7 +16,7 @@ public class CatalogProductVO {
     private String productImage;
     private BigDecimal price;
     private BigDecimal originalPrice;
-    private Integer soldCount;
+    private Long soldCount;
     private Integer stock;
     private List<String> tags;
 }

@@ -180,7 +180,7 @@ public class BrandServiceImpl implements BrandService {
                 .mapToInt(Integer::intValue).sum();
         return new CatalogProductVO(
                 product.getId(), product.getTitle(), product.getMainImage(), price, price,
-                0, stock, List.of()
+                product.getSoldCount() == null ? 0L : product.getSoldCount(), stock, List.of()
         );
     }
 
