@@ -14,3 +14,7 @@ CREATE TABLE IF NOT EXISTS `file_record` (
     KEY `idx_file_owner` (`owner_user_id`, `is_deleted`),
     KEY `idx_file_business` (`upload_type`, `business_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='本地上传文件元数据';
+
+ALTER TABLE product
+ADD COLUMN sold_count BIGINT NOT NULL DEFAULT 0
+COMMENT '累计销量';
