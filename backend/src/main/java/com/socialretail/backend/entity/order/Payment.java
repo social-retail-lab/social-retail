@@ -34,4 +34,14 @@ public class Payment {
     private BigDecimal refundAmount;
 
     private LocalDateTime refundTime;
+
+    private String thirdTradeNo;
+
+    private LocalDateTime callbackTime;
+
+    private String failReason;
+
+    private LocalDateTime createTime;
+
+    private LocalDateTime updateTime;
 }

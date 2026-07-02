@@ -62,7 +62,7 @@ public class MerchantGoodsController {
         try {
             List<Map<String, Object>> brands = merchantProductService.searchBrands(keyword);
             log.info("[品牌搜索] 成功, count={}", brands.size());
-            return Result.ok(brands);
+            return Result.success(brands);
         } catch (RuntimeException e) {
             log.warn("[品牌搜索] 失败, 原因: {}", e.getMessage());
             throw e;
@@ -81,7 +81,7 @@ public class MerchantGoodsController {
                 categories = merchantProductService.getTopCategories();
             }
             log.info("[分类列表] 成功, count={}", categories.size());
-            return Result.ok(categories);
+            return Result.success(categories);
         } catch (RuntimeException e) {
             log.warn("[分类列表] 失败, 原因: {}", e.getMessage());
             throw e;
@@ -122,7 +122,7 @@ public class MerchantGoodsController {
             String url = imageUrlResolver.resolve(folder + "/" + dateDir + "/" + newFileName);
             Map<String, String> result = Map.of("url", url, "fileName", newFileName);
             log.info("[图片上传] 成功, url={}", url);
-            return Result.ok("上传成功", result);
+            return Result.success("上传成功", result);
         } catch (IOException e) {
             log.error("[图片上传] 失败, 原因: {}", e.getMessage());
             throw new RuntimeException("图片上传失败: " + e.getMessage());
@@ -149,7 +149,7 @@ public class MerchantGoodsController {
             req.setAuditStatus(auditStatus);
             PageResult<ProductListVO> pageResult = merchantProductService.getProductList(merchantId, req, pageNum, pageSize);
             log.info("[商品列表] 成功, merchantId={}, total={}, pageSize={}", merchantId, pageResult.getTotal(), pageResult.getList().size());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[商品列表] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -166,7 +166,7 @@ public class MerchantGoodsController {
         try {
             AuditVO vo = merchantProductService.createProduct(merchantId, req);
             log.info("[发布商品] 成功, merchantId={}, productId={}, auditStatus={}", merchantId, vo.getProductId(), vo.getAuditStatus());
-            return Result.ok("商品发布成功，等待审核", vo);
+            return Result.success("商品发布成功，等待审核", vo);
         } catch (RuntimeException e) {
             log.warn("[发布商品] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -184,7 +184,7 @@ public class MerchantGoodsController {
         try {
             AuditVO vo = merchantProductService.updateProduct(merchantId, productId, req);
             log.info("[编辑商品] 成功, productId={}, auditStatus reset to 0", productId);
-            return Result.ok("商品修改成功，等待审核", vo);
+            return Result.success("商品修改成功，等待审核", vo);
         } catch (RuntimeException e) {
             log.warn("[编辑商品] 失败, merchantId={}, productId={}, 原因: {}", merchantId, productId, e.getMessage());
             throw e;
@@ -199,7 +199,7 @@ public class MerchantGoodsController {
         try {
             ProductVO vo = merchantProductService.getProductDetail(merchantId, productId);
             log.info("[商品详情] 成功, productId={}, title={}", productId, vo.getTitle());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[商品详情] 失败, merchantId={}, productId={}, 原因: {}", merchantId, productId, e.getMessage());
             throw e;
@@ -215,7 +215,7 @@ public class MerchantGoodsController {
         try {
             String message = merchantProductService.updateShelfStatus(merchantId, productId, req.getStatus());
             log.info("[上下架] 成功, productId={}, message={}", productId, message);
-            return Result.ok(message, null);
+            return Result.success(message, null);
         } catch (RuntimeException e) {
             log.warn("[上下架] 失败, merchantId={}, productId={}, 原因: {}", merchantId, productId, e.getMessage());
             throw e;
@@ -231,7 +231,7 @@ public class MerchantGoodsController {
         try {
             StockUpdateVO vo = merchantProductService.updateStock(merchantId, skuId, req);
             log.info("[库存维护] 成功, skuId={}, oldStock={}, newStock={}", skuId, vo.getOldStock(), vo.getNewStock());
-            return Result.ok("库存更新成功", vo);
+            return Result.success("库存更新成功", vo);
         } catch (RuntimeException e) {
             log.warn("[库存维护] 失败, merchantId={}, skuId={}, 原因: {}", merchantId, skuId, e.getMessage());
             throw e;
@@ -247,7 +247,7 @@ public class MerchantGoodsController {
         try {
             PriceUpdateVO vo = merchantProductService.updatePrice(merchantId, skuId, req);
             log.info("[价格维护] 成功, skuId={}, oldPrice={}, newPrice={}", skuId, vo.getOldPrice(), vo.getNewPrice());
-            return Result.ok("价格更新成功", vo);
+            return Result.success("价格更新成功", vo);
         } catch (RuntimeException e) {
             log.warn("[价格维护] 失败, merchantId={}, skuId={}, 原因: {}", merchantId, skuId, e.getMessage());
             throw e;
@@ -262,7 +262,7 @@ public class MerchantGoodsController {
         try {
             ProductAuditStatusVO vo = merchantProductService.getProductAuditStatus(merchantId, productId);
             log.info("[查询商品审核状态] 成功, productId={}, auditStatus={}", productId, vo.getAuditStatus());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[查询商品审核状态] 失败, merchantId={}, productId={}, 原因: {}", merchantId, productId, e.getMessage());
             throw e;

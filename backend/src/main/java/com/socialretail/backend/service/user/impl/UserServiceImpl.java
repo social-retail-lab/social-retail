@@ -11,7 +11,7 @@ import com.socialretail.backend.entity.user.User;
 import com.socialretail.backend.enums.UserStatusEnum;
 import com.socialretail.backend.mapper.user.UserMapper;
 import com.socialretail.backend.service.user.UserService;
-import com.socialretail.backend.utils.JwtUtil;
+import com.socialretail.backend.common.JwtUtils;
 import com.socialretail.backend.utils.PhoneUtil;
 import com.socialretail.backend.vo.UserInfoVO;
 import com.socialretail.backend.vo.UserLoginVO;
@@ -38,14 +38,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtUtils jwtUtils;
 
     public UserServiceImpl(UserMapper userMapper,
                            PasswordEncoder passwordEncoder,
-                           JwtUtil jwtUtil) {
+                           JwtUtils jwtUtils) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -90,8 +90,8 @@ public class UserServiceImpl implements UserService {
             default -> throw new BusinessException(40001, HttpStatus.BAD_REQUEST, "loginType仅支持CODE或PASSWORD");
         }
 
-        String token = jwtUtil.generateToken(user.getId());
-        return new UserLoginVO(token, jwtUtil.getExpirationSeconds(), toUserInfo(user));
+        String token = jwtUtils.generateToken(user.getId(), user.getPhone(), "user");
+        return new UserLoginVO(token, jwtUtils.getExpireTime() / 1000, toUserInfo(user));
     }
 
     @Override

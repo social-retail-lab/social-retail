@@ -1,7 +1,7 @@
 package com.socialretail.backend.controller.merchant;
 
 import com.socialretail.backend.common.PageResult;
-import com.socialretail.backend.common.Result;
+import com.socialretail.backend.common.result.Result;
 import com.socialretail.backend.service.merchant.MerchantService;
 import com.socialretail.backend.vo.AuditRequestVO;
 import com.socialretail.backend.vo.InfoChangeRequest;
@@ -45,7 +45,7 @@ public class MerchantAuthController {
         try {
             MerchantApplyVO vo = merchantService.submitApplication(userId, req);
             log.info("[入驻申请] 成功, applyId={}, auditStatus={}", vo.getApplyId(), vo.getAuditStatus());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[入驻申请] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -63,7 +63,7 @@ public class MerchantAuthController {
             } else {
                 log.info("[查询申请状态] 成功, 无申请记录");
             }
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[查询申请状态] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -76,7 +76,7 @@ public class MerchantAuthController {
         try {
             LoginVO vo = merchantService.merchantLogin(req.getPhone(), req.getPassword(), req.getSmsCode());
             log.info("[商家登录] 成功, phone={}, merchantStatus={}", req.getPhone(), vo.getMerchantStatus());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[商家登录] 失败, phone={}, 原因: {}", req.getPhone(), e.getMessage());
             throw e;
@@ -86,7 +86,7 @@ public class MerchantAuthController {
     @PostMapping("/auth/logout")
     public Result<Void> logout() {
         log.info("[商家退出] 退出登录");
-        return Result.ok("已退出登录", null);
+        return Result.success("已退出登录", null);
     }
 
     @GetMapping("/info")
@@ -96,7 +96,7 @@ public class MerchantAuthController {
         try {
             MerchantInfoVO vo = merchantService.getCurrentMerchant(userId);
             log.info("[获取商家信息] 成功, merchantId={}, merchantName={}", vo.getMerchantId(), vo.getMerchantName());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[获取商家信息] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -112,7 +112,7 @@ public class MerchantAuthController {
         try {
             MerchantInfoVO vo = merchantService.updateMerchantInfo(userId, req);
             log.info("[修改商家信息] 成功, merchantId={}", vo.getMerchantId());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[修改商家信息] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -128,7 +128,7 @@ public class MerchantAuthController {
         try {
             QualificationVO vo = merchantService.uploadQualification(userId, req);
             log.info("[上传资质] 成功, qualificationId={}", vo.getQualificationId());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[上传资质] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -142,7 +142,7 @@ public class MerchantAuthController {
         try {
             QualificationVO vo = merchantService.getQualification(userId);
             log.info("[查看资质] 成功, qualificationId={}", vo.getQualificationId());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[查看资质] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -156,7 +156,7 @@ public class MerchantAuthController {
         try {
             MerchantInfoVO vo = merchantService.getCurrentMerchant(userId);
             log.info("[获取店铺信息] 成功, merchantId={}, merchantName={}", vo.getMerchantId(), vo.getMerchantName());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[获取店铺信息] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -172,7 +172,7 @@ public class MerchantAuthController {
         try {
             MerchantInfoVO vo = merchantService.updateMerchantInfo(userId, req);
             log.info("[修改店铺信息] 成功, merchantId={}", vo.getMerchantId());
-            return Result.ok(vo);
+            return Result.success(vo);
         } catch (RuntimeException e) {
             log.warn("[修改店铺信息] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -188,7 +188,7 @@ public class MerchantAuthController {
         try {
             Map<String, Object> result = merchantService.appeal(userId, reason);
             log.info("[商家申诉] 成功, userId={}, message={}", userId, result.get("message"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[商家申诉] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -205,7 +205,7 @@ public class MerchantAuthController {
         try {
             Map<String, Object> result = merchantService.requestInfoChange(userId, req);
             log.info("[信息修改申请] 成功, changeId={}", result.get("changeId"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[信息修改申请] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -220,7 +220,7 @@ public class MerchantAuthController {
         try {
             Map<String, Object> result = merchantService.requestQualificationUpgrade(userId, req);
             log.info("[升级企业资质申请] 成功, changeId={}", result.get("changeId"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[升级企业资质申请] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -234,7 +234,7 @@ public class MerchantAuthController {
         try {
             Map<String, Object> result = merchantService.togglePause(userId);
             log.info("[暂时歇业/重新营业] 成功, userId={}, newStatus={}", userId, result.get("status"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[暂时歇业/重新营业] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -253,7 +253,7 @@ public class MerchantAuthController {
         try {
             PageResult<AuditRequestVO> pageResult = merchantService.getAuditRequests(userId, pageNum, pageSize);
             log.info("[审核请求列表] 成功, userId={}, total={}", userId, pageResult.getTotal());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[审核请求列表] 失败, userId={}, 原因: {}", userId, e.getMessage());
             throw e;
@@ -270,7 +270,7 @@ public class MerchantAuthController {
         try {
             Map<String, Object> detail = merchantService.getAuditRequestDetail(id, requestType);
             log.info("[审核请求详情] 成功, requestId={}", id);
-            return Result.ok(detail);
+            return Result.success(detail);
         } catch (RuntimeException e) {
             log.warn("[审核请求详情] 失败, requestId={}, 原因: {}", id, e.getMessage());
             throw e;
@@ -288,7 +288,7 @@ public class MerchantAuthController {
         try {
             Map<String, Object> result = merchantService.withdrawAuditRequest(userId, id, requestType);
             log.info("[撤回审核请求] 成功, requestId={}", id);
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[撤回审核请求] 失败, requestId={}, 原因: {}", id, e.getMessage());
             throw e;

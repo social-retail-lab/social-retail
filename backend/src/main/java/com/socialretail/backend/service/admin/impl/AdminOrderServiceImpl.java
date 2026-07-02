@@ -2,6 +2,7 @@ package com.socialretail.backend.service.admin.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.socialretail.backend.common.OrderStatus;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.entity.member.Merchant;
@@ -227,7 +228,7 @@ public class AdminOrderServiceImpl {
         paymentMapper.updateById(payment);
 
         // 更新订单状态
-        order.setStatus(4);
+        order.setStatus(OrderStatus.COMPLETED);
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
 
@@ -235,7 +236,7 @@ public class AdminOrderServiceImpl {
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(orderId);
         statusLog.setFromStatus(6);
-        statusLog.setToStatus(4);
+        statusLog.setToStatus(OrderStatus.COMPLETED);
         statusLog.setStatusText("已退款（管理员处理）");
         statusLog.setOperatorType("admin");
         statusLog.setRemark(reason);
@@ -256,7 +257,7 @@ public class AdminOrderServiceImpl {
         }
 
         int oldStatus = order.getStatus();
-        order.setStatus(5);
+        order.setStatus(OrderStatus.CANCELLED);
         order.setUpdateTime(LocalDateTime.now());
         if (reason != null && !reason.trim().isEmpty()) {
             order.setRemark(reason);
@@ -267,7 +268,7 @@ public class AdminOrderServiceImpl {
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(orderId);
         statusLog.setFromStatus(oldStatus);
-        statusLog.setToStatus(5);
+        statusLog.setToStatus(OrderStatus.CANCELLED);
         statusLog.setStatusText("已关闭（管理员操作）");
         statusLog.setOperatorType("admin");
         statusLog.setRemark(reason);
@@ -276,7 +277,7 @@ public class AdminOrderServiceImpl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("orderId", orderId);
-        result.put("newStatus", 5);
+        result.put("newStatus", OrderStatus.CANCELLED);
         result.put("message", "订单已关闭");
         return result;
     }
@@ -284,31 +285,11 @@ public class AdminOrderServiceImpl {
     // ==================== Helper Methods ====================
 
     private String getStatusCode(Integer status) {
-        if (status == null) return "";
-        switch (status) {
-            case 1: return "WAIT_PAY";
-            case 2: return "WAIT_SHIP";
-            case 3: return "SHIPPING";
-            case 4: return "COMPLETED";
-            case 5: return "CANCELLED";
-            case 6: return "REFUNDING";
-            default: return "";
-        }
+        return OrderStatus.userStatusCode(status);
     }
 
     private String getStatusText(Integer status, Integer deliveryType) {
-        if (status == null) return "";
-        switch (status) {
-            case 1: return "待接单";
-            case 2: return "已接单";
-            case 3:
-                if (deliveryType != null && deliveryType == 2) return "待自提";
-                return "配送中";
-            case 4: return "已完成";
-            case 5: return "已取消";
-            case 6: return "售后中";
-            default: return "";
-        }
+        return OrderStatus.merchantStatusText(status, deliveryType);
     }
 
     private String maskPhone(String phone) {

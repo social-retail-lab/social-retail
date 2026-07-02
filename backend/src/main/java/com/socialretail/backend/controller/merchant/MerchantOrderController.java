@@ -2,8 +2,9 @@ package com.socialretail.backend.controller.merchant;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialretail.backend.common.OrderStatus;
 import com.socialretail.backend.common.PageResult;
-import com.socialretail.backend.common.Result;
+import com.socialretail.backend.common.result.Result;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.entity.order.Delivery;
 import com.socialretail.backend.entity.order.DeliveryStatusLog;
@@ -18,10 +19,10 @@ import com.socialretail.backend.mapper.order.OrderItemMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.order.OrderStatusLogMapper;
 import com.socialretail.backend.service.merchant.PickupPointService;
+import com.socialretail.backend.service.merchant.PickupService;
 import com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl;
 import com.socialretail.backend.service.merchant.impl.EarningsServiceImpl;
 import com.socialretail.backend.service.merchant.impl.MerchantOrderServiceImpl;
-import com.socialretail.backend.service.merchant.impl.PickupServiceImpl;
 import com.socialretail.backend.vo.*;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,7 +54,7 @@ public class MerchantOrderController {
     private MerchantOrderServiceImpl serviceImpl;
 
     @Resource
-    private PickupServiceImpl pickupService;
+    private PickupService pickupService;
 
     @Resource
     private AfterSaleServiceImpl afterSaleService;
@@ -104,7 +105,7 @@ public class MerchantOrderController {
             PageResult<Map<String, Object>> pageResult = serviceImpl.getOrderList(
                     merchantId, status, deliveryType, orderSn, startDate, endDate, pageNum, pageSize);
             log.info("[订单列表] 成功, merchantId={}, total={}, count={}", merchantId, pageResult.getTotal(), pageResult.getList().size());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[订单列表] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -121,7 +122,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> detail = serviceImpl.getOrderDetail(orderId, merchantId);
             log.info("[订单详情] 成功, orderId={}, orderSn={}", orderId, detail.get("orderSn"));
-            return Result.ok(detail);
+            return Result.success(detail);
         } catch (RuntimeException e) {
             log.warn("[订单详情] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
             throw e;
@@ -139,7 +140,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = serviceImpl.acceptOrder(orderId, merchantId, req.getRemark());
             log.info("[接单] 成功, orderId={}, newStatus={}", orderId, result.get("newStatus"));
-            return Result.ok("接单成功", result);
+            return Result.success("接单成功", result);
         } catch (RuntimeException e) {
             log.warn("[接单] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
             throw e;
@@ -157,7 +158,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = serviceImpl.prepareGoods(orderId, merchantId, req.getRemark());
             log.info("[备货] 成功, orderId={}, newStatus={}", orderId, result.get("newStatus"));
-            return Result.ok("备货完成", result);
+            return Result.success("备货完成", result);
         } catch (RuntimeException e) {
             log.warn("[备货] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
             throw e;
@@ -176,7 +177,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = serviceImpl.shipOrder(orderId, merchantId, remark);
             log.info("[发货] 成功, orderId={}, deliveryId={}", orderId, result.get("deliveryId"));
-            return Result.ok("发货成功", result);
+            return Result.success("发货成功", result);
         } catch (RuntimeException e) {
             log.warn("[发货] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
             throw e;
@@ -195,7 +196,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = serviceImpl.cancelOrder(orderId, merchantId, reason);
             log.info("[取消订单] 成功, orderId={}, newStatus={}", orderId, result.get("newStatus"));
-            return Result.ok("订单已取消", result);
+            return Result.success("订单已取消", result);
         } catch (RuntimeException e) {
             log.warn("[取消订单] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
             throw e;
@@ -214,7 +215,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = serviceImpl.shipOrder(orderId, merchantId, req.getRemark());
             log.info("[创建配送] 成功, orderId={}, deliveryId={}", orderId, result.get("deliveryId"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[创建配送] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
             throw e;
@@ -287,7 +288,7 @@ public class MerchantOrderController {
             result.put("timeline", timelineList);
 
             log.info("[配送详情] 成功, deliveryId={}, deliverySn={}", deliveryId, delivery.getDeliverySn());
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[配送详情] 失败, merchantId={}, deliveryId={}, 原因: {}", merchantId, deliveryId, e.getMessage());
             throw e;
@@ -324,15 +325,15 @@ public class MerchantOrderController {
 
             // 如果配送已送达，更新订单状态为已完成并创建收益
             if (req.getStatus() == 4) {
-                order.setStatus(4);
+                order.setStatus(OrderStatus.COMPLETED);
                 order.setCompleteTime(now);
                 orderMapper.updateById(order);
 
                 // 创建订单状态日志
                 OrderStatusLog orderStatusLog = new OrderStatusLog();
                 orderStatusLog.setOrderId(order.getId());
-                orderStatusLog.setFromStatus(3);
-                orderStatusLog.setToStatus(4);
+                orderStatusLog.setFromStatus(OrderStatus.IN_PROGRESS);
+                orderStatusLog.setToStatus(OrderStatus.COMPLETED);
                 orderStatusLog.setStatusText("已完成");
                 orderStatusLog.setOperatorType("system");
                 orderStatusLog.setOperatorId(merchantId);
@@ -369,7 +370,7 @@ public class MerchantOrderController {
             result.put("toStatus", req.getStatus());
             result.put("statusText", getDeliveryStatusText(req.getStatus()));
             log.info("[更新配送状态] 成功, deliveryId={}, {} -> {}", deliveryId, fromStatus, req.getStatus());
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[更新配送状态] 失败, merchantId={}, deliveryId={}, 原因: {}", merchantId, deliveryId, e.getMessage());
             throw e;
@@ -386,7 +387,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = pickupService.verifyPickup(merchantId, req.getPickupCode());
             log.info("[自提核销] 成功, orderId={}, orderSn={}", result.get("orderId"), result.get("orderSn"));
-            return Result.ok("核销成功，订单已完成", result);
+            return Result.success("核销成功，订单已完成", result);
         } catch (RuntimeException e) {
             log.warn("[自提核销] 失败, merchantId={}, pickupCode={}, 原因: {}", merchantId, req.getPickupCode(), e.getMessage());
             throw e;
@@ -409,7 +410,7 @@ public class MerchantOrderController {
                     merchantId, startDate, endDate, pageNum, pageSize);
             log.info("[自提记录] 成功, merchantId={}, total={}, count={}",
                     merchantId, pageResult.getTotal(), pageResult.getList().size());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[自提记录] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -433,7 +434,7 @@ public class MerchantOrderController {
                     merchantId, type, status, orderSn, pageNum, pageSize);
             log.info("[售后列表] 成功, merchantId={}, total={}, count={}",
                     merchantId, pageResult.getTotal(), pageResult.getList().size());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[售后列表] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -450,7 +451,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> detail = afterSaleService.getAfterSaleDetail(merchantId, afterSaleId);
             log.info("[售后详情] 成功, afterSaleId={}, orderSn={}", afterSaleId, detail.get("orderSn"));
-            return Result.ok(detail);
+            return Result.success(detail);
         } catch (RuntimeException e) {
             log.warn("[售后详情] 失败, merchantId={}, afterSaleId={}, 原因: {}", merchantId, afterSaleId, e.getMessage());
             throw e;
@@ -470,7 +471,7 @@ public class MerchantOrderController {
             Map<String, Object> result = afterSaleService.auditAfterSale(
                     merchantId, afterSaleId, req.getAction(), req.getRemark(), req.getActualRefundAmount());
             log.info("[售后审核] 成功, afterSaleId={}, newStatus={}", afterSaleId, result.get("newStatus"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[售后审核] 失败, merchantId={}, afterSaleId={}, 原因: {}", merchantId, afterSaleId, e.getMessage());
             throw e;
@@ -490,7 +491,7 @@ public class MerchantOrderController {
             Map<String, Object> result = afterSaleService.returnConfirm(
                     merchantId, afterSaleId, req.getReceivedStatus(), req.getRemark());
             log.info("[退货确认] 成功, afterSaleId={}, newStatus={}", afterSaleId, result.get("newStatus"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[退货确认] 失败, merchantId={}, afterSaleId={}, 原因: {}", merchantId, afterSaleId, e.getMessage());
             throw e;
@@ -519,7 +520,7 @@ public class MerchantOrderController {
             Map<String, Object> result = afterSaleService.addFeedback(
                     merchantId, afterSaleId, req.getContent(), imagesJson);
             log.info("[售后反馈] 成功, afterSaleId={}", afterSaleId);
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[售后反馈] 失败, merchantId={}, afterSaleId={}, 原因: {}", merchantId, afterSaleId, e.getMessage());
             throw e;
@@ -540,7 +541,7 @@ public class MerchantOrderController {
             Map<String, Object> result = earningsService.getEarningsList(merchantId, status, pageNum, pageSize);
             log.info("[收益列表] 成功, merchantId={}, total={}, totalAvailable={}",
                     merchantId, result.get("total"), result.get("totalAvailable"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[收益列表] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -560,7 +561,7 @@ public class MerchantOrderController {
                     merchantId, req.getBankCardNumber(), req.getAccountName(), req.getBankName());
             log.info("[提现申请] 成功, merchantId={}, withdrawalId={}, amount={}",
                     merchantId, result.get("withdrawalId"), result.get("amount"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[提现申请] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -580,7 +581,7 @@ public class MerchantOrderController {
                     merchantId, pageNum, pageSize);
             log.info("[提现记录] 成功, merchantId={}, total={}, count={}",
                     merchantId, pageResult.getTotal(), pageResult.getList().size());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[提现记录] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -596,7 +597,7 @@ public class MerchantOrderController {
         try {
             List<Map<String, Object>> points = pickupPointService.listPickupPoints(merchantId);
             log.info("[自提点列表] 成功, merchantId={}, count={}", merchantId, points.size());
-            return Result.ok(points);
+            return Result.success(points);
         } catch (RuntimeException e) {
             log.warn("[自提点列表] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -617,7 +618,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = pickupPointService.addPickupPoint(merchantId, name, address, contactPhone, image);
             log.info("[新增自提点] 成功, pointId={}", result.get("id"));
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[新增自提点] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
             throw e;
@@ -634,7 +635,7 @@ public class MerchantOrderController {
         try {
             Map<String, Object> result = pickupPointService.deletePickupPoint(merchantId, pointId);
             log.info("[删除自提点] 成功, pointId={}", pointId);
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[删除自提点] 失败, merchantId={}, pointId={}, 原因: {}", merchantId, pointId, e.getMessage());
             throw e;

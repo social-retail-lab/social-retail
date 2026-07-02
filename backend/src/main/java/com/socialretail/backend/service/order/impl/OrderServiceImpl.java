@@ -1,6 +1,7 @@
 package com.socialretail.backend.service.order.impl;
 
 import com.socialretail.backend.common.OrderNoUtils;
+import com.socialretail.backend.common.OrderStatus;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.config.OrderTimeoutProperties;
 import com.socialretail.backend.dto.request.order.OrderCancelRequest;
@@ -48,16 +49,16 @@ import java.util.Set;
 @Service
 public class OrderServiceImpl implements OrderService {
 
-    public static final int WAIT_PAY = 0;
-    public static final int WAIT_SHIP = 1;
-    public static final int WAIT_PICKUP = 2;
-    public static final int DELIVERING = 3;
-    public static final int COMPLETED = 4;
-    public static final int CANCELLED = 5;
-    public static final int CLOSED = 6;
+    public static final int WAIT_PAY = OrderStatus.WAIT_PAY;
+    public static final int WAIT_SHIP = OrderStatus.WAIT_ACCEPT;
+    public static final int WAIT_PICKUP = OrderStatus.ACCEPTED;
+    public static final int DELIVERING = OrderStatus.IN_PROGRESS;
+    public static final int COMPLETED = OrderStatus.COMPLETED;
+    public static final int CANCELLED = OrderStatus.CANCELLED;
+    public static final int CLOSED = OrderStatus.CLOSED;
 
-    private static final int DELIVERY = 1;
-    private static final int PICKUP = 2;
+    private static final int DELIVERY = OrderStatus.DELIVERY;
+    private static final int PICKUP = OrderStatus.PICKUP;
     private static final int ON_SALE = 1;
     private static final int AUDIT_APPROVED = 1;
     private static final BigDecimal ZERO = new BigDecimal("0.00");
@@ -533,19 +534,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public static String statusText(Integer status) {
-        if (status == null) {
-            return "UNKNOWN";
-        }
-        return switch (status) {
-            case WAIT_PAY -> "WAIT_PAY";
-            case WAIT_SHIP -> "WAIT_SHIP";
-            case WAIT_PICKUP -> "WAIT_PICKUP";
-            case DELIVERING -> "DELIVERING";
-            case COMPLETED -> "COMPLETED";
-            case CANCELLED -> "CANCELLED";
-            case CLOSED -> "CLOSED";
-            default -> "UNKNOWN";
-        };
+        return OrderStatus.userStatusCode(status);
     }
 
     private record CartContext(List<CartItemVO> items, Long merchantId, BigDecimal totalAmount) {

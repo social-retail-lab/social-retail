@@ -1,6 +1,5 @@
 package com.socialretail.backend.config;
 
-import com.socialretail.backend.interceptor.AuthInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -14,33 +13,27 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private final AuthInterceptor authInterceptor;
+    private final JwtInterceptor jwtInterceptor;
 
     @Value("${upload.path:}")
     private String uploadPath;
 
-    public WebConfig(AuthInterceptor authInterceptor) {
-        this.authInterceptor = authInterceptor;
+    public WebConfig(JwtInterceptor jwtInterceptor) {
+        this.jwtInterceptor = jwtInterceptor;
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor)
+        registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         "/api/merchant/auth/login",
                         "/api/admin/operation/auth/login",
                         "/api/admin/system/auth/login",
-                        "/api/user/sms/**",
-                        "/api/auth/**",
-                        "/api/user/**",
-                        "/api/addresses/**",
-                        "/api/products/**",
-                        "/api/categories/**",
-                        "/api/brands/**",
-                        "/api/cart/**",
-                        "/api/orders/**",
-                        "/api/pay/**"
+                        "/api/auth/login",
+                        "/api/auth/register",
+                        "/api/user/sms/send",
+                        "/api/pay/alipay/notify"
                 );
     }
 

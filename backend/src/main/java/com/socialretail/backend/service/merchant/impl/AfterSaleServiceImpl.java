@@ -311,6 +311,95 @@ public class AfterSaleServiceImpl {
         return result;
     }
 
+    // ==================== 6. 申诉列表（平台介入） ====================
+
+    public PageResult<Map<String, Object>> getAppealedList(String keyword, int pageNum, int pageSize) {
+        LambdaQueryWrapper<AfterSale> wrapper = new LambdaQueryWrapper<>();
+        // 已申诉/待平台介入：商家已拒绝(status=5)，用户可申诉至平台
+        wrapper.eq(AfterSale::getStatus, 5);
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            wrapper.and(w -> w.like(AfterSale::getOrderSn, keyword.trim())
+                    .or().like(AfterSale::getProductName, keyword.trim()));
+        }
+
+        wrapper.orderByDesc(AfterSale::getApplyTime);
+
+        Page<AfterSale> page = new Page<>(pageNum, pageSize);
+        Page<AfterSale> afterSalePage = afterSaleMapper.selectPage(page, wrapper);
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (AfterSale as : afterSalePage.getRecords()) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("afterSaleId", as.getId());
+            map.put("orderSn", as.getOrderSn());
+            map.put("productName", as.getProductName());
+            map.put("type", as.getType());
+            map.put("typeText", getAfterSaleTypeText(as.getType()));
+            map.put("refundAmount", as.getRefundAmount());
+            map.put("reason", as.getReason());
+            map.put("status", as.getStatus());
+            map.put("statusText", getAfterSaleStatusText(as.getStatus()));
+            map.put("applyTime", formatDateTime(as.getApplyTime()));
+
+            Order order = orderMapper.selectById(as.getOrderId());
+            if (order != null && order.getUserId() != null) {
+                User user = userMapper.selectById(order.getUserId());
+                map.put("buyerNickname", user != null ? user.getNickname() : "");
+            } else {
+                map.put("buyerNickname", "");
+            }
+
+            resultList.add(map);
+        }
+
+        return PageResult.of(resultList, afterSalePage.getTotal(), pageNum, pageSize);
+    }
+
+    // ==================== 7. 管理员介入处理 ====================
+
+    public Map<String, Object> adminIntervene(Long afterSaleId, Integer action, String remark) {
+        AfterSale afterSale = afterSaleMapper.selectById(afterSaleId);
+        if (afterSale == null) {
+            throw new BusinessException(400, HttpStatus.BAD_REQUEST, "售后记录不存在");
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("afterSaleId", afterSaleId);
+
+        if (action == 1) {
+            // 同意退款/退货
+            afterSale.setStatus(4);
+            afterSale.setAuditRemark(remark);
+            afterSale.setAuditTime(LocalDateTime.now());
+            afterSale.setCompleteTime(LocalDateTime.now());
+
+            Order order = orderMapper.selectById(afterSale.getOrderId());
+            if (order != null) {
+                processRefund(order, afterSale, afterSale.getRefundAmount());
+            }
+
+            result.put("newStatus", 4);
+            result.put("newStatusText", getAfterSaleStatusText(4));
+            result.put("message", "平台介入：已同意退款");
+        } else if (action == 2) {
+            // 拒绝
+            afterSale.setStatus(5);
+            afterSale.setAuditRemark(remark);
+            afterSale.setAuditTime(LocalDateTime.now());
+
+            result.put("newStatus", 5);
+            result.put("newStatusText", getAfterSaleStatusText(5));
+            result.put("message", "平台介入：已拒绝售后");
+        } else {
+            throw new BusinessException(400, HttpStatus.BAD_REQUEST, "无效的操作类型");
+        }
+
+        afterSaleMapper.updateById(afterSale);
+        result.put("auditTime", formatDateTime(afterSale.getAuditTime()));
+        return result;
+    }
+
     // ==================== Helper Methods ====================
 
     private String getAfterSaleStatusText(int status) {

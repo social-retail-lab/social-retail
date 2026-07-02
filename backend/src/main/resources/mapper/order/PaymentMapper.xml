@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.socialretail.backend.mapper.PaymentMapper">
+<mapper namespace="com.socialretail.backend.mapper.order.PaymentMapper">
 
-    <resultMap id="PaymentResultMap" type="com.socialretail.backend.entity.Payment">
+    <resultMap id="PaymentResultMap" type="com.socialretail.backend.entity.order.Payment">
         <id property="id" column="id"/>
         <result property="orderId" column="order_id"/>
         <result property="paySn" column="pay_sn"/>
@@ -28,26 +28,6 @@
         refund_time, create_time, update_time
     </sql>
 
-    <insert id="insert" parameterType="com.socialretail.backend.entity.Payment"
-            useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO payment (
-            order_id, pay_sn, third_trade_no, pay_platform, amount, status,
-            pay_time, callback_time, fail_reason, refund_status, refund_amount,
-            refund_time, create_time, update_time
-        ) VALUES (
-            #{orderId}, #{paySn}, #{thirdTradeNo}, #{payPlatform}, #{amount}, #{status},
-            #{payTime}, #{callbackTime}, #{failReason}, #{refundStatus}, #{refundAmount},
-            #{refundTime}, #{createTime}, #{updateTime}
-        )
-    </insert>
-
-    <select id="selectById" resultMap="PaymentResultMap">
-        SELECT <include refid="PaymentColumns"/>
-        FROM payment
-        WHERE id = #{id}
-        LIMIT 1
-    </select>
-
     <select id="selectDetailByIdAndUserId" resultType="com.socialretail.backend.vo.payment.PaymentDetailVO">
         SELECT p.id AS paymentId,
                p.order_id AS orderId,
@@ -66,14 +46,6 @@
         FROM payment p
         JOIN `order` o ON p.order_id = o.id
         WHERE p.id = #{paymentId} AND o.user_id = #{userId}
-        LIMIT 1
-    </select>
-
-    <select id="selectLatestByOrderId" resultMap="PaymentResultMap">
-        SELECT <include refid="PaymentColumns"/>
-        FROM payment
-        WHERE order_id = #{orderId}
-        ORDER BY id DESC
         LIMIT 1
     </select>
 
@@ -111,23 +83,6 @@
         LIMIT 1
         FOR UPDATE
     </select>
-
-    <update id="updatePaid">
-        UPDATE payment
-        SET status = 1,
-            third_trade_no = #{thirdTradeNo},
-            pay_time = #{payTime},
-            callback_time = #{callbackTime},
-            fail_reason = NULL,
-            update_time = #{callbackTime}
-        WHERE id = #{paymentId} AND status != 1
-    </update>
-
-    <update id="updateFailed">
-        UPDATE payment
-        SET status = 2, fail_reason = #{failReason}, update_time = #{updateTime}
-        WHERE id = #{paymentId} AND status != 1
-    </update>
 
     <update id="updatePlatformAndPaid">
         UPDATE payment

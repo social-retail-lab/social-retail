@@ -1,50 +1,93 @@
 package com.socialretail.backend.config;
 
-import com.socialretail.backend.common.exception.BusinessException;
-import com.socialretail.backend.utils.JwtUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialretail.backend.common.JwtUtils;
+import com.socialretail.backend.common.result.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.io.IOException;
+import java.util.Set;
 
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
 
     public static final String USER_ID_ATTRIBUTE = "userId";
+    public static final String MERCHANT_ID_ATTRIBUTE = "merchantId";
+    public static final String ADMIN_ID_ATTRIBUTE = "adminId";
+    public static final String USER_TYPE_ATTRIBUTE = "userType";
+
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final JwtUtil jwtUtil;
+    private static final Set<String> WHITELIST = Set.of(
+            "/api/merchant/auth/login",
+            "/api/admin/operation/auth/login",
+            "/api/admin/system/auth/login",
+            "/api/auth/login",
+            "/api/auth/register",
+            "/api/user/sms/send",
+            "/api/pay/alipay/notify"
+    );
 
-    public JwtInterceptor(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    private final JwtUtils jwtUtils;
+
+    public JwtInterceptor(JwtUtils jwtUtils) {
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
-                             Object handler) {
-        if (HttpMethod.OPTIONS.matches(request.getMethod()) || !(handler instanceof HandlerMethod)) {
+                             Object handler) throws Exception {
+        // Allow OPTIONS (CORS preflight)
+        if (HttpMethod.OPTIONS.matches(request.getMethod())) {
             return true;
         }
 
-        String authorization = request.getHeader("Authorization");
-        if (authorization == null || !authorization.startsWith(BEARER_PREFIX)) {
-            throw unauthorized("未登录或Authorization请求头格式错误");
+        String path = request.getRequestURI();
+
+        // Allow whitelist
+        if (WHITELIST.contains(path)) {
+            return true;
         }
 
-        String token = authorization.substring(BEARER_PREFIX.length()).trim();
-        try {
-            request.setAttribute(USER_ID_ATTRIBUTE, jwtUtil.getUserId(token));
-            return true;
-        } catch (IllegalArgumentException exception) {
-            throw unauthorized("Token无效或已过期");
+        // Get Authorization header
+        String header = request.getHeader("Authorization");
+        if (header == null || header.isEmpty() || !header.startsWith(BEARER_PREFIX)) {
+            sendErrorResponse(response, 40101, "未登录或登录已过期");
+            return false;
         }
+
+        String token = header.substring(BEARER_PREFIX.length()).trim();
+
+        // Validate token
+        if (!jwtUtils.validateToken(token)) {
+            sendErrorResponse(response, 40101, "Token无效或已过期");
+            return false;
+        }
+
+        // Set request attributes by userType
+        String userType = jwtUtils.getUserType(token);
+        request.setAttribute(USER_ID_ATTRIBUTE, jwtUtils.getUserId(token));
+        request.setAttribute(USER_TYPE_ATTRIBUTE, userType);
+
+        if ("merchant".equals(userType)) {
+            request.setAttribute(MERCHANT_ID_ATTRIBUTE, jwtUtils.getMerchantId(token));
+        } else if ("admin".equals(userType)) {
+            request.setAttribute(ADMIN_ID_ATTRIBUTE, jwtUtils.getAdminId(token));
+        }
+
+        return true;
     }
 
-    private BusinessException unauthorized(String message) {
-        return new BusinessException(40101, HttpStatus.UNAUTHORIZED, message);
+    private void sendErrorResponse(HttpServletResponse response, int code, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        Result<?> result = Result.error(code, message);
+        response.getWriter().write(new ObjectMapper().writeValueAsString(result));
     }
 }
