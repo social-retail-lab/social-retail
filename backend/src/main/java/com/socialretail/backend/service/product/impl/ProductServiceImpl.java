@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialretail.backend.common.PageResult;
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.product.ProductQueryDTO;
 import com.socialretail.backend.entity.product.Product;
@@ -49,15 +50,18 @@ public class ProductServiceImpl implements ProductService {
     private final SkuMapper skuMapper;
     private final ProductCategoryRelationMapper productCategoryRelationMapper;
     private final ObjectMapper objectMapper;
+    private final ImageUrlResolver imageUrlResolver;
 
     public ProductServiceImpl(ProductMapper productMapper,
                               SkuMapper skuMapper,
                               ProductCategoryRelationMapper productCategoryRelationMapper,
-                              ObjectMapper objectMapper) {
+                              ObjectMapper objectMapper,
+                              ImageUrlResolver imageUrlResolver) {
         this.productMapper = productMapper;
         this.skuMapper = skuMapper;
         this.productCategoryRelationMapper = productCategoryRelationMapper;
         this.objectMapper = objectMapper;
+        this.imageUrlResolver = imageUrlResolver;
     }
 
     @Override
@@ -172,7 +176,7 @@ public class ProductServiceImpl implements ProductService {
         return new ProductListVO(
                 product.getId(),
                 product.getTitle(),
-                product.getMainImage(),
+                imageUrlResolver.resolve(product.getMainImage()),
                 minimumPrice(skus),
                 0
         );
@@ -227,14 +231,15 @@ public class ProductServiceImpl implements ProductService {
     private List<String> parseImages(Product product) {
         LinkedHashSet<String> images = new LinkedHashSet<>();
         if (StringUtils.hasText(product.getMainImage())) {
-            images.add(product.getMainImage());
+            images.add(imageUrlResolver.resolve(product.getMainImage()));
         }
         if (StringUtils.hasText(product.getDetailImages())) {
             try {
                 List<String> detailImages = objectMapper.readValue(product.getDetailImages(), STRING_LIST_TYPE);
-                detailImages.stream().filter(StringUtils::hasText).forEach(images::add);
+                detailImages.stream().filter(StringUtils::hasText)
+                        .map(imageUrlResolver::resolve).forEach(images::add);
             } catch (Exception ignored) {
-                images.add(product.getDetailImages());
+                images.add(imageUrlResolver.resolve(product.getDetailImages()));
             }
         }
         return new ArrayList<>(images);

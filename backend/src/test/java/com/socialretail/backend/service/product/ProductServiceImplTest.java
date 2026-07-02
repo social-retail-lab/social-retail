@@ -2,6 +2,7 @@ package com.socialretail.backend.service.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialretail.backend.common.PageResult;
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.product.ProductQueryDTO;
 import com.socialretail.backend.entity.product.Product;
@@ -49,7 +50,8 @@ class ProductServiceImplTest {
                 productMapper,
                 skuMapper,
                 relationMapper,
-                new ObjectMapper()
+                new ObjectMapper(),
+                new ImageUrlResolver("./uploads", "http://backend.test:8081")
         );
     }
 

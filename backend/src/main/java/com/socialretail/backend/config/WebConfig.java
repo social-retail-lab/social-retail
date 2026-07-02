@@ -40,6 +40,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/brands/**",
                         "/api/cart/**",
                         "/api/orders/**",
+                        "/api/files/**",
                         "/api/pay/**"
                 );
     }
@@ -63,7 +64,7 @@ public class WebConfig implements WebMvcConfigurer {
         } else {
             basePath = Paths.get(System.getProperty("user.dir"), "static").toAbsolutePath();
         }
-        registry.addResourceHandler("/static/**")
+        registry.addResourceHandler("/uploads/**", "/static/**")
                 .addResourceLocations("file:" + basePath.toString().replace("\\", "/") + "/");
     }
 }
