@@ -2,6 +2,7 @@ package com.socialretail.backend.service.merchant.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.socialretail.backend.common.OrderStatus;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.entity.member.Merchant;
@@ -343,12 +344,12 @@ public class MerchantOrderServiceImpl {
         if (!order.getMerchantId().equals(merchantId)) {
             throw new BusinessException(403, HttpStatus.FORBIDDEN, "无权操作该订单");
         }
-        if (order.getStatus() != 1) {
+        if (order.getStatus() != OrderStatus.WAIT_ACCEPT) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "当前订单状态不允许接单");
         }
 
         // 更新订单
-        order.setStatus(2);
+        order.setStatus(OrderStatus.ACCEPTED);
         order.setAcceptTime(LocalDateTime.now());
         if (remark != null && !remark.trim().isEmpty()) {
             order.setRemark(remark);
@@ -359,8 +360,8 @@ public class MerchantOrderServiceImpl {
         // 插入状态日志
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(orderId);
-        statusLog.setFromStatus(1);
-        statusLog.setToStatus(2);
+        statusLog.setFromStatus(OrderStatus.WAIT_ACCEPT);
+        statusLog.setToStatus(OrderStatus.ACCEPTED);
         statusLog.setStatusText("已接单");
         statusLog.setOperatorType("merchant");
         statusLog.setOperatorId(merchantId);
@@ -370,7 +371,7 @@ public class MerchantOrderServiceImpl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("orderId", orderId);
-        result.put("newStatus", 2);
+        result.put("newStatus", OrderStatus.ACCEPTED);
         result.put("newStatusText", "已接单");
         result.put("acceptTime", formatDateTime(LocalDateTime.now()));
         return result;
@@ -384,7 +385,7 @@ public class MerchantOrderServiceImpl {
         if (!order.getMerchantId().equals(merchantId)) {
             throw new BusinessException(403, HttpStatus.FORBIDDEN, "无权操作该订单");
         }
-        if (order.getStatus() != 2) {
+        if (order.getStatus() != OrderStatus.ACCEPTED) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "当前订单状态不允许备货");
         }
 
@@ -405,14 +406,14 @@ public class MerchantOrderServiceImpl {
         }
 
         // 更新订单状态
-        order.setStatus(3);
+        order.setStatus(OrderStatus.IN_PROGRESS);
         order.setPrepareTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
 
         Map<String, Object> result = new HashMap<>();
         result.put("orderId", orderId);
-        result.put("newStatus", 3);
+        result.put("newStatus", OrderStatus.IN_PROGRESS);
 
         String statusText;
         if (order.getDeliveryType() != null && order.getDeliveryType() == 2) {
@@ -445,8 +446,8 @@ public class MerchantOrderServiceImpl {
         // 插入状态日志
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(orderId);
-        statusLog.setFromStatus(2);
-        statusLog.setToStatus(3);
+        statusLog.setFromStatus(OrderStatus.ACCEPTED);
+        statusLog.setToStatus(OrderStatus.IN_PROGRESS);
         statusLog.setStatusText(statusText);
         statusLog.setOperatorType("merchant");
         statusLog.setOperatorId(merchantId);
@@ -468,7 +469,7 @@ public class MerchantOrderServiceImpl {
         if (order.getDeliveryType() == null || order.getDeliveryType() != 1) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "非配送订单，无法发货");
         }
-        if (order.getStatus() != 2) {
+        if (order.getStatus() != OrderStatus.ACCEPTED) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "当前订单状态不允许发货");
         }
 
@@ -497,15 +498,15 @@ public class MerchantOrderServiceImpl {
         deliveryMapper.updateById(delivery);
 
         // 更新订单状态
-        order.setStatus(3);
+        order.setStatus(OrderStatus.IN_PROGRESS);
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
 
         // 插入订单状态日志
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(orderId);
-        statusLog.setFromStatus(2);
-        statusLog.setToStatus(3);
+        statusLog.setFromStatus(OrderStatus.ACCEPTED);
+        statusLog.setToStatus(OrderStatus.IN_PROGRESS);
         statusLog.setStatusText("配送中");
         statusLog.setOperatorType("merchant");
         statusLog.setOperatorId(merchantId);
@@ -529,7 +530,7 @@ public class MerchantOrderServiceImpl {
         result.put("deliverySn", delivery.getDeliverySn());
         result.put("deliveryStatus", 2);
         result.put("deliveryStatusText", "已分配骑手");
-        result.put("newStatus", 3);
+        result.put("newStatus", OrderStatus.IN_PROGRESS);
         result.put("newStatusText", "配送中");
         result.put("startTime", formatDateTime(LocalDateTime.now()));
         result.put("simulateCompleteTime", formatDateTime(LocalDateTime.now().plusMinutes(2)));
@@ -544,12 +545,12 @@ public class MerchantOrderServiceImpl {
         if (!order.getMerchantId().equals(merchantId)) {
             throw new BusinessException(403, HttpStatus.FORBIDDEN, "无权操作该订单");
         }
-        if (order.getStatus() != 1) {
+        if (order.getStatus() != OrderStatus.WAIT_ACCEPT) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "当前订单状态不允许取消");
         }
 
         // 更新订单状态
-        order.setStatus(5);
+        order.setStatus(OrderStatus.CANCELLED);
         order.setUpdateTime(LocalDateTime.now());
         if (reason != null && !reason.trim().isEmpty()) {
             order.setRemark(reason);
@@ -559,8 +560,8 @@ public class MerchantOrderServiceImpl {
         // 插入状态日志
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(orderId);
-        statusLog.setFromStatus(1);
-        statusLog.setToStatus(5);
+        statusLog.setFromStatus(OrderStatus.WAIT_ACCEPT);
+        statusLog.setToStatus(OrderStatus.CANCELLED);
         statusLog.setStatusText("已取消");
         statusLog.setOperatorType("merchant");
         statusLog.setOperatorId(merchantId);
@@ -570,7 +571,7 @@ public class MerchantOrderServiceImpl {
 
         Map<String, Object> result = new HashMap<>();
         result.put("orderId", orderId);
-        result.put("newStatus", 5);
+        result.put("newStatus", OrderStatus.CANCELLED);
         result.put("newStatusText", "已取消");
         return result;
     }
@@ -578,28 +579,7 @@ public class MerchantOrderServiceImpl {
     // ==================== Helper Methods ====================
 
     private String getStatusText(Integer status, Integer deliveryType) {
-        if (status == null) {
-            return "";
-        }
-        switch (status) {
-            case 1:
-                return "待接单";
-            case 2:
-                return "已接单";
-            case 3:
-                if (deliveryType != null && deliveryType == 2) {
-                    return "待自提";
-                }
-                return "配送中";
-            case 4:
-                return "已完成";
-            case 5:
-                return "已取消";
-            case 6:
-                return "售后中";
-            default:
-                return "";
-        }
+        return OrderStatus.merchantStatusText(status, deliveryType);
     }
 
     private String getDeliveryTypeText(Integer type) {

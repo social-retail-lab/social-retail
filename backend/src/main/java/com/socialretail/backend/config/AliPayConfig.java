@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class AlipayConfig {
+public class AliPayConfig {
 
     @Bean
     public AlipayClient alipayClient(AlipayProperties properties) {

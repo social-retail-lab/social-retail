@@ -1,7 +1,7 @@
 package com.socialretail.backend.controller.admin;
 
 import com.socialretail.backend.common.PageResult;
-import com.socialretail.backend.common.Result;
+import com.socialretail.backend.common.result.Result;
 import com.socialretail.backend.service.admin.impl.AdminOrderServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class AdminOrderController {
             Integer statusInt = convertStatus(status);
             PageResult<Map<String, Object>> pageResult = adminOrderService.getOrderList(keyword, statusInt, page, pageSize);
             log.info("[管理端订单列表] 成功, total={}", pageResult.getTotal());
-            return Result.ok(pageResult);
+            return Result.success(pageResult);
         } catch (RuntimeException e) {
             log.warn("[管理端订单列表] 失败, 原因: {}", e.getMessage());
             throw e;
@@ -50,7 +50,7 @@ public class AdminOrderController {
         try {
             Map<String, Object> detail = adminOrderService.getOrderDetail(orderId);
             log.info("[管理端订单详情] 成功, orderId={}, orderSn={}", orderId, detail.get("orderSn"));
-            return Result.ok(detail);
+            return Result.success(detail);
         } catch (RuntimeException e) {
             log.warn("[管理端订单详情] 失败, orderId={}, 原因: {}", orderId, e.getMessage());
             throw e;
@@ -68,7 +68,7 @@ public class AdminOrderController {
         try {
             Map<String, Object> result = adminOrderService.handleRefund(orderId, refundAmount, reason);
             log.info("[管理端退款处理] 成功, orderId={}", orderId);
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[管理端退款处理] 失败, orderId={}, 原因: {}", orderId, e.getMessage());
             throw e;
@@ -84,7 +84,7 @@ public class AdminOrderController {
         try {
             Map<String, Object> result = adminOrderService.closeOrder(orderId, reason);
             log.info("[管理端关闭订单] 成功, orderId={}", orderId);
-            return Result.ok(result);
+            return Result.success(result);
         } catch (RuntimeException e) {
             log.warn("[管理端关闭订单] 失败, orderId={}, 原因: {}", orderId, e.getMessage());
             throw e;

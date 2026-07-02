@@ -3,11 +3,9 @@ package com.socialretail.backend.entity.order;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.math.BigDecimal;
 
-@Data
 @TableName("order_item")
 public class OrderItem {
     @TableId(value = "id", type = IdType.AUTO)
@@ -25,4 +23,33 @@ public class OrderItem {
     private BigDecimal itemOriginAmount;
     private BigDecimal itemFinalAmount;
     private String promotionType;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getOrderId() { return orderId; }
+    public void setOrderId(Long orderId) { this.orderId = orderId; }
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
+    public Long getSkuId() { return skuId; }
+    public void setSkuId(Long skuId) { this.skuId = skuId; }
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
+    public String getProductImage() { return productImage; }
+    public void setProductImage(String productImage) { this.productImage = productImage; }
+    public String getSkuSpecs() { return skuSpecs; }
+    public void setSkuSpecs(String skuSpecs) { this.skuSpecs = skuSpecs; }
+    public BigDecimal getOriginPrice() { return originPrice; }
+    public void setOriginPrice(BigDecimal originPrice) { this.originPrice = originPrice; }
+    public BigDecimal getFinalPrice() { return finalPrice; }
+    public void setFinalPrice(BigDecimal finalPrice) { this.finalPrice = finalPrice; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
+    public Integer getQuantity() { return quantity; }
+    public void setQuantity(Integer quantity) { this.quantity = quantity; }
+    public BigDecimal getItemOriginAmount() { return itemOriginAmount; }
+    public void setItemOriginAmount(BigDecimal itemOriginAmount) { this.itemOriginAmount = itemOriginAmount; }
+    public BigDecimal getItemFinalAmount() { return itemFinalAmount; }
+    public void setItemFinalAmount(BigDecimal itemFinalAmount) { this.itemFinalAmount = itemFinalAmount; }
+    public String getPromotionType() { return promotionType; }
+    public void setPromotionType(String promotionType) { this.promotionType = promotionType; }
 }

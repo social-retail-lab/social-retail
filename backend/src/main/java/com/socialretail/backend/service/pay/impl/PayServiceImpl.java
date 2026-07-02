@@ -9,15 +9,16 @@ import com.alipay.api.response.AlipayTradeAppPayResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialretail.backend.common.OrderStatus;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.config.AlipayProperties;
 import com.socialretail.backend.dto.request.payment.AlipayCreatePayDTO;
 import com.socialretail.backend.dto.request.payment.MockPayFailDTO;
 import com.socialretail.backend.dto.request.payment.MockPaySuccessDTO;
-import com.socialretail.backend.entity.Payment;
+import com.socialretail.backend.entity.order.Payment;
 import com.socialretail.backend.entity.order.Order;
 import com.socialretail.backend.entity.order.OrderStatusLog;
-import com.socialretail.backend.mapper.PaymentMapper;
+import com.socialretail.backend.mapper.order.PaymentMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.service.order.impl.OrderServiceImpl;
 import com.socialretail.backend.service.pay.PayService;
@@ -48,11 +49,8 @@ import java.util.Objects;
 public class PayServiceImpl implements PayService {
 
     private static final Logger log = LoggerFactory.getLogger(PayServiceImpl.class);
-    private static final int WAIT_PAY = 0;
-    private static final int WAIT_SHIP = 1;
-    private static final int WAIT_PICKUP = 2;
-    private static final int DELIVERY = 1;
-    private static final int PICKUP = 2;
+    private static final int WAIT_PAY = OrderStatus.WAIT_PAY;
+    private static final int WAIT_ACCEPT = OrderStatus.WAIT_ACCEPT;
     private static final int ALIPAY_SANDBOX = 1;
     private static final int MOCK = 2;
     private static final int UNPAID = 0;
@@ -292,7 +290,7 @@ public class PayServiceImpl implements PayService {
                                LocalDateTime payTime,
                                LocalDateTime callbackTime,
                                String remark) {
-        int nextStatus = nextOrderStatus(order.getDeliveryType());
+        int nextStatus = OrderStatus.nextStatusAfterPay(order.getDeliveryType());
         if (paymentMapper.updatePlatformAndPaid(
                 payment.getId(), platform, thirdTradeNo, payTime, callbackTime
         ) != 1) {
@@ -305,7 +303,7 @@ public class PayServiceImpl implements PayService {
         statusLog.setOrderId(order.getId());
         statusLog.setFromStatus(WAIT_PAY);
         statusLog.setToStatus(nextStatus);
-        statusLog.setStatusText(orderStatusText(nextStatus));
+        statusLog.setStatusText(OrderStatus.merchantStatusText(nextStatus, order.getDeliveryType()));
         statusLog.setOperatorType("SYSTEM");
         statusLog.setOperatorId(null);
         statusLog.setRemark(remark + "，支付流水号：" + payment.getPaySn());
@@ -394,21 +392,15 @@ public class PayServiceImpl implements PayService {
         vo.setPaySn(payment.getPaySn());
         vo.setPayStatus(paymentStatusText(paymentStatus));
         vo.setOrderStatus(paymentStatus == PAID
-                ? orderStatusText(nextOrderStatus(order.getDeliveryType()))
-                : orderStatusText(order.getStatus()));
+                ? OrderStatus.userStatusCode(OrderStatus.nextStatusAfterPay(order.getDeliveryType()))
+                : OrderStatus.userStatusText(order.getStatus(), order.getDeliveryType()));
         vo.setPayTime(payTime);
         vo.setFailReason(failReason);
         return vo;
     }
 
-    private int nextOrderStatus(Integer deliveryType) {
-        if (Objects.equals(deliveryType, DELIVERY)) {
-            return WAIT_SHIP;
-        }
-        if (Objects.equals(deliveryType, PICKUP)) {
-            return WAIT_PICKUP;
-        }
-        throw new IllegalStateException("订单配送方式无效");
+    private String orderStatusText(Integer status) {
+        return OrderServiceImpl.statusText(status);
     }
 
     private String generatePaySn(String prefix, LocalDateTime time) {
@@ -460,10 +452,6 @@ public class PayServiceImpl implements PayService {
             case 3 -> "CLOSED";
             default -> "UNKNOWN";
         };
-    }
-
-    private String orderStatusText(Integer status) {
-        return OrderServiceImpl.statusText(status);
     }
 
     private void validateAlipayConfiguration() {

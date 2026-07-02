@@ -1,0 +1,191 @@
+H:\asocial\social-retail\backend>mvn spring-boot:run
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------< com.socialretail:backend >----------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] >>> spring-boot:3.0.3:run (default-cli) > test-compile @ backend >>>
+[INFO]
+[INFO] --- resources:3.3.0:resources (default-resources) @ backend ---
+[INFO] Copying 2 resources
+[INFO] Copying 23 resources
+[INFO]
+[INFO] --- compiler:3.11.0:compile (default-compile) @ backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 334 source files with javac [debug release 17] to target\classes
+[INFO] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AuditService.java: H:\asocial\social-retail\backend\src\main\java\com\socialretail\backend\service\admin\AuditService.java使用了未经检查或不安全的操作。
+[INFO] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AuditService.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO]
+[INFO] --- resources:3.3.0:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory H:\asocial\social-retail\backend\src\test\resources
+[INFO]
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ backend ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 20 source files with javac [debug release 17] to target\test-classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR :
+[INFO] -------------------------------------------------------------
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[5,39] 找不到符号
+  符号:   类 WebMvcConfig
+  位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[12,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[45,23] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.controller.order.OrderControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[5,39] 找不到符号
+  符号:   类 WebMvcConfig
+  位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[7,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[35,23] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.controller.payment.PayControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[3,40] 程序包com.socialretail.backend.handler不存在
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[5,39] 找不到符号
+  符号:   类 WebMvcConfig
+  位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[7,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[51,13] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.controller.user.AddressControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[3,40] 程序包com.socialretail.backend.handler不存在
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[5,39] 找不到符号
+  符号:   类 WebMvcConfig
+  位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[7,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[44,13] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.controller.user.UserControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[6,39] 找不到符号
+  符号:   类 WebMvcConfig
+  位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[8,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[53,23] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.controller.user.CartControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/ProductControllerWebTest.java:[7,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/ProductControllerWebTest.java:[42,13] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.controller.user.ProductControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/service/user/UserServiceImplTest.java:[13,38] 找不到符号
+  符号:   类 JwtUtil
+  位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/service/user/UserServiceImplTest.java:[44,13] 找不到符号
+  符号:   类 JwtUtil
+  位置: 类 com.socialretail.backend.service.user.UserServiceImplTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[37,32] 找不到符号
+  符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[29,30] 找不到符号
+  符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[36,9] 找不到符号
+  符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[38,9] 找不到符号
+  符号: 类 GlobalExceptionHandler
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[31,9] 找不到符号
+  符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[33,9] 找不到符号
+  符号: 类 GlobalExceptionHandler
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[45,31] 找不到符号
+  符号: 类 WebMvcConfig
+[INFO] 28 errors
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  9.098 s
+[INFO] Finished at: 2026-07-02T11:56:12+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:testCompile (default-testCompile) on project backend: Compilation failure: Compilation failure:
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[5,39] 找不到符号
+[ERROR]   符号:   类 WebMvcConfig
+[ERROR]   位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[12,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[45,23] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.controller.order.OrderControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[5,39] 找不到符号
+[ERROR]   符号:   类 WebMvcConfig
+[ERROR]   位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[7,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[35,23] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.controller.payment.PayControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[3,40] 程序包com.socialretail.backend.handler不存在
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[5,39] 找不到符号
+[ERROR]   符号:   类 WebMvcConfig
+[ERROR]   位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[7,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[51,13] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.controller.user.AddressControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[3,40] 程序包com.socialretail.backend.handler不存在
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[5,39] 找不到符号
+[ERROR]   符号:   类 WebMvcConfig
+[ERROR]   位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[7,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[44,13] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.controller.user.UserControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[6,39] 找不到符号
+[ERROR]   符号:   类 WebMvcConfig
+[ERROR]   位置: 程序包 com.socialretail.backend.config
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[8,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[53,23] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.controller.user.CartControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/ProductControllerWebTest.java:[7,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/ProductControllerWebTest.java:[42,13] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.controller.user.ProductControllerWebTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/service/user/UserServiceImplTest.java:[13,38] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 程序包 com.socialretail.backend.utils
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/service/user/UserServiceImplTest.java:[44,13] 找不到符号
+[ERROR]   符号:   类 JwtUtil
+[ERROR]   位置: 类 com.socialretail.backend.service.user.UserServiceImplTest
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/order/OrderControllerWebTest.java:[37,32] 找不到符号
+[ERROR]   符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/payment/PayControllerWebTest.java:[29,30] 找不到符号
+[ERROR]   符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[36,9] 找不到符号
+[ERROR]   符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/AddressControllerWebTest.java:[38,9] 找不到符号
+[ERROR]   符号: 类 GlobalExceptionHandler
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[31,9] 找不到符号
+[ERROR]   符号: 类 WebMvcConfig
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/UserControllerWebTest.java:[33,9] 找不到符号
+[ERROR]   符号: 类 GlobalExceptionHandler
+[ERROR] /H:/asocial/social-retail/backend/src/test/java/com/socialretail/backend/controller/user/CartControllerWebTest.java:[45,31] 找不到符号
+[ERROR]   符号: 类 WebMvcConfig
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

@@ -1,15 +1,9 @@
 package com.socialretail.backend.common;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class PageResult<T> {
 
     private List<T> list;
@@ -17,6 +11,57 @@ public class PageResult<T> {
     private Integer pages;
     private Integer page;
     private Integer pageSize;
+
+    public PageResult() {
+    }
+
+    public PageResult(List<T> list, Long total, Integer pages, Integer page, Integer pageSize) {
+        this.list = list;
+        this.total = total;
+        this.pages = pages;
+        this.page = page;
+        this.pageSize = pageSize;
+    }
+
+    public List<T> getList() {
+        return list;
+    }
+
+    public void setList(List<T> list) {
+        this.list = list;
+    }
+
+    public Long getTotal() {
+        return total;
+    }
+
+    public void setTotal(Long total) {
+        this.total = total;
+    }
+
+    public Integer getPages() {
+        return pages;
+    }
+
+    public void setPages(Integer pages) {
+        this.pages = pages;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    public Integer getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(Integer pageSize) {
+        this.pageSize = pageSize;
+    }
 
     public static <T> PageResult<T> of(List<T> list, long total, int pageNum, int pageSize) {
         int pages = pageSize <= 0 ? 0 : (int) ((total + pageSize - 1) / pageSize);
@@ -27,9 +72,6 @@ public class PageResult<T> {
         return new PageResult<>(List.of(), 0L, 0, page, pageSize);
     }
 
-    /**
-     * 兼容已有商家端代码中的 pageNum 命名，JSON 统一输出 page。
-     */
     @JsonIgnore
     public Integer getPageNum() {
         return page;

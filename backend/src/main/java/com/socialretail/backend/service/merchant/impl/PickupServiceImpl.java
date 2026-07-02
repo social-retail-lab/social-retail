@@ -2,6 +2,7 @@ package com.socialretail.backend.service.merchant.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.socialretail.backend.common.OrderStatus;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.entity.order.MerchantEarnings;
@@ -16,6 +17,8 @@ import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.order.OrderStatusLogMapper;
 import com.socialretail.backend.mapper.order.PickupPointMapper;
 import com.socialretail.backend.mapper.user.UserMapper;
+import com.socialretail.backend.service.merchant.PickupService;
+
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,7 +35,7 @@ import java.util.Random;
 
 @Slf4j
 @Service
-public class PickupServiceImpl {
+public class PickupServiceImpl implements PickupService {
 
     @Resource
     private OrderMapper orderMapper;
@@ -73,20 +76,20 @@ public class PickupServiceImpl {
         if (order.getDeliveryType() == null || order.getDeliveryType() != 2) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "该订单非自提订单");
         }
-        if (order.getStatus() == null || order.getStatus() != 3) {
+        if (order.getStatus() == null || order.getStatus() != OrderStatus.IN_PROGRESS) {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "订单状态不允许核销");
         }
 
         LocalDateTime now = LocalDateTime.now();
 
-        order.setStatus(4);
+        order.setStatus(OrderStatus.COMPLETED);
         order.setCompleteTime(now);
         orderMapper.updateById(order);
 
         OrderStatusLog statusLog = new OrderStatusLog();
         statusLog.setOrderId(order.getId());
-        statusLog.setFromStatus(3);
-        statusLog.setToStatus(4);
+        statusLog.setFromStatus(OrderStatus.IN_PROGRESS);
+        statusLog.setToStatus(OrderStatus.COMPLETED);
         statusLog.setStatusText("已完成");
         statusLog.setOperatorType("merchant");
         statusLog.setOperatorId(merchantId);
@@ -107,7 +110,7 @@ public class PickupServiceImpl {
         Map<String, Object> result = new HashMap<>();
         result.put("orderId", order.getId());
         result.put("orderSn", order.getOrderSn());
-        result.put("newStatus", 4);
+        result.put("newStatus", OrderStatus.COMPLETED);
         result.put("newStatusText", "已完成");
         result.put("completeTime", formatDateTime(now));
         return result;
@@ -121,7 +124,7 @@ public class PickupServiceImpl {
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Order::getMerchantId, merchantId);
         wrapper.eq(Order::getDeliveryType, 2);
-        wrapper.eq(Order::getStatus, 4);
+        wrapper.eq(Order::getStatus, OrderStatus.COMPLETED);
 
         if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
             LocalDateTime start = LocalDateTime.parse(startDate + " 00:00:00", FORMATTER);

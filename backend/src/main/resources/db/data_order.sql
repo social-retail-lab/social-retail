@@ -15,7 +15,7 @@ INSERT INTO `pickup_point` (`id`, `merchant_id`, `name`, `address`, `contact_pho
 
 -- ==========================================
 -- 2. 订单主表
--- status: 1待接单 2已接单 3配送中/待自提 4已完成 5已取消
+-- status: 0待支付 1待接单 2已接单 3配送中/待自提 4已完成 5已取消 6已关闭
 -- delivery_type: 1配送 2自提
 -- ==========================================
 INSERT INTO `order` (`id`, `order_sn`, `user_id`, `merchant_id`, `pickup_point_id`, `total_amount`, `pay_amount`, `discount_amount`, `delivery_type`, `status`, `pickup_code`, `remark`, `create_time`, `update_time`, `accept_time`, `prepare_time`, `complete_time`) VALUES
