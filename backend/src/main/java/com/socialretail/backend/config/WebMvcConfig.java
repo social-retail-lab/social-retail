@@ -18,11 +18,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns(
                         "/api/user/**",
-                        "/api/addresses/**"
+                        "/api/addresses/**",
+                        "/api/cart/**",
+                        "/api/orders/**",
+                        "/api/pay/**"
                 )
                 .excludePathPatterns(
                         "/api/auth/login",
-                        "/api/auth/register"
+                        "/api/auth/register",
+                        "/api/pay/alipay/notify"
                 );
     }
 }

@@ -5,5 +5,5 @@ import com.socialretail.backend.entity.member.User;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface UserMapper extends BaseMapper<User> {
+public interface MemberUserMapper extends BaseMapper<User> {
 }

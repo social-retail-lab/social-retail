@@ -1,0 +1,56 @@
+@baseUrl = http://localhost:8081
+@token = replace-with-login-token
+@cartItemId = 9001
+
+### 查询购物车
+GET {{baseUrl}}/api/cart/items
+Authorization: Bearer {{token}}
+
+### 加入购物车
+POST {{baseUrl}}/api/cart/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "skuId": 8001,
+  "quantity": 2
+}
+
+### 修改购物车商品数量
+PUT {{baseUrl}}/api/cart/items/{{cartItemId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "quantity": 3
+}
+
+### 删除购物车商品
+DELETE {{baseUrl}}/api/cart/items/{{cartItemId}}
+Authorization: Bearer {{token}}
+
+### 批量删除前端勾选的购物车商品
+DELETE {{baseUrl}}/api/cart/items
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cartItemIds": [{{cartItemId}}]
+}
+
+### 生成前端勾选商品的结算预览（推荐的新接口）
+POST {{baseUrl}}/api/cart/checkout-preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cartItemIds": [{{cartItemId}}],
+  "couponUserId": null,
+  "usePoints": false,
+  "activityContext": {
+    "seckillId": null,
+    "bargainId": null,
+    "groupId": null,
+    "promotionIds": []
+  }
+}

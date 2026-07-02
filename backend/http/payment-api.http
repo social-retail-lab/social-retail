@@ -1,0 +1,50 @@
+### 支付宝移动端沙箱支付（WAP，手机浏览器/H5）
+POST http://localhost:8081/api/pay/alipay/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "orderId": 5001,
+  "payType": "WAP"
+}
+
+### 支付宝 App 支付（Android/iOS/uni-app 原生 App）
+POST http://localhost:8081/api/pay/alipay/create
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "orderId": 5001,
+  "payType": "APP"
+}
+
+### 查询订单支付状态
+GET http://localhost:8081/api/pay/orders/5001/status
+Authorization: Bearer {{token}}
+
+### 模拟支付成功
+POST http://localhost:8081/api/pay/mock/success
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "orderId": 5001,
+  "payAmount": 184.80
+}
+
+### 模拟支付失败
+POST http://localhost:8081/api/pay/mock/fail
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "orderId": 5001,
+  "failReason": "用户主动取消支付"
+}
+
+### 查询支付流水详情
+GET http://localhost:8081/api/pay/payments/6001
+Authorization: Bearer {{token}}
+
+### 支付宝异步通知由支付宝服务器调用，不能用 Postman 伪造签名
+### POST http://k626bf44.natappfree.cc/api/pay/alipay/notify

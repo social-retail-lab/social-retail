@@ -31,7 +31,16 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/merchant/auth/login",
                         "/api/admin/operation/auth/login",
                         "/api/admin/system/auth/login",
-                        "/api/user/sms/**"
+                        "/api/user/sms/**",
+                        "/api/auth/**",
+                        "/api/user/**",
+                        "/api/addresses/**",
+                        "/api/products/**",
+                        "/api/categories/**",
+                        "/api/brands/**",
+                        "/api/cart/**",
+                        "/api/orders/**",
+                        "/api/pay/**"
                 );
     }
 
@@ -52,9 +61,9 @@ public class WebConfig implements WebMvcConfigurer {
         if (uploadPath != null && !uploadPath.isEmpty()) {
             basePath = Paths.get(uploadPath).toAbsolutePath();
         } else {
-            basePath = Paths.get(System.getProperty("user.dir"), "uploads").toAbsolutePath();
+            basePath = Paths.get(System.getProperty("user.dir"), "static").toAbsolutePath();
         }
-        registry.addResourceHandler("/uploads/**")
+        registry.addResourceHandler("/static/**")
                 .addResourceLocations("file:" + basePath.toString().replace("\\", "/") + "/");
     }
 }

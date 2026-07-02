@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.socialretail.backend.mapper.order.CartMapper">
+
+    <resultMap id="CartResultMap" type="com.socialretail.backend.entity.order.Cart">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="skuId" column="sku_id"/>
+        <result property="quantity" column="quantity"/>
+    </resultMap>
+
+    <resultMap id="CartItemResultMap" type="com.socialretail.backend.vo.CartItemVO">
+        <id property="cartId" column="cart_id"/>
+        <result property="skuId" column="sku_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="skuSpec" column="sku_spec"/>
+        <result property="productImage" column="product_image"/>
+        <result property="price" column="price"/>
+        <result property="quantity" column="quantity"/>
+        <result property="stock" column="stock"/>
+        <result property="merchantId" column="merchant_id"/>
+        <result property="merchantName" column="merchant_name"/>
+        <result property="productStatus" column="product_status"/>
+        <result property="productAuditStatus" column="product_audit_status"/>
+    </resultMap>
+
+    <sql id="CartItemColumns">
+        c.id AS cart_id,
+        s.id AS sku_id,
+        p.id AS product_id,
+        p.title AS product_name,
+        s.specs AS sku_spec,
+        p.main_image AS product_image,
+        s.price AS price,
+        c.quantity AS quantity,
+        s.stock AS stock,
+        p.merchant_id AS merchant_id,
+        m.merchant_name AS merchant_name,
+        p.status AS product_status,
+        p.audit_status AS product_audit_status
+    </sql>
+
+    <select id="selectByIdAndUserId" resultMap="CartResultMap">
+        SELECT id, user_id, sku_id, quantity
+        FROM cart
+        WHERE id = #{id} AND user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <select id="selectByUserIdAndSkuId" resultMap="CartResultMap">
+        SELECT id, user_id, sku_id, quantity
+        FROM cart
+        WHERE user_id = #{userId} AND sku_id = #{skuId}
+        LIMIT 1
+        FOR UPDATE
+    </select>
+
+    <select id="selectCartItemsByUserId" resultMap="CartItemResultMap">
+        SELECT <include refid="CartItemColumns"/>
+        FROM cart c
+        JOIN sku s ON c.sku_id = s.id
+        JOIN product p ON s.product_id = p.id
+        LEFT JOIN merchant m ON p.merchant_id = m.id
+        WHERE c.user_id = #{userId}
+        ORDER BY c.id DESC
+    </select>
+
+    <select id="selectCartItemsByIds" resultMap="CartItemResultMap">
+        SELECT <include refid="CartItemColumns"/>
+        FROM cart c
+        JOIN sku s ON c.sku_id = s.id
+        JOIN product p ON s.product_id = p.id
+        LEFT JOIN merchant m ON p.merchant_id = m.id
+        WHERE c.user_id = #{userId}
+          AND c.id IN
+        <foreach collection="cartItemIds" item="cartItemId" open="(" separator="," close=")">
+            #{cartItemId}
+        </foreach>
+        ORDER BY c.id DESC
+    </select>
+
+    <insert id="insert" parameterType="com.socialretail.backend.entity.order.Cart"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cart (user_id, sku_id, quantity)
+        VALUES (#{userId}, #{skuId}, #{quantity})
+    </insert>
+
+    <update id="updateQuantity">
+        UPDATE cart
+        SET quantity = #{quantity}
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteByIdAndUserId">
+        DELETE FROM cart
+        WHERE id = #{id} AND user_id = #{userId}
+    </delete>
+
+    <delete id="deleteByIdsAndUserId">
+        DELETE FROM cart
+        WHERE user_id = #{userId}
+          AND id IN
+        <foreach collection="cartItemIds" item="cartItemId" open="(" separator="," close=")">
+            #{cartItemId}
+        </foreach>
+    </delete>
+</mapper>

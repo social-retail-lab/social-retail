@@ -1,0 +1,17 @@
+### 商品 SKU 列表
+GET http://localhost:8081/api/products/6001/skus
+
+### 分类树
+GET http://localhost:8081/api/categories/tree
+
+### 分类商品
+GET http://localhost:8081/api/categories/101/products?page=1&pageSize=10&sortField=price&sortOrder=asc
+
+### 品牌列表
+GET http://localhost:8081/api/brands?page=1&pageSize=20
+
+### 分类相关品牌
+GET http://localhost:8081/api/brands?categoryId=101&page=1&pageSize=20
+
+### 品牌商品
+GET http://localhost:8081/api/brands/5001/products?page=1&pageSize=10&sortField=createTime&sortOrder=desc

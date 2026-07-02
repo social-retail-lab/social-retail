@@ -13,4 +13,5 @@ public class AdminInfoVO {
     private String role;
     private Integer status;
     private String lastLoginTime;
+    private String adminType;
 }

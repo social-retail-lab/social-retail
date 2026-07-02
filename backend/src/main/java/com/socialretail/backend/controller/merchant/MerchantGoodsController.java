@@ -51,7 +51,7 @@ public class MerchantGoodsController {
     @Value("${upload.path:}")
     private String uploadPath;
 
-    @Value("${upload.base-url:http://192.168.169.141:8080}")
+    @Value("${upload.base-url:http://192.168.0.179:8080}")
     private String baseUrl;
 
     // ========== 品牌搜索（支持模糊匹配） ==========
@@ -68,12 +68,17 @@ public class MerchantGoodsController {
         }
     }
 
-    // ========== 分类列表（一级分类） ==========
+    // ========== 分类列表（一级分类 / 二级分类，通过 parentId 区分） ==========
     @GetMapping("/categories")
-    public Result<List<Map<String, Object>>> getCategories() {
-        log.info("[分类列表]");
+    public Result<List<Map<String, Object>>> getCategories(@RequestParam(required = false) Long parentId) {
+        log.info("[分类列表] parentId={}", parentId);
         try {
-            List<Map<String, Object>> categories = merchantProductService.getTopCategories();
+            List<Map<String, Object>> categories;
+            if (parentId != null) {
+                categories = merchantProductService.getSubCategories(parentId);
+            } else {
+                categories = merchantProductService.getTopCategories();
+            }
             log.info("[分类列表] 成功, count={}", categories.size());
             return Result.ok(categories);
         } catch (RuntimeException e) {
@@ -82,10 +87,12 @@ public class MerchantGoodsController {
         }
     }
 
-    // ========== 图片上传 ==========
+    // ========== 图片上传（支持分文件夹保存） ==========
+    // folder可选值: product(默认), id_card, business_license, food_permit, avatar, evidence
     @PostMapping("/upload/image")
-    public Result<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
-        log.info("[图片上传] fileName={}, size={}", file.getOriginalFilename(), file.getSize());
+    public Result<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file,
+                                                    @RequestParam(defaultValue = "product") String folder) {
+        log.info("[图片上传] fileName={}, size={}, folder={}", file.getOriginalFilename(), file.getSize(), folder);
         try {
             if (file.isEmpty()) {
                 throw new RuntimeException("上传文件为空");
@@ -103,15 +110,15 @@ public class MerchantGoodsController {
             if (uploadPath != null && !uploadPath.isEmpty()) {
                 basePath = Paths.get(uploadPath).toAbsolutePath();
             } else {
-                basePath = Paths.get(System.getProperty("user.dir"), "uploads").toAbsolutePath();
+                basePath = Paths.get(System.getProperty("user.dir"), "static").toAbsolutePath();
             }
-            Path dirPath = basePath.resolve("images").resolve(dateDir);
+            Path dirPath = basePath.resolve(folder).resolve(dateDir);
             Files.createDirectories(dirPath);
 
             File dest = dirPath.resolve(newFileName).toFile();
             file.transferTo(dest);
 
-            String url = baseUrl + "/uploads/images/" + dateDir + "/" + newFileName;
+            String url = baseUrl + "/static/" + folder + "/" + dateDir + "/" + newFileName;
             Map<String, String> result = Map.of("url", url, "fileName", newFileName);
             log.info("[图片上传] 成功, url={}", url);
             return Result.ok("上传成功", result);
