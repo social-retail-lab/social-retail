@@ -1,6 +1,6 @@
 package com.socialretail.backend.controller.user;
 
-import com.socialretail.backend.handler.GlobalExceptionHandler;
+import com.socialretail.backend.common.GlobalExceptionHandler;
 import com.socialretail.backend.config.JwtInterceptor;
 import com.socialretail.backend.config.WebMvcConfig;
 import com.socialretail.backend.service.address.AddressService;

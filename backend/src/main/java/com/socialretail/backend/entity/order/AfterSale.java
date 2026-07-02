@@ -20,9 +20,13 @@ public class AfterSale {
 
     private Long orderItemId;
 
+    private Long merchantId;
+
     private String orderSn;
 
     private Integer type;
+
+    private Integer serviceType;
 
     private BigDecimal refundAmount;
 
@@ -38,7 +42,13 @@ public class AfterSale {
 
     private Integer status;
 
+    private Integer auditStatus;
+
+    private Integer refundStatus;
+
     private String auditRemark;
+
+    private String rejectReason;
 
     private LocalDateTime auditTime;
 
@@ -55,4 +65,8 @@ public class AfterSale {
     private LocalDateTime completeTime;
 
     private LocalDateTime applyTime;
+
+    private LocalDateTime updateTime;
+
+    private Integer isDeleted;
 }
