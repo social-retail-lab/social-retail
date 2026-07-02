@@ -1,7 +1,7 @@
 package com.socialretail.backend.controller.merchant;
 
 import com.socialretail.backend.common.PageResult;
-import com.socialretail.backend.common.Result;
+import com.socialretail.backend.common.result.Result;
 import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.service.merchant.MerchantProductService;
 import com.socialretail.backend.vo.AuditVO;
