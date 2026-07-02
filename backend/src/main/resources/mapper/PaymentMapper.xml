@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.socialretail.backend.mapper.PaymentMapper">
+
+    <resultMap id="PaymentResultMap" type="com.socialretail.backend.entity.Payment">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="paySn" column="pay_sn"/>
+        <result property="thirdTradeNo" column="third_trade_no"/>
+        <result property="payPlatform" column="pay_platform"/>
+        <result property="amount" column="amount"/>
+        <result property="status" column="status"/>
+        <result property="payTime" column="pay_time"/>
+        <result property="callbackTime" column="callback_time"/>
+        <result property="failReason" column="fail_reason"/>
+        <result property="refundStatus" column="refund_status"/>
+        <result property="refundAmount" column="refund_amount"/>
+        <result property="refundTime" column="refund_time"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="PaymentColumns">
+        id, order_id, pay_sn, third_trade_no, pay_platform, amount, status,
+        pay_time, callback_time, fail_reason, refund_status, refund_amount,
+        refund_time, create_time, update_time
+    </sql>
+
+    <insert id="insert" parameterType="com.socialretail.backend.entity.Payment"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO payment (
+            order_id, pay_sn, third_trade_no, pay_platform, amount, status,
+            pay_time, callback_time, fail_reason, refund_status, refund_amount,
+            refund_time, create_time, update_time
+        ) VALUES (
+            #{orderId}, #{paySn}, #{thirdTradeNo}, #{payPlatform}, #{amount}, #{status},
+            #{payTime}, #{callbackTime}, #{failReason}, #{refundStatus}, #{refundAmount},
+            #{refundTime}, #{createTime}, #{updateTime}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="PaymentResultMap">
+        SELECT <include refid="PaymentColumns"/>
+        FROM payment
+        WHERE id = #{id}
+        LIMIT 1
+    </select>
+
+    <select id="selectDetailByIdAndUserId" resultType="com.socialretail.backend.vo.payment.PaymentDetailVO">
+        SELECT p.id AS paymentId,
+               p.order_id AS orderId,
+               o.order_sn AS orderSn,
+               p.pay_sn AS paySn,
+               p.third_trade_no AS thirdTradeNo,
+               CASE p.pay_platform WHEN 1 THEN 'ALIPAY_SANDBOX' WHEN 2 THEN 'MOCK' ELSE 'UNKNOWN' END AS payPlatform,
+               p.amount,
+               CASE p.status WHEN 0 THEN 'UNPAID' WHEN 1 THEN 'PAID' WHEN 2 THEN 'FAILED' WHEN 3 THEN 'CLOSED' ELSE 'UNKNOWN' END AS status,
+               p.pay_time AS payTime,
+               p.callback_time AS callbackTime,
+               p.fail_reason AS failReason,
+               CASE p.refund_status WHEN 0 THEN 'NONE' WHEN 1 THEN 'REFUNDING' WHEN 2 THEN 'REFUNDED' WHEN 3 THEN 'REFUND_FAILED' ELSE 'UNKNOWN' END AS refundStatus,
+               p.refund_amount AS refundAmount,
+               p.refund_time AS refundTime
+        FROM payment p
+        JOIN `order` o ON p.order_id = o.id
+        WHERE p.id = #{paymentId} AND o.user_id = #{userId}
+        LIMIT 1
+    </select>
+
+    <select id="selectLatestByOrderId" resultMap="PaymentResultMap">
+        SELECT <include refid="PaymentColumns"/>
+        FROM payment
+        WHERE order_id = #{orderId}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectLatestByOrderIdAndUserId" resultMap="PaymentResultMap">
+        SELECT p.id, p.order_id, p.pay_sn, p.third_trade_no, p.pay_platform,
+               p.amount, p.status, p.pay_time, p.callback_time, p.fail_reason,
+               p.refund_status, p.refund_amount, p.refund_time, p.create_time, p.update_time
+        FROM payment p
+        JOIN `order` o ON p.order_id = o.id
+        WHERE p.order_id = #{orderId} AND o.user_id = #{userId}
+        ORDER BY p.id DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectLatestByOrderIdForUpdate" resultMap="PaymentResultMap">
+        SELECT <include refid="PaymentColumns"/>
+        FROM payment
+        WHERE order_id = #{orderId}
+        ORDER BY id DESC
+        LIMIT 1
+        FOR UPDATE
+    </select>
+
+    <select id="selectByPaySn" resultMap="PaymentResultMap">
+        SELECT <include refid="PaymentColumns"/>
+        FROM payment
+        WHERE pay_sn = #{paySn}
+        LIMIT 1
+    </select>
+
+    <select id="selectByPaySnForUpdate" resultMap="PaymentResultMap">
+        SELECT <include refid="PaymentColumns"/>
+        FROM payment
+        WHERE pay_sn = #{paySn}
+        LIMIT 1
+        FOR UPDATE
+    </select>
+
+    <update id="updatePaid">
+        UPDATE payment
+        SET status = 1,
+            third_trade_no = #{thirdTradeNo},
+            pay_time = #{payTime},
+            callback_time = #{callbackTime},
+            fail_reason = NULL,
+            update_time = #{callbackTime}
+        WHERE id = #{paymentId} AND status != 1
+    </update>
+
+    <update id="updateFailed">
+        UPDATE payment
+        SET status = 2, fail_reason = #{failReason}, update_time = #{updateTime}
+        WHERE id = #{paymentId} AND status != 1
+    </update>
+
+    <update id="updatePlatformAndPaid">
+        UPDATE payment
+        SET pay_platform = #{payPlatform},
+            status = 1,
+            third_trade_no = #{thirdTradeNo},
+            pay_time = #{payTime},
+            callback_time = #{callbackTime},
+            fail_reason = NULL,
+            update_time = #{callbackTime}
+        WHERE id = #{paymentId} AND status != 1
+    </update>
+
+    <update id="updatePlatformAndFailed">
+        UPDATE payment
+        SET pay_platform = #{payPlatform},
+            status = 2,
+            fail_reason = #{failReason},
+            update_time = #{updateTime}
+        WHERE id = #{paymentId} AND status != 1
+    </update>
+</mapper>

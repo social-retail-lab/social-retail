@@ -23,6 +23,8 @@ public class PickupPoint {
 
     private String contactPhone;
 
+    private String businessHours;
+
     private Integer status;
 
     private Integer auditStatus;

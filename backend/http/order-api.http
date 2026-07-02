@@ -1,0 +1,70 @@
+@baseUrl = http://localhost:8081
+@token = replace-with-login-token
+@cartItemId = 7
+@addressId = 501
+@orderId = 9001
+
+### 订单预览
+POST {{baseUrl}}/api/orders/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cartItemIds": [{{cartItemId}}],
+  "addressId": {{addressId}},
+  "deliveryType": 1,
+  "couponUserId": null,
+  "usePoints": false,
+  "activityContext": {
+    "seckillId": null,
+    "bargainId": null,
+    "groupId": null,
+    "promotionIds": []
+  },
+  "remark": "请尽快配送"
+}
+
+### 提交订单
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "cartItemIds": [{{cartItemId}}],
+  "addressId": {{addressId}},
+  "deliveryType": 1,
+  "couponUserId": null,
+  "usePoints": false,
+  "activityContext": {
+    "seckillId": null,
+    "bargainId": null,
+    "groupId": null,
+    "promotionIds": []
+  },
+  "remark": "请尽快配送"
+}
+
+### 订单列表
+GET {{baseUrl}}/api/orders?status=0&page=1&pageSize=10
+Authorization: Bearer {{token}}
+
+### 订单详情
+GET {{baseUrl}}/api/orders/{{orderId}}
+Authorization: Bearer {{token}}
+
+### 取消订单
+POST {{baseUrl}}/api/orders/{{orderId}}/cancel
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "reason": "不需要了"
+}
+
+### 确认收货
+POST {{baseUrl}}/api/orders/{{orderId}}/confirm
+Authorization: Bearer {{token}}
+
+### 查询订单状态
+GET {{baseUrl}}/api/orders/{{orderId}}/status
+Authorization: Bearer {{token}}

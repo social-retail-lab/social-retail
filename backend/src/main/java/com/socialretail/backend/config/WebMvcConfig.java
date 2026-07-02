@@ -19,11 +19,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns(
                         "/api/user/**",
                         "/api/addresses/**",
-                        "/api/cart/**"
+                        "/api/cart/**",
+                        "/api/orders/**",
+                        "/api/pay/**"
                 )
                 .excludePathPatterns(
                         "/api/auth/login",
-                        "/api/auth/register"
+                        "/api/auth/register",
+                        "/api/pay/alipay/notify"
                 );
     }
 }

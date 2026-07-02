@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>支付宝沙箱支付测试</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: Inter, "Microsoft YaHei", system-ui, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+        main { width: min(680px, 100%); background: #fff; border-radius: 18px; padding: 30px; box-shadow: 0 18px 50px rgba(31, 46, 77, .12); }
+        h1 { margin: 0 0 8px; font-size: 26px; }
+        .hint { margin: 0 0 26px; color: #667085; line-height: 1.7; }
+        label { display: block; margin: 16px 0 7px; font-weight: 650; }
+        input, textarea {
+            width: 100%; border: 1px solid #d7deea; border-radius: 10px; padding: 12px 14px;
+            font: inherit; outline: none; transition: border-color .2s, box-shadow .2s;
+        }
+        input:focus, textarea:focus { border-color: #1677ff; box-shadow: 0 0 0 3px rgba(22, 119, 255, .12); }
+        textarea { min-height: 92px; resize: vertical; }
+        .actions { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+        button {
+            border: 0; border-radius: 10px; padding: 12px 20px; font: inherit; font-weight: 700;
+            cursor: pointer; background: #1677ff; color: #fff;
+        }
+        button.secondary { background: #eef4ff; color: #175cd3; }
+        button:disabled { opacity: .55; cursor: wait; }
+        #status { margin-top: 22px; border-radius: 10px; padding: 14px; background: #f8fafc; min-height: 52px; white-space: pre-wrap; line-height: 1.6; }
+        #status.ok { background: #ecfdf3; color: #067647; }
+        #status.error { background: #fef3f2; color: #b42318; }
+        .warning { margin-top: 18px; padding: 12px 14px; border-left: 4px solid #f79009; background: #fffaeb; color: #7a2e0e; line-height: 1.6; }
+    </style>
+</head>
+<body>
+<main>
+    <h1>支付宝沙箱支付测试</h1>
+    <p class="hint">填写待支付订单 ID 和登录 JWT。页面会请求后端并在新窗口完整提交支付宝表单。</p>
+
+    <label for="apiBase">后端地址</label>
+    <input id="apiBase" value="http://localhost:8081" autocomplete="url">
+
+    <label for="orderId">订单 ID</label>
+    <input id="orderId" type="number" min="1" placeholder="例如：5" autocomplete="off">
+
+    <label for="token">JWT Token（不要填写 Bearer 前缀）</label>
+    <textarea id="token" placeholder="粘贴登录接口返回的 token" autocomplete="off"></textarea>
+
+    <div class="actions">
+        <button id="payButton" type="button">打开沙箱收银台</button>
+        <button id="statusButton" class="secondary" type="button">查询支付状态</button>
+    </div>
+
+    <div id="status">等待操作</div>
+    <div class="warning">仅用于本地沙箱调试。页面不会保存 JWT，也不要在生产环境开放该测试页。</div>
+</main>
+
+<script>
+    const apiBaseInput = document.getElementById('apiBase');
+    const orderIdInput = document.getElementById('orderId');
+    const tokenInput = document.getElementById('token');
+    const payButton = document.getElementById('payButton');
+    const statusButton = document.getElementById('statusButton');
+    const statusBox = document.getElementById('status');
+
+    function formValues() {
+        const apiBase = apiBaseInput.value.trim().replace(/\/$/, '');
+        const orderId = Number(orderIdInput.value);
+        const token = tokenInput.value.trim().replace(/^Bearer\s+/i, '');
+        if (!apiBase || !Number.isInteger(orderId) || orderId <= 0 || !token) {
+            throw new Error('请完整填写后端地址、有效订单 ID 和 JWT Token');
+        }
+        return { apiBase, orderId, token };
+    }
+
+    function showStatus(message, type = '') {
+        statusBox.textContent = message;
+        statusBox.className = type;
+    }
+
+    async function readResult(response) {
+        const result = await response.json();
+        if (!response.ok || result.code !== 0) {
+            throw new Error(result.message || `请求失败（HTTP ${response.status}）`);
+        }
+        return result;
+    }
+
+    payButton.addEventListener('click', async () => {
+        let payWindow;
+        try {
+            const { apiBase, orderId, token } = formValues();
+            payWindow = window.open('', '_blank');
+            if (!payWindow) {
+                throw new Error('浏览器拦截了支付窗口，请允许本站弹出窗口后重试');
+            }
+            payWindow.document.write('<p style="font-family:sans-serif;padding:24px">正在创建支付宝沙箱支付请求…</p>');
+            payButton.disabled = true;
+            showStatus('正在创建支付请求…');
+
+            const response = await fetch(`${apiBase}/api/pay/alipay/create`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ orderId, payType: 'WAP' })
+            });
+            const result = await readResult(response);
+            if (!result.data?.payPayload) {
+                throw new Error('后端响应中缺少 payPayload');
+            }
+
+            showStatus(`支付请求创建成功\n支付流水号：${result.data.paySn}\n金额：¥${result.data.payAmount}`, 'ok');
+            payWindow.document.open();
+            payWindow.document.write(result.data.payPayload);
+            payWindow.document.close();
+        } catch (error) {
+            if (payWindow && !payWindow.closed) payWindow.close();
+            showStatus(error.message || '支付请求失败', 'error');
+        } finally {
+            payButton.disabled = false;
+        }
+    });
+
+    statusButton.addEventListener('click', async () => {
+        try {
+            const { apiBase, orderId, token } = formValues();
+            statusButton.disabled = true;
+            showStatus('正在查询支付状态…');
+            const response = await fetch(`${apiBase}/api/pay/orders/${orderId}/status`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const result = await readResult(response);
+            showStatus(JSON.stringify(result.data, null, 2), 'ok');
+        } catch (error) {
+            showStatus(error.message || '状态查询失败', 'error');
+        } finally {
+            statusButton.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>
