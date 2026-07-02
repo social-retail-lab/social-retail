@@ -63,25 +63,26 @@ class ProductControllerWebTest {
 
     @Test
     void productDetailReturnsSkuList() throws Exception {
-        ProductDetailVO detail = new ProductDetailVO(
-                1001L,
-                "新疆阿克苏苹果",
-                "冰糖心苹果",
-                List.of("https://example.com/1.jpg"),
+        ProductDetailVO detail = new ProductDetailVO();
+        detail.setProductId(1001L);
+        detail.setProductName("新疆阿克苏苹果");
+        detail.setDescription("冰糖心苹果");
+        detail.setProductImage("https://example.com/main.jpg");
+        detail.setDetailImages(List.of("https://example.com/1.jpg"));
+        detail.setPrice(new BigDecimal("39.90"));
+        detail.setSkuList(List.of(new SkuVO(
+                2001L,
+                Map.of("重量", "5斤"),
                 new BigDecimal("39.90"),
-                List.of(new SkuVO(
-                        2001L,
-                        Map.of("重量", "5斤"),
-                        new BigDecimal("39.90"),
-                        100
-                ))
-        );
+                100
+        )));
         when(productService.getProductDetail(1001L)).thenReturn(detail);
 
         mockMvc.perform(get("/api/products/1001"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.productId").value(1001))
-                .andExpect(jsonPath("$.data.images[0]").value("https://example.com/1.jpg"))
+                .andExpect(jsonPath("$.data.productImage").value("https://example.com/main.jpg"))
+                .andExpect(jsonPath("$.data.detailImages[0]").value("https://example.com/1.jpg"))
                 .andExpect(jsonPath("$.data.skuList[0].skuId").value(2001))
                 .andExpect(jsonPath("$.data.skuList[0].spec.重量").value("5斤"))
                 .andExpect(jsonPath("$.data.skuList[0].stock").value(100));
@@ -135,7 +136,7 @@ class ProductControllerWebTest {
                 "新疆阿克苏苹果",
                 "https://example.com/main.jpg",
                 new BigDecimal("39.90"),
-                568
+                568L
         );
     }
 }

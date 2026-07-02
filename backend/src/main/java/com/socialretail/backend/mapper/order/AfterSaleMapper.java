@@ -45,7 +45,7 @@ public interface AfterSaleMapper extends BaseMapper<AfterSale> {
     @Select("""
             SELECT COUNT(*) FROM after_sale
             WHERE order_item_id = #{orderItemId} AND COALESCE(is_deleted, 0) = 0
-              AND status IN (1, 2, 4)
+              AND (status IN (1, 2, 4) OR refund_status = 2)
             """)
     int countActiveByOrderItemId(@Param("orderItemId") Long orderItemId);
 

@@ -14,8 +14,10 @@ import com.socialretail.backend.dto.request.payment.AlipayCreatePayDTO;
 import com.socialretail.backend.dto.request.payment.MockPaySuccessDTO;
 import com.socialretail.backend.entity.Payment;
 import com.socialretail.backend.entity.order.Order;
+import com.socialretail.backend.entity.order.OrderItem;
 import com.socialretail.backend.mapper.PaymentMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
+import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.service.pay.impl.PayServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,7 @@ import java.security.KeyPairGenerator;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,6 +50,7 @@ class PayServiceImplTest {
 
     @Mock private PaymentMapper paymentMapper;
     @Mock private OrderMapper orderMapper;
+    @Mock private ProductMapper productMapper;
     @Mock private AlipayClient alipayClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -71,7 +75,8 @@ class PayServiceImplTest {
         properties.setCharset("UTF-8");
         properties.setSignType("RSA2");
         properties.setFormat("json");
-        service = new PayServiceImpl(paymentMapper, orderMapper, alipayClient, properties, objectMapper);
+        service = new PayServiceImpl(paymentMapper, orderMapper, productMapper,
+                alipayClient, properties, objectMapper);
     }
 
     @Test
@@ -136,6 +141,11 @@ class PayServiceImplTest {
         });
         when(paymentMapper.updatePlatformAndPaid(eq(6001L), eq(2), any(), any(), any())).thenReturn(1);
         when(orderMapper.updateStatusAfterPay(eq(20L), eq(1), any(), any())).thenReturn(1);
+        OrderItem item = new OrderItem();
+        item.setProductId(6001L);
+        item.setQuantity(2);
+        when(orderMapper.selectItemsByOrderId(20L)).thenReturn(List.of(item));
+        when(productMapper.incrementSoldCount(6001L, 2)).thenReturn(1);
         when(orderMapper.insertStatusLog(any())).thenReturn(1);
         MockPaySuccessDTO dto = new MockPaySuccessDTO();
         dto.setOrderId(20L);
@@ -145,6 +155,7 @@ class PayServiceImplTest {
 
         assertEquals("PAID", result.getPayStatus());
         assertEquals("WAIT_SHIP", result.getOrderStatus());
+        verify(productMapper).incrementSoldCount(6001L, 2);
         verify(orderMapper, never()).decrementStock(any(), anyInt());
     }
 

@@ -1,10 +1,13 @@
 package com.socialretail.backend.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.socialretail.backend.common.JwtUtils;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JwtUtilTest {
 
@@ -32,5 +35,18 @@ class JwtUtilTest {
                 + token.substring(signatureStart + 1);
 
         assertThrows(IllegalArgumentException.class, () -> jwtUtil.getUserId(tampered));
+    }
+
+    @Test
+    void legacyInterceptorCanReadUserToken() {
+        JwtUtil jwtUtil = new JwtUtil(SECRET, 60_000, new ObjectMapper());
+        JwtUtils legacyJwtUtils = new JwtUtils();
+        ReflectionTestUtils.setField(legacyJwtUtils, "secret", SECRET);
+        ReflectionTestUtils.setField(legacyJwtUtils, "expiration", 60_000L);
+
+        String token = jwtUtil.generateToken(10001L);
+
+        assertTrue(legacyJwtUtils.validateToken(token));
+        assertEquals(10001L, legacyJwtUtils.getUserId(token));
     }
 }

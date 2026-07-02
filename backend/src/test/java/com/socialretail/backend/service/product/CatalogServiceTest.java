@@ -83,6 +83,7 @@ class CatalogServiceTest {
 
         assertEquals(new BigDecimal("39.90"), result.getList().get(0).getPrice());
         assertEquals(300, result.getList().get(0).getStock());
+        assertEquals(568L, result.getList().get(0).getSoldCount());
         assertEquals(1L, result.getTotal());
     }
 
@@ -143,6 +144,7 @@ class CatalogServiceTest {
         product.setMainImage("image.jpg");
         product.setStatus(1);
         product.setAuditStatus(1);
+        product.setSoldCount(568L);
         product.setCreateTime(LocalDateTime.of(2026, 6, 1, 10, 0));
         return product;
     }

@@ -1,6 +1,7 @@
 package com.socialretail.backend.service.file;
 
 import com.socialretail.backend.common.ImageUrlResolver;
+import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.response.file.BatchImageUploadResponse;
 import com.socialretail.backend.entity.file.FileRecord;
 import com.socialretail.backend.enums.file.ImageUploadType;
@@ -59,6 +60,34 @@ class LocalImageStorageServiceTest {
         assertEquals(1, response.successList().size());
         assertEquals("detail.exe", response.failList().get(0).fileName());
         assertTrue(response.failList().get(0).reason().contains("文件格式不支持"));
+    }
+
+    @Test
+    void rejectsMultipleImagesForSingleImageType() {
+        LocalImageStorageService service = service(mapperAssigningId(6001L));
+        MockMultipartFile first = new MockMultipartFile(
+                "files", "avatar1.png", "image/png", pngBytes());
+        MockMultipartFile second = new MockMultipartFile(
+                "files", "avatar2.png", "image/png", pngBytes());
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> service.uploadImages(1001L, List.of(first, second),
+                        ImageUploadType.USER_AVATAR, null));
+
+        assertEquals(40040, exception.getCode());
+        assertTrue(exception.getMessage().contains("仅允许上传一张图片"));
+    }
+
+    @Test
+    void storesBrandLogoInBrandLogoDirectory() {
+        LocalImageStorageService service = service(mapperAssigningId(6002L));
+        MockMultipartFile logo = new MockMultipartFile(
+                "files", "brand-logo.png", "image/png", pngBytes());
+
+        BatchImageUploadResponse response = service.uploadImages(
+                1001L, List.of(logo), ImageUploadType.BRAND_LOGO, 3001L);
+
+        assertTrue(response.list().get(0).fileUrl().contains("/uploads/brand/logo/"));
     }
 
     private LocalImageStorageService service(FileRecordMapper mapper) {

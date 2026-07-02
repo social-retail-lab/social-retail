@@ -36,6 +36,20 @@ public class ImageUrlResolver {
             value = markdown.group(1);
         }
         if (value.startsWith("http://") || value.startsWith("https://")) {
+            String normalizedUrl = value.replace('\\', '/');
+            String lowerUrl = normalizedUrl.toLowerCase(Locale.ROOT);
+            int uploadsMarker = lowerUrl.indexOf("/uploads/");
+            if (uploadsMarker >= 0) {
+                String relative = normalizedUrl.substring(uploadsMarker + "/uploads/".length());
+                return requestBaseUrl() + "/uploads/"
+                        + UriUtils.encodePath(relative, StandardCharsets.UTF_8);
+            }
+            int staticMarker = lowerUrl.indexOf("/static/");
+            if (staticMarker >= 0) {
+                String relative = normalizedUrl.substring(staticMarker + "/static/".length());
+                return requestBaseUrl() + "/uploads/"
+                        + UriUtils.encodePath(relative, StandardCharsets.UTF_8);
+            }
             return value;
         }
 

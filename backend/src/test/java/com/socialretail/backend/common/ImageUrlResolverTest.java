@@ -31,4 +31,12 @@ class ImageUrlResolverTest {
         assertEquals("https://cdn.example.com/product.jpg",
                 resolver.resolve("[image](https://cdn.example.com/product.jpg)"));
     }
+
+    @Test
+    void rewritesStoredLocalhostUploadUrlToConfiguredBackendHost() {
+        assertEquals(
+                "http://192.168.1.20:8081/uploads/temp/upload/image.jpg",
+                resolver.resolve("http://localhost:8081/uploads/temp/upload/image.jpg")
+        );
+    }
 }

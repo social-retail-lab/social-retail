@@ -116,6 +116,7 @@ public class MerchantProductService {
             vo.setProductId(product.getId());
             vo.setTitle(product.getTitle());
             vo.setMainImage(product.getMainImage());
+            vo.setSales(product.getSoldCount() == null ? 0L : product.getSoldCount());
             vo.setAuditStatus(product.getAuditStatus());
             vo.setAuditStatusText(getAuditStatusText(product.getAuditStatus()));
             vo.setStatus(product.getStatus());

@@ -38,15 +38,18 @@ public class AfterSaleServiceImpl implements AfterSaleService {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final AliPayRefundService aliPayRefundService;
+    private final AfterSaleRefundCompletionService refundCompletionService;
     private final ObjectMapper objectMapper;
 
     public AfterSaleServiceImpl(AfterSaleMapper afterSaleMapper, OrderMapper orderMapper,
                                 OrderItemMapper orderItemMapper, AliPayRefundService aliPayRefundService,
+                                AfterSaleRefundCompletionService refundCompletionService,
                                 ObjectMapper objectMapper) {
         this.afterSaleMapper = afterSaleMapper;
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.aliPayRefundService = aliPayRefundService;
+        this.refundCompletionService = refundCompletionService;
         this.objectMapper = objectMapper;
     }
 
@@ -205,10 +208,7 @@ public class AfterSaleServiceImpl implements AfterSaleService {
         boolean success = throwable == null && result != null && result.success();
         String message = throwable != null ? "支付宝沙箱调用异常: " + throwable.getMessage()
                 : result == null ? "支付宝沙箱未返回结果" : result.message();
-        int changed = afterSaleMapper.finishRefund(afterSaleId,
-                success ? AfterSaleStatus.COMPLETED.getCode() : AfterSaleStatus.FAILED.getCode(),
-                success ? RefundStatus.SUCCESS.getCode() : RefundStatus.FAILED.getCode(),
-                message, LocalDateTime.now());
+        int changed = refundCompletionService.complete(afterSaleId, success, message);
         if (changed == 0) log.info("售后退款结果已处理，忽略重复回写: afterSaleId={}", afterSaleId);
     }
 

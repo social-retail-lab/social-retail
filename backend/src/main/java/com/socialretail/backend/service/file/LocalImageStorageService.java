@@ -56,6 +56,10 @@ public class LocalImageStorageService {
         if (files.size() > maxCount) {
             throw new BusinessException(40040, HttpStatus.BAD_REQUEST, "单次最多上传" + maxCount + "张图片");
         }
+        if (uploadType.isSingleImageOnly() && files.size() > 1) {
+            throw new BusinessException(40040, HttpStatus.BAD_REQUEST,
+                    uploadType.name() + "仅允许上传一张图片");
+        }
 
         List<UploadedImageResponse> success = new ArrayList<>();
         List<FailedImageResponse> failed = new ArrayList<>();

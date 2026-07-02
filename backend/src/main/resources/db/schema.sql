@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS `product` (
   `detail_desc` TEXT DEFAULT NULL COMMENT '详情描述',
   `sale_type` TINYINT DEFAULT NULL COMMENT '销售模式（自提/配送）',
   `status` TINYINT DEFAULT NULL COMMENT '上架状态',
+  `sold_count` BIGINT NOT NULL DEFAULT 0 COMMENT '已售数量',
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_product_brand` FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_product_merchant` FOREIGN KEY (`merchant_id`) REFERENCES `merchant` (`id`) ON DELETE CASCADE ON UPDATE CASCADE

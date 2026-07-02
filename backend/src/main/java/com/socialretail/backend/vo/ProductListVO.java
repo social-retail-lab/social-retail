@@ -15,7 +15,7 @@ public class ProductListVO {
     private String title;
     private String mainImage;
     private BigDecimal price;
-    private Integer sales;
+    private Long sales;
 
     // 以下字段保留给现有商家端与审核端使用。
     private BigDecimal minPrice;
@@ -31,7 +31,7 @@ public class ProductListVO {
                          String title,
                          String mainImage,
                          BigDecimal price,
-                         Integer sales) {
+                         Long sales) {
         this.productId = productId;
         this.title = title;
         this.mainImage = mainImage;

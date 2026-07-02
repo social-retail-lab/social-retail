@@ -10,6 +10,12 @@ import com.socialretail.backend.dto.request.product.ProductQueryDTO;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.product.ProductCategoryRelation;
 import com.socialretail.backend.entity.product.Sku;
+import com.socialretail.backend.entity.product.Brand;
+import com.socialretail.backend.entity.product.Category;
+import com.socialretail.backend.entity.member.Merchant;
+import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.product.BrandMapper;
+import com.socialretail.backend.mapper.product.CategoryMapper;
 import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
@@ -18,6 +24,7 @@ import com.socialretail.backend.vo.ProductDetailVO;
 import com.socialretail.backend.vo.ProductListVO;
 import com.socialretail.backend.vo.ProductSkuListVO;
 import com.socialretail.backend.vo.ProductSkuVO;
+import com.socialretail.backend.vo.ProductMerchantInfoVO;
 import com.socialretail.backend.vo.SkuVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -49,17 +56,26 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
     private final SkuMapper skuMapper;
     private final ProductCategoryRelationMapper productCategoryRelationMapper;
+    private final BrandMapper brandMapper;
+    private final CategoryMapper categoryMapper;
+    private final MerchantMapper merchantMapper;
     private final ObjectMapper objectMapper;
     private final ImageUrlResolver imageUrlResolver;
 
     public ProductServiceImpl(ProductMapper productMapper,
                               SkuMapper skuMapper,
                               ProductCategoryRelationMapper productCategoryRelationMapper,
+                              BrandMapper brandMapper,
+                              CategoryMapper categoryMapper,
+                              MerchantMapper merchantMapper,
                               ObjectMapper objectMapper,
                               ImageUrlResolver imageUrlResolver) {
         this.productMapper = productMapper;
         this.skuMapper = skuMapper;
         this.productCategoryRelationMapper = productCategoryRelationMapper;
+        this.brandMapper = brandMapper;
+        this.categoryMapper = categoryMapper;
+        this.merchantMapper = merchantMapper;
         this.objectMapper = objectMapper;
         this.imageUrlResolver = imageUrlResolver;
     }
@@ -120,14 +136,49 @@ public class ProductServiceImpl implements ProductService {
                         .orderByAsc(Sku::getId)
         );
         List<SkuVO> skuList = skus.stream().map(this::toSkuVO).toList();
-        return new ProductDetailVO(
-                product.getId(),
-                product.getTitle(),
-                product.getDetailDesc(),
-                parseImages(product),
-                minimumPrice(skus),
-                skuList
+        ProductDetailVO detail = new ProductDetailVO();
+        detail.setProductId(product.getId());
+        detail.setProductName(product.getTitle());
+        detail.setProductImage(imageUrlResolver.resolve(product.getMainImage()));
+        detail.setDetailImages(parseDetailImages(product));
+        detail.setDescription(product.getDetailDesc());
+        detail.setPrice(minimumPrice(skus));
+        detail.setSoldCount(soldCount(product));
+        detail.setStock(skus.stream().map(Sku::getStock).filter(value -> value != null)
+                .mapToInt(Integer::intValue).sum());
+        detail.setStatus(product.getStatus() != null && product.getStatus() == ON_SALE
+                ? "ON_SALE" : "OFF_SALE");
+        detail.setSkuList(skuList);
+
+        if (product.getBrandId() != null) {
+            Brand brand = brandMapper.selectById(product.getBrandId());
+            if (brand != null) {
+                detail.setBrandId(brand.getId());
+                detail.setBrandName(brand.getName());
+            }
+        }
+        ProductCategoryRelation relation = productCategoryRelationMapper.selectOne(
+                Wrappers.<ProductCategoryRelation>lambdaQuery()
+                        .eq(ProductCategoryRelation::getProductId, productId)
+                        .orderByAsc(ProductCategoryRelation::getId)
+                        .last("LIMIT 1")
         );
+        if (relation != null) {
+            Category category = categoryMapper.selectById(relation.getCategoryId());
+            if (category != null) {
+                detail.setCategoryId(category.getId());
+                detail.setCategoryName(category.getName());
+            }
+        }
+        if (product.getMerchantId() != null) {
+            Merchant merchant = merchantMapper.selectById(product.getMerchantId());
+            if (merchant != null) {
+                detail.setMerchantInfo(new ProductMerchantInfoVO(
+                        merchant.getId(), merchant.getMerchantName(),
+                        imageUrlResolver.resolve(merchant.getLogo())));
+            }
+        }
+        return detail;
     }
 
     @Override
@@ -178,7 +229,7 @@ public class ProductServiceImpl implements ProductService {
                 product.getTitle(),
                 imageUrlResolver.resolve(product.getMainImage()),
                 minimumPrice(skus),
-                0
+                soldCount(product)
         );
     }
 
@@ -228,11 +279,12 @@ public class ProductServiceImpl implements ProductService {
                 .orElse(null);
     }
 
-    private List<String> parseImages(Product product) {
+    private long soldCount(Product product) {
+        return product.getSoldCount() == null ? 0L : product.getSoldCount();
+    }
+
+    private List<String> parseDetailImages(Product product) {
         LinkedHashSet<String> images = new LinkedHashSet<>();
-        if (StringUtils.hasText(product.getMainImage())) {
-            images.add(imageUrlResolver.resolve(product.getMainImage()));
-        }
         if (StringUtils.hasText(product.getDetailImages())) {
             try {
                 List<String> detailImages = objectMapper.readValue(product.getDetailImages(), STRING_LIST_TYPE);

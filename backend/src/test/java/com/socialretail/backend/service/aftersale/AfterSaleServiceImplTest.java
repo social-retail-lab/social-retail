@@ -12,6 +12,7 @@ import com.socialretail.backend.mapper.order.AfterSaleMapper;
 import com.socialretail.backend.mapper.order.OrderItemMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.service.aftersale.impl.AfterSaleServiceImpl;
+import com.socialretail.backend.service.aftersale.impl.AfterSaleRefundCompletionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,12 +34,13 @@ class AfterSaleServiceImplTest {
     @Mock private OrderMapper orderMapper;
     @Mock private OrderItemMapper orderItemMapper;
     @Mock private AliPayRefundService aliPayRefundService;
+    @Mock private AfterSaleRefundCompletionService refundCompletionService;
     private AfterSaleServiceImpl service;
 
     @BeforeEach
     void setUp() {
         service = new AfterSaleServiceImpl(afterSaleMapper, orderMapper, orderItemMapper,
-                aliPayRefundService, new ObjectMapper());
+                aliPayRefundService, refundCompletionService, new ObjectMapper());
     }
 
     @Test
@@ -58,8 +60,7 @@ class AfterSaleServiceImplTest {
         service.handleAuditResult(1L, AuditStatus.APPROVED, "同意退款");
 
         verify(aliPayRefundService).refund(10L, new BigDecimal("59.90"));
-        verify(afterSaleMapper).finishRefund(eq(1L), eq(AfterSaleStatus.COMPLETED.getCode()),
-                eq(RefundStatus.SUCCESS.getCode()), anyString(), any());
+        verify(refundCompletionService).complete(eq(1L), eq(true), anyString());
     }
 
     @Test
@@ -91,8 +92,7 @@ class AfterSaleServiceImplTest {
 
         service.handleAuditResult(1L, AuditStatus.APPROVED, "同意退款");
 
-        verify(afterSaleMapper).finishRefund(eq(1L), eq(AfterSaleStatus.FAILED.getCode()),
-                eq(RefundStatus.FAILED.getCode()), eq("sandbox fail"), any());
+        verify(refundCompletionService).complete(1L, false, "sandbox fail");
     }
 
     @Test

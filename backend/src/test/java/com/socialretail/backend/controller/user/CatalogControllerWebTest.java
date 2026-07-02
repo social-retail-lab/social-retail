@@ -108,7 +108,7 @@ class CatalogControllerWebTest {
         return new CatalogProductVO(
                 1001L, "进口车厘子", "image.jpg",
                 new BigDecimal("99.90"), new BigDecimal("99.90"),
-                0, 200, List.of()
+                0L, 200, List.of()
         );
     }
 }

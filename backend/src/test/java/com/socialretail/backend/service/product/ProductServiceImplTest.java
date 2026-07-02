@@ -7,9 +7,16 @@ import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.product.ProductQueryDTO;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.product.Sku;
+import com.socialretail.backend.entity.product.Brand;
+import com.socialretail.backend.entity.product.Category;
+import com.socialretail.backend.entity.product.ProductCategoryRelation;
+import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
+import com.socialretail.backend.mapper.product.BrandMapper;
+import com.socialretail.backend.mapper.product.CategoryMapper;
+import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.service.product.impl.ProductServiceImpl;
 import com.socialretail.backend.vo.ProductDetailVO;
 import com.socialretail.backend.vo.ProductListVO;
@@ -42,6 +49,15 @@ class ProductServiceImplTest {
     @Mock
     private ProductCategoryRelationMapper relationMapper;
 
+    @Mock
+    private BrandMapper brandMapper;
+
+    @Mock
+    private CategoryMapper categoryMapper;
+
+    @Mock
+    private MerchantMapper merchantMapper;
+
     private ProductServiceImpl productService;
 
     @BeforeEach
@@ -50,6 +66,9 @@ class ProductServiceImplTest {
                 productMapper,
                 skuMapper,
                 relationMapper,
+                brandMapper,
+                categoryMapper,
+                merchantMapper,
                 new ObjectMapper(),
                 new ImageUrlResolver("./uploads", "http://backend.test:8081")
         );
@@ -58,6 +77,7 @@ class ProductServiceImplTest {
     @Test
     void listProductsUsesMinimumSkuPriceAndPagination() {
         Product apple = product(6001L, "苹果");
+        apple.setSoldCount(568L);
         Product orange = product(6002L, "橙子");
         when(productMapper.selectList(any())).thenReturn(List.of(apple, orange));
         when(skuMapper.selectList(any())).thenReturn(List.of(
@@ -74,7 +94,7 @@ class ProductServiceImplTest {
         assertEquals(1, result.getPages());
         assertEquals(6001L, result.getList().get(0).getProductId());
         assertEquals(new BigDecimal("39.90"), result.getList().get(0).getPrice());
-        assertEquals(0, result.getList().get(0).getSales());
+        assertEquals(568L, result.getList().get(0).getSales());
     }
 
     @Test
@@ -95,7 +115,27 @@ class ProductServiceImplTest {
         product.setMainImage("https://example.com/main.jpg");
         product.setDetailImages("[\"https://example.com/1.jpg\"]");
         product.setDetailDesc("商品详情");
+        product.setSoldCount(1234L);
+        product.setBrandId(2L);
+        product.setMerchantId(5001L);
         when(productMapper.selectOne(any())).thenReturn(product);
+
+        Brand brand = new Brand();
+        brand.setId(2L);
+        brand.setName("优选生鲜");
+        when(brandMapper.selectById(2L)).thenReturn(brand);
+        ProductCategoryRelation relation = new ProductCategoryRelation();
+        relation.setCategoryId(1L);
+        when(relationMapper.selectOne(any())).thenReturn(relation);
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("水果生鲜");
+        when(categoryMapper.selectById(1L)).thenReturn(category);
+        Merchant merchant = new Merchant();
+        merchant.setId(5001L);
+        merchant.setMerchantName("某某生鲜店");
+        merchant.setLogo("https://example.com/logo.jpg");
+        when(merchantMapper.selectById(5001L)).thenReturn(merchant);
 
         Sku sku = sku(8001L, 6001L, "39.90");
         sku.setSpecs("{\"规格\":\"5斤装\"}");
@@ -103,9 +143,15 @@ class ProductServiceImplTest {
 
         ProductDetailVO result = productService.getProductDetail(6001L);
 
-        assertEquals(2, result.getImages().size());
+        assertEquals("https://example.com/main.jpg", result.getProductImage());
+        assertEquals(1, result.getDetailImages().size());
         assertEquals("5斤装", result.getSkuList().get(0).getSpec().get("规格"));
         assertEquals(new BigDecimal("39.90"), result.getPrice());
+        assertEquals(100, result.getStock());
+        assertEquals("水果生鲜", result.getCategoryName());
+        assertEquals("优选生鲜", result.getBrandName());
+        assertEquals("某某生鲜店", result.getMerchantInfo().merchantName());
+        assertEquals(1234L, result.getSoldCount());
     }
 
     @Test
