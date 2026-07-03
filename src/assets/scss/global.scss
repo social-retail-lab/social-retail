@@ -1,0 +1,59 @@
+// 页面全局重置样式
+// 包含：通用样式重置、页面基础样式、组件基础样式
+
+// 注意：variable.scss 和 mixin.scss 已通过 uni.scss 全局注入，此处不再重复导入
+
+// 样式重置
+page {
+  background-color: $bg-page;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: $font-md;
+  color: $text-main;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+view, text, image {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
+button::after {
+  display: none;
+}
+
+// 通用卡片统一样式
+.card-wrap {
+  background: $bg-card;
+  border-radius: $radius-lg;
+}
+
+// 全局文字默认层级
+.text-main { color: $text-main; }
+.text-sub { color: $text-sub; }
+.text-weak { color: $text-weak; }
+
+// 主按钮通用样式（下单/加购/结算）
+.btn-primary {
+  background: $color-primary;
+  color: #fff;
+}
+
+.btn-danger {
+  background: $color-primary-danger;
+  color: #fff;
+}
+
+// 辅助文字/标签
+.text-assist { color: $color-assist; }
+.tag-assist {
+  color: $color-assist;
+  border: 1rpx solid $color-assist;
+}

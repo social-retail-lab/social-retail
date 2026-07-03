@@ -1,0 +1,93 @@
+// SCSS 变量定义 - 社交新零售电商平台配色方案
+
+// 主色调-橙红促销色
+$color-primary: #FF6A00;
+$color-primary-dark: #E55A00;
+$color-primary-light: #FF8A33;
+$color-primary-danger: #FF4D4F;
+
+// 辅助蓝色
+$color-assist: #1890FF;
+
+// 页面背景色
+$bg-page: #F5F5F5;
+$bg-page-light: #F9FAFB;
+$bg-grey: #F5F5F5;
+
+// 卡片底色
+$bg-card: #FFFFFF;
+$bg-white: #FFFFFF;
+
+// 文字层级
+$text-main: #333333;
+$text-sub: #666666;
+$text-weak: #999999;
+
+// 状态点缀色（小图标专用，禁止大块背景）
+$color-success: #52C41A;
+$color-warning: #FAAD14;
+$color-error: #FF4D4F;
+
+// 边框颜色
+$border-color: #E8E8E8;
+
+// 兼容旧变量名
+$primary-color: $color-primary;
+$primary-action: $color-primary-danger;
+$info-color: $color-assist;
+$success-color: $color-success;
+$warning-color: $color-warning;
+$error-color: $color-error;
+
+// Tailwind gray 系列（用于精确匹配设计稿）
+$gray-100: #F3F4F6;
+$gray-200: #E5E7EB;
+$gray-300: #D1D5DB;
+$gray-400: #9CA3AF;
+$gray-500: #6B7280;
+$gray-600: #4B5563;
+$gray-800: #1F2937;
+
+// Tailwind orange/red/green 系列
+$orange-500: #F97316;
+$red-500: #EF4444;
+$green-500: #22C55E;
+
+// 字体大小
+$font-xs: 20rpx;
+$font-sm: 24rpx;
+$font-md: 28rpx;
+$font-lg: 32rpx;
+$font-xl: 36rpx;
+
+// 兼容设计稿命名
+$font-size-xs: 22rpx;
+$font-size-sm: 24rpx;
+$font-size-base: 28rpx;
+$font-size-lg: 32rpx;
+$font-size-xl: 36rpx;
+$font-size-xxl: 44rpx;
+
+// 间距
+$spacing-xs: 10rpx;
+$spacing-sm: 20rpx;
+$spacing-md: 30rpx;
+$spacing-lg: 40rpx;
+
+// 兼容设计稿命名
+$spacing-base: 24rpx;
+
+// 圆角
+$radius-sm: 8rpx;
+$radius-base: 12rpx;
+$radius-md: 12rpx;
+$radius-lg: 16rpx;
+$radius-xl: 24rpx;
+$radius-full: 999rpx;
+
+// 分类页面专用变量
+$category-bg: #F7F8FA;           // 页面背景色
+$category-left-width: 190rpx;    // 左侧导航宽度
+$category-item-height: 100rpx;   // 分类项高度
+$category-card-radius: 32rpx;    // 卡片圆角(16px)
+$category-shadow-sm: 0 4rpx 16rpx rgba(0, 0, 0, 0.06); // 轻量级阴影

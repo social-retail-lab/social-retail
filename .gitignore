@@ -1,0 +1,15 @@
+node_modules/
+unpackage/
+.hbuilderx/
+.DS_Store
+.trae/
+dist/
+node_cache/
+.vscode/
+.idea/
+Thumbs.db
+*.log
+npm-debug.log*
+.env
+.env.local
+.env.*.local

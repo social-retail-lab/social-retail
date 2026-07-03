@@ -1,0 +1,190 @@
+// 通用样式混入
+
+// 弹性布局 - 水平居中
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 弹性布局 - 水平两端对齐
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// 弹性布局 - 垂直居中
+@mixin flex-col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// 弹性布局 - 左对齐
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+// 弹性布局 - 右对齐
+@mixin flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// 文字省略 - 单行
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 文字省略 - 多行
+@mixin text-ellipsis-multi($lines: 2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+}
+
+// 圆角
+@mixin rounded($radius: $radius-md) {
+  border-radius: $radius;
+}
+
+// 圆形
+@mixin circle {
+  border-radius: 50%;
+}
+
+// 阴影
+@mixin shadow($type: 'sm') {
+  @if $type == 'sm' {
+    box-shadow: $shadow-sm;
+  } @else if $type == 'md' {
+    box-shadow: $shadow-md;
+  } @else if $type == 'lg' {
+    box-shadow: $shadow-lg;
+  }
+}
+
+// 边框
+@mixin border($color: $border-color) {
+  border: 2rpx solid $color;
+}
+
+// 边框底部
+@mixin border-bottom($color: $border-color) {
+  border-bottom: 2rpx solid $color;
+}
+
+// 边框顶部
+@mixin border-top($color: $border-color) {
+  border-top: 2rpx solid $color;
+}
+
+// 背景色
+@mixin bg($color: $bg-white) {
+  background-color: $color;
+}
+
+// 文字颜色
+@mixin text-color($color: $text-primary) {
+  color: $color;
+}
+
+// 字体大小
+@mixin font-size($size: $font-md) {
+  font-size: $size;
+}
+
+// 字体粗细
+@mixin font-weight($weight: 'normal') {
+  @if $weight == 'normal' {
+    font-weight: 400;
+  } @else if $weight == 'medium' {
+    font-weight: 500;
+  } @else if $weight == 'bold' {
+    font-weight: 700;
+  }
+}
+
+// 占位图
+@mixin placeholder {
+  background: $bg-grey;
+  border-radius: $radius-sm;
+}
+
+// 按钮基础样式
+@mixin button-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  font-size: $font-md;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+// 主题按钮
+@mixin button-primary {
+  @include button-base;
+  background: $primary-color;
+  color: $text-white;
+  
+  &:active {
+    background: $primary-dark;
+  }
+}
+
+// 次要按钮
+@mixin button-secondary {
+  @include button-base;
+  background: $bg-page;
+  color: $text-secondary;
+}
+
+// 禁用按钮
+@mixin button-disabled {
+  @include button-base;
+  background: $text-placeholder;
+  color: $text-white;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// 卡片基础样式
+@mixin card-base {
+  background: $bg-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+// 毛玻璃效果
+@mixin glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20rpx);
+}
+
+// 渐变背景
+@mixin gradient-primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-action 100%);
+}
+
+// 渐变文字
+@mixin gradient-text {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-action 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
