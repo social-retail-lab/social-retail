@@ -18,6 +18,7 @@ public class Coupon {
     private Integer receivedCount;
     private Integer perUserLimit;
     private Integer exchangePoints;
+    private Integer memberLevelRequired;
     private Integer validityType;
     private Integer validityDays;
     private LocalDateTime validStart;
@@ -44,6 +45,8 @@ public class Coupon {
     public void setPerUserLimit(Integer perUserLimit) { this.perUserLimit = perUserLimit; }
     public Integer getExchangePoints() { return exchangePoints; }
     public void setExchangePoints(Integer exchangePoints) { this.exchangePoints = exchangePoints; }
+    public Integer getMemberLevelRequired() { return memberLevelRequired; }
+    public void setMemberLevelRequired(Integer memberLevelRequired) { this.memberLevelRequired = memberLevelRequired; }
     public Integer getValidityType() { return validityType; }
     public void setValidityType(Integer validityType) { this.validityType = validityType; }
     public Integer getValidityDays() { return validityDays; }

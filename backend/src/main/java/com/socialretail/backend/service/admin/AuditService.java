@@ -12,6 +12,7 @@ import com.socialretail.backend.entity.product.Category;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.product.ProductCategoryRelation;
 import com.socialretail.backend.entity.product.Sku;
+import com.socialretail.backend.entity.system.Notification;
 import com.socialretail.backend.mapper.member.MerchantApplyMapper;
 import com.socialretail.backend.mapper.member.MerchantInfoChangeMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
@@ -21,6 +22,7 @@ import com.socialretail.backend.mapper.product.CategoryMapper;
 import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
+import com.socialretail.backend.mapper.system.NotificationMapper;
 import com.socialretail.backend.vo.AdminProductDetailVO;
 import com.socialretail.backend.vo.AdminProductListVO;
 import com.socialretail.backend.vo.AuditVO;
@@ -74,6 +76,9 @@ public class AuditService {
 
     @Resource
     private MerchantInfoChangeMapper merchantInfoChangeMapper;
+
+    @Resource
+    private NotificationMapper notificationMapper;
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
@@ -242,6 +247,17 @@ public class AuditService {
         product.setAuditRemark(auditRemark);
         product.setAuditTime(LocalDateTime.now());
         productMapper.updateById(product);
+
+        // 创建通知给商家
+        Notification n = new Notification();
+        n.setMerchantId(product.getMerchantId());
+        n.setType("AUDIT_RESULT");
+        n.setTitle("商品审核结果");
+        n.setContent(auditStatus == 1 ? "商品「" + product.getTitle() + "」审核通过" : "商品「" + product.getTitle() + "」审核驳回: " + (auditRemark != null ? auditRemark : ""));
+        n.setIsRead(0);
+        n.setRelatedId(productId);
+        n.setCreateTime(LocalDateTime.now());
+        notificationMapper.insert(n);
 
         AuditVO auditVO = new AuditVO();
         auditVO.setProductId(productId);

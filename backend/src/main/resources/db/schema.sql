@@ -293,7 +293,7 @@ CREATE TABLE IF NOT EXISTS `seckill_product` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '秒杀关联ID（主键）',
   `seckill_activity_id` BIGINT DEFAULT NULL COMMENT '秒杀活动ID',
   `product_id` BIGINT DEFAULT NULL COMMENT '商品SpuID',
-  `sku_id` BIGINT DEFAULT NULL COMMENT '商品SkuID',
+  `sku_id` VARCHAR(100) DEFAULT NULL COMMENT '商品SKU码',
   `seckill_price` DECIMAL(10,2) DEFAULT NULL COMMENT '秒杀专享价',
   `seckill_stock` INT DEFAULT NULL COMMENT '秒杀专享库存',
   `sold_count` INT NOT NULL DEFAULT 0 COMMENT '已售数量',
@@ -304,8 +304,7 @@ CREATE TABLE IF NOT EXISTS `seckill_product` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_seckill_activity_sku` (`seckill_activity_id`, `sku_id`),
   CONSTRAINT `fk_seckill_act` FOREIGN KEY (`seckill_activity_id`) REFERENCES `seckill_activity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_seckill_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_seckill_sku` FOREIGN KEY (`sku_id`) REFERENCES `sku` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_seckill_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='秒杀商品表';
 
 -- BargainActivity（砍价活动表）
