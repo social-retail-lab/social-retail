@@ -6,6 +6,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import com.socialretail.backend.vo.PointsInfoVO;
 
 @Data
 @AllArgsConstructor
@@ -26,4 +27,5 @@ public class OrderPricingResult {
     private Map<Long, OrderItemPrice> itemPrices;
     private List<Object> availablePromotions;
     private List<Object> availableCoupons;
+    private PointsInfoVO pointsInfo;
 }

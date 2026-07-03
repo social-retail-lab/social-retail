@@ -9,9 +9,12 @@ import com.socialretail.backend.vo.CartBatchDeleteVO;
 import com.socialretail.backend.vo.CartListVO;
 import com.socialretail.backend.vo.CartUpdateVO;
 import com.socialretail.backend.vo.CartCheckoutPreviewVO;
+import com.socialretail.backend.vo.CartInvalidItemListVO;
 
 public interface CartService {
     CartListVO list(Long userId);
+
+    CartInvalidItemListVO listInvalidItems(Long userId);
 
     CartAddVO add(Long userId, CartAddDTO dto);
 

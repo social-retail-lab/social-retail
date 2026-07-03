@@ -12,6 +12,7 @@ import com.socialretail.backend.vo.CartBatchDeleteVO;
 import com.socialretail.backend.vo.CartListVO;
 import com.socialretail.backend.vo.CartUpdateVO;
 import com.socialretail.backend.vo.CartCheckoutPreviewVO;
+import com.socialretail.backend.vo.CartInvalidItemListVO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +41,12 @@ public class CartController {
     public Result<CartListVO> list(
             @RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId) {
         return Result.success(cartService.list(userId));
+    }
+
+    @GetMapping("/invalid-items")
+    public Result<CartInvalidItemListVO> listInvalidItems(
+            @RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId) {
+        return Result.success(cartService.listInvalidItems(userId));
     }
 
     @PostMapping("/items")

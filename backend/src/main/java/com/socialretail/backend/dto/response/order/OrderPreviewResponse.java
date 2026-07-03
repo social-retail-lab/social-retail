@@ -4,25 +4,24 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.util.List;
+import com.socialretail.backend.vo.CartActivityInfoVO;
+import com.socialretail.backend.vo.CartCouponInfoVO;
+import com.socialretail.backend.vo.CartPromotionDetailVO;
+import com.socialretail.backend.vo.PointsInfoVO;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderPreviewResponse {
     private List<OrderItemResponse> itemList;
-    private BigDecimal totalAmount;
-    private BigDecimal discountAmount;
-    private BigDecimal payAmount;
-    private BigDecimal deliveryFee;
-    private BigDecimal seckillDiscount;
-    private BigDecimal bargainDiscount;
-    private BigDecimal promotionDiscount;
-    private BigDecimal couponDiscount;
-    private BigDecimal pointsDeduction;
+    private OrderPreviewPriceDetailResponse priceDetail;
+    private PointsInfoVO pointsInfo;
+    private List<CartPromotionDetailVO> promotionDetail;
     private OrderAddressInfoResponse addressInfo;
     private OrderPickupPointInfoResponse pickupPointInfo;
+    private CartCouponInfoVO couponInfo;
+    private CartActivityInfoVO activityInfo;
     private List<Object> availablePromotions;
     private List<Object> availableCoupons;
     private Object promotionSnapshot;

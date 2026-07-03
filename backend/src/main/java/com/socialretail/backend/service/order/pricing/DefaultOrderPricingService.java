@@ -1,6 +1,8 @@
 package com.socialretail.backend.service.order.pricing;
 
 import com.socialretail.backend.vo.CartItemVO;
+import com.socialretail.backend.vo.PointsInfoVO;
+import com.socialretail.backend.service.member.PointsCalculationService;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -12,6 +14,11 @@ import java.util.Map;
 public class DefaultOrderPricingService implements OrderPricingService {
 
     private static final BigDecimal ZERO = new BigDecimal("0.00");
+    private final PointsCalculationService pointsCalculationService;
+
+    public DefaultOrderPricingService(PointsCalculationService pointsCalculationService) {
+        this.pointsCalculationService = pointsCalculationService;
+    }
 
     @Override
     public OrderPricingResult calculate(OrderPricingCommand command) {
@@ -27,23 +34,30 @@ public class DefaultOrderPricingService implements OrderPricingService {
             ));
         }
 
+        // 积分只抵扣商品优惠后的金额，配送费不参与 10% 上限计算。
+        PointsInfoVO pointsInfo = pointsCalculationService.calculate(
+                command.userId(), originalAmount, command.usePoints(), command.usePointsAmount());
+        BigDecimal pointsDeduction = pointsInfo.getDeductionAmount();
+        BigDecimal payableAmount = originalAmount.subtract(pointsDeduction).max(BigDecimal.ZERO);
+
         return new OrderPricingResult(
                 originalAmount,
+                pointsDeduction,
+                ZERO,
+                payableAmount,
                 ZERO,
                 ZERO,
-                originalAmount,
                 ZERO,
                 ZERO,
-                ZERO,
-                ZERO,
-                ZERO,
+                pointsDeduction,
                 null,
                 null,
                 null,
                 null,
                 itemPrices,
                 List.of(),
-                List.of()
+                List.of(),
+                pointsInfo
         );
     }
 }

@@ -7,6 +7,7 @@
     <resultMap id="OrderResultMap" type="com.socialretail.backend.entity.order.Order">
         <id property="id" column="id"/>
         <result property="orderSn" column="order_sn"/>
+        <result property="idempotentKey" column="idempotent_key"/>
         <result property="userId" column="user_id"/>
         <result property="merchantId" column="merchant_id"/>
         <result property="pickupPointId" column="pickup_point_id"/>
@@ -31,6 +32,8 @@
         <result property="bargainDiscount" column="bargain_discount"/>
         <result property="couponDiscount" column="coupon_discount"/>
         <result property="pointsDeduction" column="points_deduction"/>
+        <result property="usedPoints" column="used_points"/>
+        <result property="pointsStatus" column="points_status"/>
         <result property="couponUserId" column="coupon_user_id"/>
         <result property="seckillId" column="seckill_id"/>
         <result property="bargainId" column="bargain_id"/>
@@ -61,11 +64,12 @@
     </resultMap>
 
     <sql id="OrderColumns">
-        id, order_sn, user_id, merchant_id, pickup_point_id, address_id,
+        id, order_sn, idempotent_key, user_id, merchant_id, pickup_point_id, address_id,
         consignee, phone, province, city, district, detailed_address,
         total_amount, pay_amount, delivery_type, status, create_time, pay_expire_time, pay_time, cancel_time,
         discount_amount, delivery_fee, seckill_discount, bargain_discount,
-        coupon_discount, points_deduction, coupon_user_id, seckill_id, bargain_id,
+        coupon_discount, points_deduction, used_points, points_status,
+        coupon_user_id, seckill_id, bargain_id,
         promotion_snapshot, pickup_code, remark, update_time, complete_time,
         accept_time, prepare_time
     </sql>
@@ -73,18 +77,20 @@
     <insert id="insertOrder" parameterType="com.socialretail.backend.entity.order.Order"
             useGeneratedKeys="true" keyProperty="id">
         INSERT INTO `order` (
-            order_sn, user_id, merchant_id, pickup_point_id, address_id,
+            order_sn, idempotent_key, user_id, merchant_id, pickup_point_id, address_id,
             consignee, phone, province, city, district, detailed_address,
             total_amount, pay_amount, delivery_type, status, create_time, pay_expire_time,
             discount_amount, delivery_fee, seckill_discount, bargain_discount,
-            coupon_discount, points_deduction, coupon_user_id, seckill_id,
+            coupon_discount, points_deduction, used_points, points_status,
+            coupon_user_id, seckill_id,
             bargain_id, promotion_snapshot, pickup_code, remark, update_time
         ) VALUES (
-            #{orderSn}, #{userId}, #{merchantId}, #{pickupPointId}, #{addressId},
+            #{orderSn}, #{idempotentKey}, #{userId}, #{merchantId}, #{pickupPointId}, #{addressId},
             #{consignee}, #{phone}, #{province}, #{city}, #{district}, #{detailedAddress},
             #{totalAmount}, #{payAmount}, #{deliveryType}, #{status}, #{createTime}, #{payExpireTime},
             #{discountAmount}, #{deliveryFee}, #{seckillDiscount}, #{bargainDiscount},
-            #{couponDiscount}, #{pointsDeduction}, #{couponUserId}, #{seckillId},
+            #{couponDiscount}, #{pointsDeduction}, #{usedPoints}, #{pointsStatus},
+            #{couponUserId}, #{seckillId},
             #{bargainId}, #{promotionSnapshot}, #{pickupCode}, #{remark}, #{updateTime}
         )
     </insert>
@@ -124,6 +130,13 @@
         SELECT <include refid="OrderColumns"/>
         FROM `order`
         WHERE id = #{orderId}
+        LIMIT 1
+    </select>
+
+    <select id="selectByUserIdAndIdempotentKey" resultMap="OrderResultMap">
+        SELECT <include refid="OrderColumns"/>
+        FROM `order`
+        WHERE user_id = #{userId} AND idempotent_key = #{idempotentKey}
         LIMIT 1
     </select>
 
@@ -232,6 +245,12 @@
         UPDATE `order`
         SET status = #{status}, update_time = #{updateTime}
         WHERE id = #{orderId}
+    </update>
+
+    <update id="updatePointsStatus">
+        UPDATE `order`
+        SET points_status = #{toStatus}, update_time = NOW()
+        WHERE id = #{orderId} AND points_status = #{fromStatus}
     </update>
 
 </mapper>

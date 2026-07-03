@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS `member` (
   `points_balance` INT DEFAULT NULL COMMENT '积分余额',
   `growth_value` INT DEFAULT NULL COMMENT '成长值',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_member_user` (`user_id`),
   CONSTRAINT `fk_member_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='会员表';
 
@@ -198,15 +199,19 @@ CREATE TABLE IF NOT EXISTS `pickup_point` (
 CREATE TABLE IF NOT EXISTS `order` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '订单ID（主键）',
   `order_sn` VARCHAR(50) DEFAULT NULL COMMENT '订单编号',
+  `idempotent_key` VARCHAR(100) DEFAULT NULL COMMENT '用户提交订单幂等键',
   `user_id` BIGINT DEFAULT NULL COMMENT '用户ID',
   `merchant_id` BIGINT DEFAULT NULL COMMENT '商家ID',
   `pickup_point_id` BIGINT DEFAULT NULL COMMENT '自提点ID',
   `total_amount` DECIMAL(10,2) DEFAULT NULL COMMENT '订单总价',
   `pay_amount` DECIMAL(10,2) DEFAULT NULL COMMENT '应付金额',
+  `used_points` INT NOT NULL DEFAULT 0 COMMENT '订单使用积分',
+  `points_status` TINYINT NOT NULL DEFAULT 0 COMMENT '积分状态：0无 1预占 2已扣减 3已释放',
   `delivery_type` TINYINT DEFAULT NULL COMMENT '配送方式',
   `status` TINYINT DEFAULT NULL COMMENT '订单状态',
   `create_time` DATETIME DEFAULT NULL COMMENT '下单时间',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_order_user_idempotent` (`user_id`, `idempotent_key`),
   CONSTRAINT `fk_order_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_order_merchant` FOREIGN KEY (`merchant_id`) REFERENCES `merchant` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_order_pickup` FOREIGN KEY (`pickup_point_id`) REFERENCES `pickup_point` (`id`) ON DELETE SET NULL ON UPDATE CASCADE

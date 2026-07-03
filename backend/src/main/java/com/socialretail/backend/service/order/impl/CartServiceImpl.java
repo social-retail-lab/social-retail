@@ -12,6 +12,7 @@ import com.socialretail.backend.mapper.order.CartMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.service.order.CartService;
+import com.socialretail.backend.service.member.PointsCalculationService;
 import com.socialretail.backend.vo.CartAddVO;
 import com.socialretail.backend.vo.CartBatchDeleteVO;
 import com.socialretail.backend.vo.CartItemVO;
@@ -24,6 +25,9 @@ import com.socialretail.backend.vo.CartCheckoutPriceDetailVO;
 import com.socialretail.backend.vo.CartActivityInfoVO;
 import com.socialretail.backend.vo.CartCouponInfoVO;
 import com.socialretail.backend.vo.CartPromotionDetailVO;
+import com.socialretail.backend.vo.CartInvalidItemVO;
+import com.socialretail.backend.vo.CartInvalidItemListVO;
+import com.socialretail.backend.vo.PointsInfoVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,11 +50,14 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
     private final SkuMapper skuMapper;
     private final ProductMapper productMapper;
+    private final PointsCalculationService pointsCalculationService;
 
-    public CartServiceImpl(CartMapper cartMapper, SkuMapper skuMapper, ProductMapper productMapper) {
+    public CartServiceImpl(CartMapper cartMapper, SkuMapper skuMapper, ProductMapper productMapper,
+                           PointsCalculationService pointsCalculationService) {
         this.cartMapper = cartMapper;
         this.skuMapper = skuMapper;
         this.productMapper = productMapper;
+        this.pointsCalculationService = pointsCalculationService;
     }
 
     @Override
@@ -67,6 +74,25 @@ public class CartServiceImpl implements CartService {
             }
         }
         return new CartListVO(items, totalQuantity, totalAmount, totalAmount);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CartInvalidItemListVO listInvalidItems(Long userId) {
+        List<CartInvalidItemVO> invalidItems = cartMapper.selectCartItemsByUserId(userId).stream()
+                .peek(this::prepareItem)
+                .filter(item -> !Boolean.TRUE.equals(item.getIsValid()))
+                .map(item -> new CartInvalidItemVO(
+                        item.getCartId(),
+                        item.getSkuId(),
+                        item.getProductId(),
+                        item.getProductName(),
+                        item.getProductImage(),
+                        item.getQuantity(),
+                        item.getInvalidReason()
+                ))
+                .toList();
+        return new CartInvalidItemListVO(invalidItems);
     }
 
     @Override
@@ -159,7 +185,7 @@ public class CartServiceImpl implements CartService {
         }
 
         CartPriceDetailVO priceDetail = new CartPriceDetailVO(
-                totalAmount, ZERO_AMOUNT, ZERO_AMOUNT, ZERO_AMOUNT,
+                totalAmount, ZERO_AMOUNT, ZERO_AMOUNT, ZERO_AMOUNT, ZERO_AMOUNT,
                 ZERO_AMOUNT, ZERO_AMOUNT, totalAmount
         );
         return new CalculationResult(priceDetail, items);
@@ -170,6 +196,14 @@ public class CartServiceImpl implements CartService {
     public CartCheckoutPreviewVO checkoutPreview(Long userId, CartCheckoutPreviewDTO dto) {
         CalculationResult calculated = calculate(userId, dto);
         CartPriceDetailVO calculatedPrice = calculated.priceDetail();
+        BigDecimal discountedGoodsAmount = calculatedPrice.getTotalAmount()
+                .subtract(calculatedPrice.getSeckillDiscount())
+                .subtract(calculatedPrice.getBargainDiscount())
+                .subtract(calculatedPrice.getPromotionDiscount())
+                .subtract(calculatedPrice.getCouponDiscount())
+                .max(BigDecimal.ZERO);
+        PointsInfoVO pointsInfo = pointsCalculationService.calculate(
+                userId, discountedGoodsAmount, dto.getUsePoints(), dto.getUsePointsAmount());
         List<CartCheckoutItemVO> items = calculated.items().stream()
                 .map(this::toCheckoutItem)
                 .toList();
@@ -185,9 +219,10 @@ public class CartServiceImpl implements CartService {
                 calculatedPrice.getBargainDiscount(),
                 ZERO_AMOUNT,
                 calculatedPrice.getCouponDiscount(),
-                calculatedPrice.getPointsDeduction(),
+                pointsInfo.getDeductionAmount(),
                 calculatedPrice.getDeliveryFee(),
-                calculatedPrice.getPayableAmount()
+                discountedGoodsAmount.add(calculatedPrice.getDeliveryFee())
+                        .subtract(pointsInfo.getDeductionAmount()).max(BigDecimal.ZERO)
         );
         CartCouponInfoVO couponInfo = dto.getCouponUserId() == null ? null
                 : new CartCouponInfoVO(dto.getCouponUserId(), null, calculatedPrice.getCouponDiscount());
@@ -195,6 +230,7 @@ public class CartServiceImpl implements CartService {
         return new CartCheckoutPreviewVO(
                 items,
                 priceDetail,
+                pointsInfo,
                 buildPromotionDetails(priceDetail),
                 couponInfo,
                 activityInfo,

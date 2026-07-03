@@ -58,7 +58,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         // Get Authorization header
         String header = request.getHeader("Authorization");
         if (header == null || header.isEmpty() || !header.startsWith(BEARER_PREFIX)) {
-            sendErrorResponse(response, 40101, "未登录或登录已过期");
+            sendErrorResponse(response, 40100, "用户未登录或登录已过期");
             return false;
         }
 
@@ -66,7 +66,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
         // Validate token
         if (!jwtUtils.validateToken(token)) {
-            sendErrorResponse(response, 40101, "Token无效或已过期");
+            sendErrorResponse(response, 40100, "用户未登录或登录已过期");
             return false;
         }
 

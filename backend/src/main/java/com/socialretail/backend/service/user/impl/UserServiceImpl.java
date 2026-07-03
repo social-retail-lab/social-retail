@@ -8,8 +8,10 @@ import com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest;
 import com.socialretail.backend.dto.request.user.UserRegisterRequest;
 import com.socialretail.backend.dto.request.user.UserUpdateRequest;
 import com.socialretail.backend.entity.user.User;
+import com.socialretail.backend.entity.member.Member;
 import com.socialretail.backend.enums.UserStatusEnum;
 import com.socialretail.backend.mapper.user.UserMapper;
+import com.socialretail.backend.mapper.member.MemberMapper;
 import com.socialretail.backend.service.user.UserService;
 import com.socialretail.backend.common.JwtUtils;
 import com.socialretail.backend.utils.PhoneUtil;
@@ -37,13 +39,16 @@ public class UserServiceImpl implements UserService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final UserMapper userMapper;
+    private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
     public UserServiceImpl(UserMapper userMapper,
+                           MemberMapper memberMapper,
                            PasswordEncoder passwordEncoder,
                            JwtUtils jwtUtils) {
         this.userMapper = userMapper;
+        this.memberMapper = memberMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtils = jwtUtils;
     }
@@ -63,6 +68,15 @@ public class UserServiceImpl implements UserService {
 
         if (userMapper.insert(user) != 1 || user.getId() == null) {
             throw new IllegalStateException("用户注册写入失败");
+        }
+
+        Member member = new Member();
+        member.setUserId(user.getId());
+        member.setMemberLevel(1);
+        member.setPointsBalance(0);
+        member.setGrowthValue(0);
+        if (memberMapper.insert(member) != 1) {
+            throw new IllegalStateException("会员账户初始化失败");
         }
 
         return new UserRegisterVO(

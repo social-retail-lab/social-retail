@@ -14,6 +14,7 @@ import com.socialretail.backend.dto.response.order.OrderItemResponse;
 import com.socialretail.backend.dto.response.order.OrderListResponse;
 import com.socialretail.backend.dto.response.order.OrderPickupPointInfoResponse;
 import com.socialretail.backend.dto.response.order.OrderPreviewResponse;
+import com.socialretail.backend.dto.response.order.OrderPreviewPriceDetailResponse;
 import com.socialretail.backend.dto.response.order.OrderStatusResponse;
 import com.socialretail.backend.dto.response.order.OrderSubmitResponse;
 import com.socialretail.backend.dto.response.order.OrderSummaryResponse;
@@ -26,14 +27,19 @@ import com.socialretail.backend.mapper.address.AddressMapper;
 import com.socialretail.backend.mapper.order.CartMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.service.order.OrderService;
+import com.socialretail.backend.service.order.OrderPointsService;
 import com.socialretail.backend.service.order.pricing.OrderItemPrice;
 import com.socialretail.backend.service.order.pricing.OrderPricingCommand;
 import com.socialretail.backend.service.order.pricing.OrderPricingResult;
 import com.socialretail.backend.service.order.pricing.OrderPricingService;
 import com.socialretail.backend.utils.PhoneUtil;
 import com.socialretail.backend.vo.CartItemVO;
+import com.socialretail.backend.vo.CartActivityInfoVO;
+import com.socialretail.backend.vo.CartCouponInfoVO;
+import com.socialretail.backend.vo.CartPromotionDetailVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -69,17 +75,20 @@ public class OrderServiceImpl implements OrderService {
     private final AddressMapper addressMapper;
     private final OrderPricingService pricingService;
     private final OrderTimeoutProperties timeoutProperties;
+    private final OrderPointsService orderPointsService;
 
     public OrderServiceImpl(OrderMapper orderMapper,
                             CartMapper cartMapper,
                             AddressMapper addressMapper,
                             OrderPricingService pricingService,
-                            OrderTimeoutProperties timeoutProperties) {
+                            OrderTimeoutProperties timeoutProperties,
+                            OrderPointsService orderPointsService) {
         this.orderMapper = orderMapper;
         this.cartMapper = cartMapper;
         this.addressMapper = addressMapper;
         this.pricingService = pricingService;
         this.timeoutProperties = timeoutProperties;
+        this.orderPointsService = orderPointsService;
     }
 
     @Override
@@ -92,13 +101,16 @@ public class OrderServiceImpl implements OrderService {
         );
         OrderPricingResult pricing = pricingService.calculate(new OrderPricingCommand(
                 userId, context.items(), request.getCouponUserId(),
-                request.getUsePoints(), request.getActivityContext()
+                request.getUsePoints(), request.getUsePointsAmount(), request.getActivityContext()
         ));
         OrderPreviewResponse response = new OrderPreviewResponse();
         response.setItemList(context.items().stream()
                 .map(item -> toPreviewItem(item, pricing.getItemPrices().get(item.getCartId())))
                 .toList());
         applyPreviewPricing(response, pricing);
+        response.setActivityInfo(toActivityInfo(request.getActivityContext()));
+        response.setCouponInfo(request.getCouponUserId() == null ? null
+                : new CartCouponInfoVO(request.getCouponUserId(), null, pricing.getCouponDiscount()));
         response.setAddressInfo(toAddressInfo(fulfillment.address()));
         response.setPickupPointInfo(toPickupInfo(fulfillment.pickupPoint()));
         return response;
@@ -106,7 +118,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderSubmitResponse submit(Long userId, OrderSubmitRequest request) {
+    public OrderSubmitResponse submit(Long userId, String idempotentKey, OrderSubmitRequest request) {
+        Order existingOrder = orderMapper.selectByUserIdAndIdempotentKey(userId, idempotentKey);
+        if (existingOrder != null) {
+            return toSubmitResponse(existingOrder);
+        }
         List<Long> cartItemIds = distinctIds(request.getCartItemIds());
         CartContext context = loadCartContext(userId, cartItemIds);
         Fulfillment fulfillment = resolveFulfillment(
@@ -115,14 +131,24 @@ public class OrderServiceImpl implements OrderService {
         );
         OrderPricingResult pricing = pricingService.calculate(new OrderPricingCommand(
                 userId, context.items(), request.getCouponUserId(),
-                request.getUsePoints(), request.getActivityContext()
+                request.getUsePoints(), request.getUsePointsAmount(), request.getActivityContext()
         ));
 
         LocalDateTime now = LocalDateTime.now();
-        Order order = buildOrder(userId, request, context, fulfillment, pricing, now);
-        if (orderMapper.insertOrder(order) != 1 || order.getId() == null) {
-            throw new IllegalStateException("订单创建失败");
+        Order order = buildOrder(userId, idempotentKey, request, context, fulfillment, pricing, now);
+        try {
+            if (orderMapper.insertOrder(order) != 1 || order.getId() == null) {
+                throw new IllegalStateException("订单创建失败");
+            }
+        } catch (DuplicateKeyException exception) {
+            Order duplicated = orderMapper.selectByUserIdAndIdempotentKey(userId, idempotentKey);
+            if (duplicated != null) {
+                return toSubmitResponse(duplicated);
+            }
+            throw exception;
         }
+
+        orderPointsService.reserve(userId, value(pricing.getPointsInfo().getUsedPoints()));
 
         for (CartItemVO cartItem : context.items()) {
             OrderItem item = toOrderItem(
@@ -141,10 +167,7 @@ public class OrderServiceImpl implements OrderService {
             throw cartItemNotFound();
         }
         insertStatusLog(order.getId(), null, WAIT_PAY, userId, "订单创建", now);
-        return new OrderSubmitResponse(
-                order.getId(), order.getOrderSn(), WAIT_PAY, statusText(WAIT_PAY),
-                order.getPayAmount(), order.getPayExpireTime()
-        );
+        return toSubmitResponse(order);
     }
 
     @Override
@@ -188,6 +211,7 @@ public class OrderServiceImpl implements OrderService {
         if (orderMapper.cancelWaitPayOrder(orderId, userId) != 1) {
             throw invalidOrderStatus("订单状态已变化，请刷新后重试");
         }
+        orderPointsService.release(order);
         List<OrderItem> items = orderMapper.selectItemsByOrderId(orderId);
         for (OrderItem item : items) {
             if (item.getSkuId() != null
@@ -287,6 +311,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Order buildOrder(Long userId,
+                             String idempotentKey,
                              OrderSubmitRequest request,
                              CartContext context,
                              Fulfillment fulfillment,
@@ -294,6 +319,7 @@ public class OrderServiceImpl implements OrderService {
                              LocalDateTime now) {
         Order order = new Order();
         order.setOrderSn(OrderNoUtils.generate());
+        order.setIdempotentKey(idempotentKey);
         order.setUserId(userId);
         order.setMerchantId(context.merchantId());
         order.setPickupPointId(fulfillment.pickupPoint() == null ? null : fulfillment.pickupPoint().getId());
@@ -312,6 +338,9 @@ public class OrderServiceImpl implements OrderService {
         order.setBargainDiscount(pricing.getBargainDiscount());
         order.setCouponDiscount(pricing.getCouponDiscount());
         order.setPointsDeduction(pricing.getPointsDeduction());
+        int usedPoints = value(pricing.getPointsInfo().getUsedPoints());
+        order.setUsedPoints(usedPoints);
+        order.setPointsStatus(usedPoints > 0 ? OrderPointsService.RESERVED : OrderPointsService.NONE);
         order.setCouponUserId(pricing.getAppliedCouponUserId());
         order.setSeckillId(pricing.getAppliedSeckillId());
         order.setBargainId(pricing.getAppliedBargainId());
@@ -428,22 +457,47 @@ public class OrderServiceImpl implements OrderService {
         response.setFinalPrice(price.finalPrice());
         response.setQuantity(cartItem.getQuantity());
         response.setItemAmount(price.finalAmount());
+        response.setItemOriginAmount(price.originAmount());
+        response.setItemFinalAmount(price.finalAmount());
+        response.setPromotionType(price.promotionType());
         return response;
     }
 
     private void applyPreviewPricing(OrderPreviewResponse response, OrderPricingResult pricing) {
-        response.setTotalAmount(pricing.getOriginalAmount());
-        response.setDiscountAmount(pricing.getDiscountAmount());
-        response.setPayAmount(pricing.getPayableAmount());
-        response.setDeliveryFee(pricing.getDeliveryFee());
-        response.setSeckillDiscount(pricing.getSeckillDiscount());
-        response.setBargainDiscount(pricing.getBargainDiscount());
-        response.setPromotionDiscount(pricing.getPromotionDiscount());
-        response.setCouponDiscount(pricing.getCouponDiscount());
-        response.setPointsDeduction(pricing.getPointsDeduction());
+        response.setPriceDetail(new OrderPreviewPriceDetailResponse(
+                pricing.getOriginalAmount(), pricing.getSeckillDiscount(),
+                pricing.getBargainDiscount(), pricing.getPromotionDiscount(),
+                pricing.getCouponDiscount(), pricing.getPointsDeduction(),
+                pricing.getDeliveryFee(), pricing.getPayableAmount()));
+        response.setPointsInfo(pricing.getPointsInfo());
+        response.setPromotionDetail(buildPromotionDetails(pricing));
         response.setAvailablePromotions(pricing.getAvailablePromotions());
         response.setAvailableCoupons(pricing.getAvailableCoupons());
         response.setPromotionSnapshot(pricing.getPromotionSnapshot());
+    }
+
+    private List<CartPromotionDetailVO> buildPromotionDetails(OrderPricingResult pricing) {
+        List<CartPromotionDetailVO> details = new ArrayList<>();
+        addPromotion(details, "SECKILL", "秒杀活动优惠", pricing.getSeckillDiscount());
+        addPromotion(details, "BARGAIN", "砍价活动优惠", pricing.getBargainDiscount());
+        addPromotion(details, "PROMOTION", "满减满折优惠", pricing.getPromotionDiscount());
+        addPromotion(details, "COUPON", "优惠券优惠", pricing.getCouponDiscount());
+        addPromotion(details, "POINTS", "积分抵扣", pricing.getPointsDeduction());
+        return details;
+    }
+
+    private void addPromotion(List<CartPromotionDetailVO> details, String type,
+                              String title, BigDecimal discount) {
+        if (discount != null && discount.compareTo(BigDecimal.ZERO) > 0) {
+            details.add(new CartPromotionDetailVO(type, title, discount));
+        }
+    }
+
+    private CartActivityInfoVO toActivityInfo(
+            com.socialretail.backend.dto.request.order.OrderActivityContextRequest context) {
+        if (context == null) return new CartActivityInfoVO(null, null, null, List.of());
+        return new CartActivityInfoVO(context.getSeckillId(), context.getBargainId(),
+                context.getGroupId(), context.getPromotionIds() == null ? List.of() : context.getPromotionIds());
     }
 
     private OrderItemPrice requireItemPrice(CartItemVO item, OrderItemPrice price) {
@@ -512,6 +566,15 @@ public class OrderServiceImpl implements OrderService {
 
     private String generatePickupCode() {
         return String.format("%06d", RANDOM.nextInt(1_000_000));
+    }
+
+    private OrderSubmitResponse toSubmitResponse(Order order) {
+        return new OrderSubmitResponse(order.getId(), order.getOrderSn(), order.getStatus(),
+                statusText(order.getStatus()), order.getPayAmount(), order.getPayExpireTime());
+    }
+
+    private int value(Integer number) {
+        return number == null ? 0 : number;
     }
 
     private BigDecimal zeroIfNull(BigDecimal value) {

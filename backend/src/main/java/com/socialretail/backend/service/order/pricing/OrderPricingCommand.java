@@ -10,6 +10,7 @@ public record OrderPricingCommand(
         List<CartItemVO> items,
         Long couponUserId,
         Boolean usePoints,
+        Integer usePointsAmount,
         OrderActivityContextRequest activityContext
 ) {
 }
