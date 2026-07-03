@@ -60,6 +60,34 @@ public class PickupServiceImpl implements PickupService {
     private static final Random RANDOM = new Random();
 
     /**
+     * 订单管理中的确认自提（核对单订单自提码，支持万能码111111）
+     */
+    public Map<String, Object> confirmPickup(Long merchantId, Long orderId, String pickupCode) {
+        Order order = orderMapper.selectById(orderId);
+        if (order == null) {
+            throw new BusinessException(400, HttpStatus.BAD_REQUEST, "订单不存在");
+        }
+        if (!order.getMerchantId().equals(merchantId)) {
+            throw new BusinessException(400, HttpStatus.BAD_REQUEST, "该订单不属于本店");
+        }
+        if (order.getDeliveryType() == null || order.getDeliveryType() != 2) {
+            throw new BusinessException(400, HttpStatus.BAD_REQUEST, "该订单非自提订单");
+        }
+        if (order.getStatus() == null || order.getStatus() != OrderStatus.IN_PROGRESS) {
+            throw new BusinessException(400, HttpStatus.BAD_REQUEST, "订单状态不允许自提");
+        }
+
+        // 万能测试码跳过自提码校验
+        if (!"111111".equals(pickupCode)) {
+            if (order.getPickupCode() == null || !order.getPickupCode().equals(pickupCode)) {
+                throw new BusinessException(400, HttpStatus.BAD_REQUEST, "自提码不正确");
+            }
+        }
+
+        return doVerifyPickup(order, merchantId);
+    }
+
+    /**
      * 自提取货码核销
      */
     public Map<String, Object> verifyPickup(Long merchantId, String pickupCode) {
@@ -80,6 +108,13 @@ public class PickupServiceImpl implements PickupService {
             throw new BusinessException(400, HttpStatus.BAD_REQUEST, "订单状态不允许核销");
         }
 
+        return doVerifyPickup(order, merchantId);
+    }
+
+    /**
+     * 执行核销（订单状态更新 + 记录 + 收益）
+     */
+    private Map<String, Object> doVerifyPickup(Order order, Long merchantId) {
         LocalDateTime now = LocalDateTime.now();
 
         order.setStatus(OrderStatus.COMPLETED);

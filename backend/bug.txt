@@ -1,0 +1,649 @@
+H:\asocial\social-retail\backend>mvn spring-boot:run -Dspring-boot.run.profiles=local-merchant
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ----------------------< com.socialretail:backend >----------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO]
+[INFO] >>> spring-boot:3.0.3:run (default-cli) > test-compile @ backend >>>
+[INFO]
+[INFO] --- resources:3.3.0:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource
+[INFO] Copying 2 resources
+[INFO] Copying 30 resources
+[INFO]
+[INFO] --- compiler:3.11.0:compile (default-compile) @ backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 418 source files with javac [debug release 17] to target\classes
+[INFO] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java: H:\asocial\social-retail\backend\src\main\java\com\socialretail\backend\controller\admin\AdminPromotionController.java使用了未经检查或不安全的操作。
+[INFO] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java: 有关详细信息, 请使用 -Xlint:unchecked 重新编译。
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR :
+[INFO] -------------------------------------------------------------
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[5,50] 无法访问com.socialretail.backend.service.promotion.CouponService
+  错误的源文件: H:\asocial\social-retail\backend\src\main\java\com\socialretail\backend\service\promotion\CouponService.java
+    文件不包含类com.socialretail.backend.service.promotion.CouponService
+    请删除该文件或确保该文件位于正确的源路径子目录中。
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[16,19] 找不到符号
+  符号:   类 CouponService
+  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[18,34] 找不到符号
+  符号:   类 CouponService
+  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[14,27] 找不到符号
+  符号:   方法 getServerUrl()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[14,54] 找不到符号
+  符号:   方法 getAppId()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[15,27] 找不到符号
+  符号:   方法 getPrivateKey()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[15,55] 找不到符号
+  符号:   方法 getFormat()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[16,27] 找不到符号
+  符号:   方法 getCharset()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[16,52] 找不到符号
+  符号:   方法 getAlipayPublicKey()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[17,27] 找不到符号
+  符号:   方法 getSignType()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[60,57] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[63,71] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[75,34] 找不到符号
+  符号:   方法 getLimitQuantity()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[76,75] 找不到符号
+  符号:   方法 getActivityId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[76,97] 找不到符号
+  符号:   方法 getSkuId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[79,17] 找不到符号
+  符号:   方法 getStartTime()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[79,48] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[81,30] 找不到符号
+  符号:   方法 getStartTime()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[83,31] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[85,44] 找不到符号
+  符号:   方法 getSeckillProductStatus()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[86,51] 找不到符号
+  符号:   方法 getProductStatus()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[87,51] 找不到符号
+  符号:   方法 getProductAuditStatus()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[101,79] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[112,41] 找不到符号
+  符号:   方法 getStartTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[113,49] 找不到符号
+  符号:   方法 getStartTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[113,90] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[115,35] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[115,59] 找不到符号
+  符号:   方法 getStartTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[116,41] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[116,59] 找不到符号
+  符号:   方法 getTitle()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[117,32] 找不到符号
+  符号:   方法 getStartTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[117,65] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[127,36] 找不到符号
+  符号:   方法 getSeckillProductId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[127,64] 找不到符号
+  符号:   方法 getActivityId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[127,86] 找不到符号
+  符号:   方法 getProductId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[128,21] 找不到符号
+  符号:   方法 getSkuId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[128,38] 找不到符号
+  符号:   方法 getProductName()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[128,86] 找不到符号
+  符号:   方法 getProductImage()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[129,21] 找不到符号
+  符号:   方法 getSkuSpecs()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[129,41] 找不到符号
+  符号:   方法 getOriginPrice()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[129,64] 找不到符号
+  符号:   方法 getSeckillPrice()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[130,27] 找不到符号
+  符号:   方法 getSeckillStock()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[130,58] 找不到符号
+  符号:   方法 getSoldCount()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[131,30] 找不到符号
+  符号:   方法 getLimitQuantity()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[135,35] 找不到符号
+  符号:   方法 getActivityId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[135,57] 找不到符号
+  符号:   方法 getSkuId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[143,38] 找不到符号
+  符号:   方法 getSeckillStock()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[143,70] 找不到符号
+  符号:   方法 getSoldCount()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[147,75] 找不到符号
+  符号:   方法 getEndTime()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[148,43] 找不到符号
+  符号:   方法 getSeckillStock()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[148,75] 找不到符号
+  符号:   方法 getSoldCount()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[149,62] 找不到符号
+  符号:   方法 getActivityId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[149,84] 找不到符号
+  符号:   方法 getSkuId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[155,72] 找不到符号
+  符号:   方法 getActivityId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[155,94] 找不到符号
+  符号:   方法 getSkuId()
+  位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[42,43] 找不到符号
+  符号:   方法 getOrderItemId()
+  位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[45,62] 找不到符号
+  符号:   方法 getOrderItemId()
+  位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[47,86] 找不到符号
+  符号:   方法 getOrderItemId()
+  位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[54,22] 找不到符号
+  符号:   方法 getRefundAmount()
+  位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[55,29] 找不到符号
+  符号:   方法 getRefundAmount()
+  位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[59,32] 找不到符号
+  符号:   方法 getPhone()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserRegisterRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[64,30] 找不到符号
+  符号:   方法 getPhone()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserRegisterRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[65,56] 找不到符号
+  符号:   方法 getPassword()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserRegisterRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[82,16] 无法将类 com.socialretail.backend.vo.UserRegisterVO中的构造器 UserRegisterVO应用到给定类型;
+  需要: 没有参数
+  找到:    java.lang.Long,java.lang.String,java.lang.String,java.lang.String
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[92,40] 找不到符号
+  符号:   方法 getPhone()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[100,35] 找不到符号
+  符号:   方法 getLoginType()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[108,16] 无法将类 com.socialretail.backend.vo.UserLoginVO中的构造器 UserLoginVO应用到给定类型;
+  需要: 没有参数
+  找到:    java.lang.String,long,com.socialretail.backend.vo.UserInfoVO
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[119,20] 找不到符号
+  符号:   方法 getNickname()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[119,53] 找不到符号
+  符号:   方法 getAvatar()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[122,20] 找不到符号
+  符号:   方法 getNickname()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[122,74] 找不到符号
+  符号:   方法 getNickname()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[127,20] 找不到符号
+  符号:   方法 getNickname()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[128,37] 找不到符号
+  符号:   方法 getNickname()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[130,20] 找不到符号
+  符号:   方法 getAvatar()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[131,35] 找不到符号
+  符号:   方法 getAvatar()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[136,16] 无法将类 com.socialretail.backend.vo.UserUpdateVO中的构造器 UserUpdateVO应用到给定类型;
+  需要: 没有参数
+  找到:    java.lang.Long,java.lang.String,java.lang.String
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[143,46] 找不到符号
+  符号:   方法 getNewPhone()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[149,41] 找不到符号
+  符号:   方法 getCode()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[149,64] 找不到符号
+  符号:   方法 getCode()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[153,21] 找不到符号
+  符号:   方法 getNewPhone()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[154,34] 找不到符号
+  符号:   方法 getNewPhone()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[159,16] 无法将类 com.socialretail.backend.vo.UserPhoneVO中的构造器 UserPhoneVO应用到给定类型;
+  需要: 没有参数
+  找到:    java.lang.String
+  原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[167,52] 找不到符号
+  符号:   方法 getOldPassword()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPasswordUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[171,56] 找不到符号
+  符号:   方法 getNewPassword()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserPasswordUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[208,41] 找不到符号
+  符号:   方法 getCode()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[208,64] 找不到符号
+  符号:   方法 getCode()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[214,41] 找不到符号
+  符号:   方法 getPassword()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[216,52] 找不到符号
+  符号:   方法 getPassword()
+  位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/NotificationController.java:[40,9] 找不到符号
+  符号:   变量 log
+  位置: 类 com.socialretail.backend.controller.merchant.NotificationController
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[95,54] 找不到符号
+  符号:   方法 getOrderId()
+  位置: 类型为com.socialretail.backend.dto.request.payment.AlipayCreatePayDTO的变量 dto
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[97,52] 找不到符号
+  符号:   方法 getPayType()
+  位置: 类型为com.socialretail.backend.dto.request.payment.AlipayCreatePayDTO的变量 dto
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[103,54] 找不到符号
+  符号:   方法 getNotifyUrl()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 alipayProperties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[112,54] 找不到符号
+  符号:   方法 getNotifyUrl()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 alipayProperties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[124,34] 找不到符号
+  符号:   方法 getAmount()
+  位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[123,45] 找不到符号
+  符号:   方法 getPaySn()
+  位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[123,28] 找不到符号
+  符号:   方法 getId()
+  位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[128,28] 找不到符号
+  符号:   方法 getPaySn()
+  位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[140,45] 找不到符号
+  符号:   方法 getAppId()
+  位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 alipayProperties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[160,66] 找不到符号
+  符号:   方法 getOrderId()
+  位置: 类型为com.socialretail.backend.entity.order.Payment的变量 preliminary
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[162,67] 找不到符号
+  符号:   方法 getAmount()
+  位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[INFO] 100 errors
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  4.142 s
+[INFO] Finished at: 2026-07-03T16:29:46+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project backend: Compilation failure: Compilation failure:
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[5,50] 无法访问com.socialretail.backend.service.promotion.CouponService
+[ERROR]   错误的源文件: H:\asocial\social-retail\backend\src\main\java\com\socialretail\backend\service\promotion\CouponService.java
+[ERROR]     文件不包含类com.socialretail.backend.service.promotion.CouponService
+[ERROR]     请删除该文件或确保该文件位于正确的源路径子目录中。
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[16,19] 找不到符号
+[ERROR]   符号:   类 CouponService
+[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[18,34] 找不到符号
+[ERROR]   符号:   类 CouponService
+[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[14,27] 找不到符号
+[ERROR]   符号:   方法 getServerUrl()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[14,54] 找不到符号
+[ERROR]   符号:   方法 getAppId()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[15,27] 找不到符号
+[ERROR]   符号:   方法 getPrivateKey()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[15,55] 找不到符号
+[ERROR]   符号:   方法 getFormat()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[16,27] 找不到符号
+[ERROR]   符号:   方法 getCharset()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[16,52] 找不到符号
+[ERROR]   符号:   方法 getAlipayPublicKey()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/config/AliPayConfig.java:[17,27] 找不到符号
+[ERROR]   符号:   方法 getSignType()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 properties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[60,57] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[63,71] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[75,34] 找不到符号
+[ERROR]   符号:   方法 getLimitQuantity()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[76,75] 找不到符号
+[ERROR]   符号:   方法 getActivityId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[76,97] 找不到符号
+[ERROR]   符号:   方法 getSkuId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[79,17] 找不到符号
+[ERROR]   符号:   方法 getStartTime()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[79,48] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[81,30] 找不到符号
+[ERROR]   符号:   方法 getStartTime()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[83,31] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[85,44] 找不到符号
+[ERROR]   符号:   方法 getSeckillProductStatus()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[86,51] 找不到符号
+[ERROR]   符号:   方法 getProductStatus()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[87,51] 找不到符号
+[ERROR]   符号:   方法 getProductAuditStatus()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[101,79] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[112,41] 找不到符号
+[ERROR]   符号:   方法 getStartTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[113,49] 找不到符号
+[ERROR]   符号:   方法 getStartTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[113,90] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[115,35] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[115,59] 找不到符号
+[ERROR]   符号:   方法 getStartTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[116,41] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[116,59] 找不到符号
+[ERROR]   符号:   方法 getTitle()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[117,32] 找不到符号
+[ERROR]   符号:   方法 getStartTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[117,65] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.promotion.SeckillActivity的变量 activity
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[127,36] 找不到符号
+[ERROR]   符号:   方法 getSeckillProductId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[127,64] 找不到符号
+[ERROR]   符号:   方法 getActivityId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[127,86] 找不到符号
+[ERROR]   符号:   方法 getProductId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[128,21] 找不到符号
+[ERROR]   符号:   方法 getSkuId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[128,38] 找不到符号
+[ERROR]   符号:   方法 getProductName()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[128,86] 找不到符号
+[ERROR]   符号:   方法 getProductImage()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[129,21] 找不到符号
+[ERROR]   符号:   方法 getSkuSpecs()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[129,41] 找不到符号
+[ERROR]   符号:   方法 getOriginPrice()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[129,64] 找不到符号
+[ERROR]   符号:   方法 getSeckillPrice()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[130,27] 找不到符号
+[ERROR]   符号:   方法 getSeckillStock()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[130,58] 找不到符号
+[ERROR]   符号:   方法 getSoldCount()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[131,30] 找不到符号
+[ERROR]   符号:   方法 getLimitQuantity()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[135,35] 找不到符号
+[ERROR]   符号:   方法 getActivityId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[135,57] 找不到符号
+[ERROR]   符号:   方法 getSkuId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[143,38] 找不到符号
+[ERROR]   符号:   方法 getSeckillStock()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[143,70] 找不到符号
+[ERROR]   符号:   方法 getSoldCount()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[147,75] 找不到符号
+[ERROR]   符号:   方法 getEndTime()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[148,43] 找不到符号
+[ERROR]   符号:   方法 getSeckillStock()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[148,75] 找不到符号
+[ERROR]   符号:   方法 getSoldCount()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[149,62] 找不到符号
+[ERROR]   符号:   方法 getActivityId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[149,84] 找不到符号
+[ERROR]   符号:   方法 getSkuId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[155,72] 找不到符号
+[ERROR]   符号:   方法 getActivityId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/promotion/impl/SeckillServiceImpl.java:[155,94] 找不到符号
+[ERROR]   符号:   方法 getSkuId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.promotion.SeckillProductView的变量 view
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[42,43] 找不到符号
+[ERROR]   符号:   方法 getOrderItemId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[45,62] 找不到符号
+[ERROR]   符号:   方法 getOrderItemId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[47,86] 找不到符号
+[ERROR]   符号:   方法 getOrderItemId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[54,22] 找不到符号
+[ERROR]   符号:   方法 getRefundAmount()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/aftersale/impl/AfterSaleRefundCompletionService.java:[55,29] 找不到符号
+[ERROR]   符号:   方法 getRefundAmount()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.AfterSale的变量 afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[59,32] 找不到符号
+[ERROR]   符号:   方法 getPhone()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserRegisterRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[64,30] 找不到符号
+[ERROR]   符号:   方法 getPhone()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserRegisterRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[65,56] 找不到符号
+[ERROR]   符号:   方法 getPassword()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserRegisterRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[82,16] 无法将类 com.socialretail.backend.vo.UserRegisterVO中的构造器 UserRegisterVO应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    java.lang.Long,java.lang.String,java.lang.String,java.lang.String
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[92,40] 找不到符号
+[ERROR]   符号:   方法 getPhone()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[100,35] 找不到符号
+[ERROR]   符号:   方法 getLoginType()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[108,16] 无法将类 com.socialretail.backend.vo.UserLoginVO中的构造器 UserLoginVO应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    java.lang.String,long,com.socialretail.backend.vo.UserInfoVO
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[119,20] 找不到符号
+[ERROR]   符号:   方法 getNickname()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[119,53] 找不到符号
+[ERROR]   符号:   方法 getAvatar()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[122,20] 找不到符号
+[ERROR]   符号:   方法 getNickname()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[122,74] 找不到符号
+[ERROR]   符号:   方法 getNickname()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[127,20] 找不到符号
+[ERROR]   符号:   方法 getNickname()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[128,37] 找不到符号
+[ERROR]   符号:   方法 getNickname()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[130,20] 找不到符号
+[ERROR]   符号:   方法 getAvatar()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[131,35] 找不到符号
+[ERROR]   符号:   方法 getAvatar()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[136,16] 无法将类 com.socialretail.backend.vo.UserUpdateVO中的构造器 UserUpdateVO应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    java.lang.Long,java.lang.String,java.lang.String
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[143,46] 找不到符号
+[ERROR]   符号:   方法 getNewPhone()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[149,41] 找不到符号
+[ERROR]   符号:   方法 getCode()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[149,64] 找不到符号
+[ERROR]   符号:   方法 getCode()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[153,21] 找不到符号
+[ERROR]   符号:   方法 getNewPhone()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[154,34] 找不到符号
+[ERROR]   符号:   方法 getNewPhone()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPhoneUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[159,16] 无法将类 com.socialretail.backend.vo.UserPhoneVO中的构造器 UserPhoneVO应用到给定类型;
+[ERROR]   需要: 没有参数
+[ERROR]   找到:    java.lang.String
+[ERROR]   原因: 实际参数列表和形式参数列表长度不同
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[167,52] 找不到符号
+[ERROR]   符号:   方法 getOldPassword()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPasswordUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[171,56] 找不到符号
+[ERROR]   符号:   方法 getNewPassword()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserPasswordUpdateRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[208,41] 找不到符号
+[ERROR]   符号:   方法 getCode()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[208,64] 找不到符号
+[ERROR]   符号:   方法 getCode()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[214,41] 找不到符号
+[ERROR]   符号:   方法 getPassword()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/user/impl/UserServiceImpl.java:[216,52] 找不到符号
+[ERROR]   符号:   方法 getPassword()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.user.UserLoginRequest的变量 request
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/NotificationController.java:[40,9] 找不到符号
+[ERROR]   符号:   变量 log
+[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.NotificationController
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[95,54] 找不到符号
+[ERROR]   符号:   方法 getOrderId()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.payment.AlipayCreatePayDTO的变量 dto
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[97,52] 找不到符号
+[ERROR]   符号:   方法 getPayType()
+[ERROR]   位置: 类型为com.socialretail.backend.dto.request.payment.AlipayCreatePayDTO的变量 dto
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[103,54] 找不到符号
+[ERROR]   符号:   方法 getNotifyUrl()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 alipayProperties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[112,54] 找不到符号
+[ERROR]   符号:   方法 getNotifyUrl()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 alipayProperties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[124,34] 找不到符号
+[ERROR]   符号:   方法 getAmount()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[123,45] 找不到符号
+[ERROR]   符号:   方法 getPaySn()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[123,28] 找不到符号
+[ERROR]   符号:   方法 getId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[128,28] 找不到符号
+[ERROR]   符号:   方法 getPaySn()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[140,45] 找不到符号
+[ERROR]   符号:   方法 getAppId()
+[ERROR]   位置: 类型为com.socialretail.backend.config.AlipayProperties的变量 alipayProperties
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[160,66] 找不到符号
+[ERROR]   符号:   方法 getOrderId()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.Payment的变量 preliminary
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[162,67] 找不到符号
+[ERROR]   符号:   方法 getAmount()
+[ERROR]   位置: 类型为com.socialretail.backend.entity.order.Payment的变量 payment
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
