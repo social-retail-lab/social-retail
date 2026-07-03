@@ -39,8 +39,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -71,9 +73,40 @@ public class MerchantProductService {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Product::getMerchantId, merchantId);
 
-        // 关键词模糊搜索
+        // 关键词模糊搜索（商品名称 + SKU编码）
         if (req.getKeyword() != null && !req.getKeyword().isEmpty()) {
-            wrapper.like(Product::getTitle, req.getKeyword());
+            // 先获取该商家下的所有product_id
+            LambdaQueryWrapper<Product> merchantProductWrapper = new LambdaQueryWrapper<>();
+            merchantProductWrapper.eq(Product::getMerchantId, merchantId)
+                    .select(Product::getId);
+            List<Product> merchantProducts = productMapper.selectList(merchantProductWrapper);
+            Set<Long> merchantProductIds = merchantProducts.stream()
+                    .map(Product::getId)
+                    .collect(Collectors.toSet());
+
+            // 在商家的product_id范围内检索SKU编码
+            final Set<Long> skuMatchedProductIds;
+            if (merchantProductIds.isEmpty()) {
+                skuMatchedProductIds = new HashSet<>();
+            } else {
+                LambdaQueryWrapper<Sku> skuSearchWrapper = new LambdaQueryWrapper<>();
+                skuSearchWrapper.like(Sku::getSkuCode, req.getKeyword())
+                        .in(Sku::getProductId, merchantProductIds)
+                        .select(Sku::getProductId);
+                List<Sku> matchedSkus = skuMapper.selectList(skuSearchWrapper);
+                skuMatchedProductIds = matchedSkus.stream()
+                        .map(Sku::getProductId)
+                        .filter(id -> id != null)
+                        .collect(Collectors.toSet());
+            }
+
+            // 合并标题匹配和SKU匹配：title LIKE %keyword% OR id IN (skuMatchedProductIds)
+            wrapper.and(w -> {
+                w.like(Product::getTitle, req.getKeyword());
+                if (!skuMatchedProductIds.isEmpty()) {
+                    w.or().in(Product::getId, skuMatchedProductIds);
+                }
+            });
         }
 
         // 分类筛选：需要子查询product_category_relation

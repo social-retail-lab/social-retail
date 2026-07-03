@@ -394,6 +394,25 @@ public class MerchantOrderController {
         }
     }
 
+    // ==================== 10.1 确认自提（订单管理内） ====================
+
+    @PostMapping("/pickup/confirm/{orderId}")
+    public Result<Map<String, Object>> confirmPickup(HttpServletRequest request,
+                                                      @PathVariable Long orderId,
+                                                      @RequestBody Map<String, String> body) {
+        Long merchantId = (Long) request.getAttribute("merchantId");
+        String pickupCode = body.get("pickupCode");
+        log.info("[确认自提] merchantId={}, orderId={}, pickupCode={}", merchantId, orderId, pickupCode);
+        try {
+            Map<String, Object> result = pickupService.confirmPickup(merchantId, orderId, pickupCode);
+            log.info("[确认自提] 成功, orderId={}, orderSn={}", result.get("orderId"), result.get("orderSn"));
+            return Result.success("自提确认成功", result);
+        } catch (RuntimeException e) {
+            log.warn("[确认自提] 失败, merchantId={}, orderId={}, 原因: {}", merchantId, orderId, e.getMessage());
+            throw e;
+        }
+    }
+
     // ==================== 11. 自提记录 ====================
 
     @GetMapping("/pickup/records")
