@@ -296,8 +296,13 @@ CREATE TABLE IF NOT EXISTS `seckill_product` (
   `sku_id` BIGINT DEFAULT NULL COMMENT '商品SkuID',
   `seckill_price` DECIMAL(10,2) DEFAULT NULL COMMENT '秒杀专享价',
   `seckill_stock` INT DEFAULT NULL COMMENT '秒杀专享库存',
+  `sold_count` INT NOT NULL DEFAULT 0 COMMENT '已售数量',
   `limit_quantity` TINYINT DEFAULT NULL COMMENT '每人限购数量',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：0禁用 1启用',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_seckill_activity_sku` (`seckill_activity_id`, `sku_id`),
   CONSTRAINT `fk_seckill_act` FOREIGN KEY (`seckill_activity_id`) REFERENCES `seckill_activity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_seckill_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_seckill_sku` FOREIGN KEY (`sku_id`) REFERENCES `sku` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
