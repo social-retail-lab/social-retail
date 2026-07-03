@@ -5,6 +5,7 @@ import com.socialretail.backend.entity.promotion.MerchantCoupon;
 import com.socialretail.backend.service.merchant.MerchantCouponService;
 import com.socialretail.backend.service.promotion.PromotionService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
