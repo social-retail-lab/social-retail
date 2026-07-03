@@ -19,4 +19,7 @@ public class OrderItemResponse {
     private BigDecimal finalPrice;
     private Integer quantity;
     private BigDecimal itemAmount;
+    private BigDecimal itemOriginAmount;
+    private BigDecimal itemFinalAmount;
+    private String promotionType;
 }

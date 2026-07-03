@@ -12,6 +12,7 @@ import java.util.List;
 public class CartCheckoutPreviewVO {
     private List<CartCheckoutItemVO> items;
     private CartCheckoutPriceDetailVO priceDetail;
+    private PointsInfoVO pointsInfo;
     private List<CartPromotionDetailVO> promotionDetail;
     private CartCouponInfoVO couponInfo;
     private CartActivityInfoVO activityInfo;

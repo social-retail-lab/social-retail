@@ -2,9 +2,11 @@ package com.socialretail.backend.service.order.impl;
 
 import com.socialretail.backend.config.OrderTimeoutProperties;
 import com.socialretail.backend.entity.order.OrderItem;
+import com.socialretail.backend.entity.order.Order;
 import com.socialretail.backend.entity.order.OrderStatusLog;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.service.order.OrderTimeoutService;
+import com.socialretail.backend.service.order.OrderPointsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +18,13 @@ public class OrderTimeoutServiceImpl implements OrderTimeoutService {
 
     private final OrderMapper orderMapper;
     private final OrderTimeoutProperties properties;
+    private final OrderPointsService orderPointsService;
 
-    public OrderTimeoutServiceImpl(OrderMapper orderMapper, OrderTimeoutProperties properties) {
+    public OrderTimeoutServiceImpl(OrderMapper orderMapper, OrderTimeoutProperties properties,
+                                   OrderPointsService orderPointsService) {
         this.orderMapper = orderMapper;
         this.properties = properties;
+        this.orderPointsService = orderPointsService;
     }
 
     @Override
@@ -29,10 +34,12 @@ public class OrderTimeoutServiceImpl implements OrderTimeoutService {
         List<Long> orderIds = orderMapper.selectExpiredWaitPayOrderIds(batchSize);
         int cancelledCount = 0;
         for (Long orderId : orderIds) {
+            Order order = orderMapper.selectById(orderId);
             // 条件更新相当于抢占：多实例或手动取消并发时，只有一个执行者能成功。
             if (orderMapper.expireWaitPayOrder(orderId) != 1) {
                 continue;
             }
+            orderPointsService.release(order);
             for (OrderItem item : orderMapper.selectItemsByOrderId(orderId)) {
                 if (item.getSkuId() != null
                         && orderMapper.incrementStock(item.getSkuId(), item.getQuantity()) != 1) {

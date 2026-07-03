@@ -20,6 +20,9 @@ public interface OrderMapper extends BaseMapper<Order> {
 
     Order selectByIdAndUserId(@Param("orderId") Long orderId, @Param("userId") Long userId);
 
+    Order selectByUserIdAndIdempotentKey(@Param("userId") Long userId,
+                                         @Param("idempotentKey") String idempotentKey);
+
     Order selectById(@Param("orderId") Long orderId);
 
     Order selectByIdForUpdate(@Param("orderId") Long orderId);
@@ -58,4 +61,8 @@ public interface OrderMapper extends BaseMapper<Order> {
     int updateStatus(@Param("orderId") Long orderId,
                      @Param("status") Integer status,
                      @Param("updateTime") java.time.LocalDateTime updateTime);
+
+    int updatePointsStatus(@Param("orderId") Long orderId,
+                           @Param("fromStatus") Integer fromStatus,
+                           @Param("toStatus") Integer toStatus);
 }

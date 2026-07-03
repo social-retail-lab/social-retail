@@ -1,4 +1,4 @@
-package com.socialretail.backend.vo;
+package com.socialretail.backend.dto.response.order;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartPriceDetailVO {
+public class OrderPreviewPriceDetailResponse {
     private BigDecimal totalAmount;
     private BigDecimal seckillDiscount;
     private BigDecimal bargainDiscount;
@@ -17,5 +17,5 @@ public class CartPriceDetailVO {
     private BigDecimal couponDiscount;
     private BigDecimal pointsDeduction;
     private BigDecimal deliveryFee;
-    private BigDecimal payableAmount;
+    private BigDecimal payAmount;
 }

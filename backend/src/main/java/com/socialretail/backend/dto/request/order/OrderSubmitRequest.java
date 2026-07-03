@@ -33,6 +33,9 @@ public class OrderSubmitRequest {
 
     private Boolean usePoints = false;
 
+    @Positive(message = "使用积分必须大于0")
+    private Integer usePointsAmount;
+
     @jakarta.validation.Valid
     private OrderActivityContextRequest activityContext;
 }

@@ -23,6 +23,7 @@ import com.socialretail.backend.mapper.order.PaymentMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.service.order.impl.OrderServiceImpl;
+import com.socialretail.backend.service.order.OrderPointsService;
 import com.socialretail.backend.service.pay.PayService;
 import com.socialretail.backend.vo.payment.AlipayCreatePayVO;
 import com.socialretail.backend.vo.payment.MockPayResultVO;
@@ -69,19 +70,22 @@ public class PayServiceImpl implements PayService {
     private final AlipayClient alipayClient;
     private final AlipayProperties alipayProperties;
     private final ObjectMapper objectMapper;
+    private final OrderPointsService orderPointsService;
 
     public PayServiceImpl(PaymentMapper paymentMapper,
                           OrderMapper orderMapper,
                           ProductMapper productMapper,
                           AlipayClient alipayClient,
                           AlipayProperties alipayProperties,
-                          ObjectMapper objectMapper) {
+                          ObjectMapper objectMapper,
+                          OrderPointsService orderPointsService) {
         this.paymentMapper = paymentMapper;
         this.orderMapper = orderMapper;
         this.productMapper = productMapper;
         this.alipayClient = alipayClient;
         this.alipayProperties = alipayProperties;
         this.objectMapper = objectMapper;
+        this.orderPointsService = orderPointsService;
     }
 
     @Override
@@ -304,6 +308,7 @@ public class PayServiceImpl implements PayService {
         if (orderMapper.updateStatusAfterPay(order.getId(), nextStatus, payTime, callbackTime) != 1) {
             throw new BusinessException(40924, HttpStatus.CONFLICT, "当前订单状态不允许支付");
         }
+        orderPointsService.consume(order);
         for (OrderItem item : orderMapper.selectItemsByOrderId(order.getId())) {
             if (item.getProductId() == null || item.getQuantity() == null || item.getQuantity() <= 0) {
                 continue;

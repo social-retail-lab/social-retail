@@ -14,8 +14,8 @@ import com.socialretail.backend.dto.response.order.OrderSubmitResponse;
 import com.socialretail.backend.service.order.OrderService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -45,11 +46,13 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<Result<OrderSubmitResponse>> submit(
+    public Result<OrderSubmitResponse> submit(
             @RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId,
+            @RequestHeader("X-Idempotent-Key")
+            @NotBlank(message = "X-Idempotent-Key不能为空")
+            @Size(max = 100, message = "X-Idempotent-Key不能超过100个字符") String idempotentKey,
             @Valid @RequestBody OrderSubmitRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(Result.success("订单创建成功", orderService.submit(userId, request)));
+        return Result.success("订单创建成功", orderService.submit(userId, idempotentKey.trim(), request));
     }
 
     @GetMapping

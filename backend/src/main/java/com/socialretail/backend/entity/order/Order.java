@@ -13,6 +13,7 @@ public class Order {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     private String orderSn;
+    private String idempotentKey;
     private Long userId;
     private Long merchantId;
     private Long pickupPointId;
@@ -32,6 +33,8 @@ public class Order {
     private BigDecimal bargainDiscount;
     private BigDecimal couponDiscount;
     private BigDecimal pointsDeduction;
+    private Integer usedPoints;
+    private Integer pointsStatus;
     private Long couponUserId;
     private Long seckillId;
     private Long bargainId;
@@ -53,6 +56,8 @@ public class Order {
     public void setId(Long id) { this.id = id; }
     public String getOrderSn() { return orderSn; }
     public void setOrderSn(String orderSn) { this.orderSn = orderSn; }
+    public String getIdempotentKey() { return idempotentKey; }
+    public void setIdempotentKey(String idempotentKey) { this.idempotentKey = idempotentKey; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public Long getMerchantId() { return merchantId; }
@@ -89,6 +94,10 @@ public class Order {
     public void setCouponDiscount(BigDecimal couponDiscount) { this.couponDiscount = couponDiscount; }
     public BigDecimal getPointsDeduction() { return pointsDeduction; }
     public void setPointsDeduction(BigDecimal pointsDeduction) { this.pointsDeduction = pointsDeduction; }
+    public Integer getUsedPoints() { return usedPoints; }
+    public void setUsedPoints(Integer usedPoints) { this.usedPoints = usedPoints; }
+    public Integer getPointsStatus() { return pointsStatus; }
+    public void setPointsStatus(Integer pointsStatus) { this.pointsStatus = pointsStatus; }
     public Long getCouponUserId() { return couponUserId; }
     public void setCouponUserId(Long couponUserId) { this.couponUserId = couponUserId; }
     public Long getSeckillId() { return seckillId; }

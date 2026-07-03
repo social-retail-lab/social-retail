@@ -13,7 +13,7 @@ import com.socialretail.backend.dto.response.order.OrderSubmitResponse;
 public interface OrderService {
     OrderPreviewResponse preview(Long userId, OrderPreviewRequest request);
 
-    OrderSubmitResponse submit(Long userId, OrderSubmitRequest request);
+    OrderSubmitResponse submit(Long userId, String idempotentKey, OrderSubmitRequest request);
 
     OrderListResponse list(Long userId, OrderQueryRequest request);
 
