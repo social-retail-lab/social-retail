@@ -10,12 +10,13 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartCheckoutPriceDetailVO {
-    private BigDecimal originalAmount;
+    private BigDecimal totalAmount;
     private BigDecimal seckillDiscount;
     private BigDecimal bargainDiscount;
     private BigDecimal promotionDiscount;
-    private BigDecimal couponDiscount;
+    private BigDecimal merchantCouponDiscount;
+    private BigDecimal platformCouponDiscount;
     private BigDecimal pointsDeduction;
     private BigDecimal deliveryFee;
-    private BigDecimal payableAmount;
+    private BigDecimal payAmount;
 }

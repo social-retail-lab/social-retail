@@ -6,6 +6,7 @@ import com.socialretail.backend.entity.promotion.SeckillProduct;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import java.util.List;
 
 @Mapper
@@ -41,13 +42,33 @@ public interface SeckillProductMapper extends BaseMapper<SeckillProduct> {
             "WHERE sp.id=#{seckillProductId} LIMIT 1")
     SeckillProductView selectViewById(@Param("seckillProductId") Long seckillProductId);
 
+    @Select("SELECT " + VIEW_COLUMNS + " FROM seckill_product sp " +
+            "JOIN seckill_activity a ON a.id=sp.seckill_activity_id " +
+            "JOIN product p ON p.id=sp.product_id JOIN sku s ON s.id=sp.sku_id " +
+            "WHERE sp.sku_id=#{skuId} AND COALESCE(sp.status,1)=1 AND a.status=1 " +
+            "AND a.start_time<=#{now} AND a.end_time>#{now} " +
+            "AND p.status=1 AND p.audit_status=1 ORDER BY sp.seckill_price,sp.id LIMIT 1")
+    SeckillProductView selectCurrentViewBySku(@Param("skuId") Long skuId,
+                                               @Param("now") java.time.LocalDateTime now);
+
     @Select("SELECT COALESCE(SUM(oi.quantity),0) FROM `order` o " +
             "JOIN order_item oi ON oi.order_id=o.id " +
-            "WHERE o.user_id=#{userId} AND o.seckill_id=#{activityId} " +
+            "WHERE o.user_id=#{userId} AND o.seckill_id=#{seckillProductId} " +
             "AND oi.sku_id=#{skuId} AND o.status NOT IN (5,6)")
     int sumBoughtQuantity(@Param("userId") Long userId,
-                          @Param("activityId") Long activityId,
+                          @Param("seckillProductId") Long seckillProductId,
                           @Param("skuId") Long skuId);
+
+    @Update("UPDATE seckill_product SET sold_count=COALESCE(sold_count,0)+#{quantity}, " +
+            "update_time=NOW() WHERE id=#{seckillProductId} AND status=1 " +
+            "AND COALESCE(sold_count,0)+#{quantity}<=seckill_stock")
+    int consumeStock(@Param("seckillProductId") Long seckillProductId,
+                     @Param("quantity") Integer quantity);
+
+    @Update("UPDATE seckill_product SET sold_count=GREATEST(COALESCE(sold_count,0)-#{quantity},0), " +
+            "update_time=NOW() WHERE id=#{seckillProductId}")
+    int releaseStock(@Param("seckillProductId") Long seckillProductId,
+                     @Param("quantity") Integer quantity);
 
     @Select("SELECT " + VIEW_COLUMNS + " FROM seckill_product sp " +
             "JOIN seckill_activity a ON a.id=sp.seckill_activity_id " +

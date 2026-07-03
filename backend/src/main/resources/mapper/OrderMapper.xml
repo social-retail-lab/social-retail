@@ -30,11 +30,14 @@
         <result property="deliveryFee" column="delivery_fee"/>
         <result property="seckillDiscount" column="seckill_discount"/>
         <result property="bargainDiscount" column="bargain_discount"/>
+        <result property="promotionDiscount" column="promotion_discount"/>
         <result property="couponDiscount" column="coupon_discount"/>
+        <result property="merchantCouponDiscount" column="merchant_coupon_discount"/>
         <result property="pointsDeduction" column="points_deduction"/>
         <result property="usedPoints" column="used_points"/>
         <result property="pointsStatus" column="points_status"/>
         <result property="couponUserId" column="coupon_user_id"/>
+        <result property="merchantCouponUserId" column="merchant_coupon_user_id"/>
         <result property="seckillId" column="seckill_id"/>
         <result property="bargainId" column="bargain_id"/>
         <result property="promotionSnapshot" column="promotion_snapshot"/>
@@ -67,9 +70,9 @@
         id, order_sn, idempotent_key, user_id, merchant_id, pickup_point_id, address_id,
         consignee, phone, province, city, district, detailed_address,
         total_amount, pay_amount, delivery_type, status, create_time, pay_expire_time, pay_time, cancel_time,
-        discount_amount, delivery_fee, seckill_discount, bargain_discount,
-        coupon_discount, points_deduction, used_points, points_status,
-        coupon_user_id, seckill_id, bargain_id,
+        discount_amount, delivery_fee, seckill_discount, bargain_discount, promotion_discount,
+        coupon_discount, merchant_coupon_discount, points_deduction, used_points, points_status,
+        coupon_user_id, merchant_coupon_user_id, seckill_id, bargain_id,
         promotion_snapshot, pickup_code, remark, update_time, complete_time,
         accept_time, prepare_time
     </sql>
@@ -80,17 +83,17 @@
             order_sn, idempotent_key, user_id, merchant_id, pickup_point_id, address_id,
             consignee, phone, province, city, district, detailed_address,
             total_amount, pay_amount, delivery_type, status, create_time, pay_expire_time,
-            discount_amount, delivery_fee, seckill_discount, bargain_discount,
-            coupon_discount, points_deduction, used_points, points_status,
-            coupon_user_id, seckill_id,
+            discount_amount, delivery_fee, seckill_discount, bargain_discount, promotion_discount,
+            coupon_discount, merchant_coupon_discount, points_deduction, used_points, points_status,
+            coupon_user_id, merchant_coupon_user_id, seckill_id,
             bargain_id, promotion_snapshot, pickup_code, remark, update_time
         ) VALUES (
             #{orderSn}, #{idempotentKey}, #{userId}, #{merchantId}, #{pickupPointId}, #{addressId},
             #{consignee}, #{phone}, #{province}, #{city}, #{district}, #{detailedAddress},
             #{totalAmount}, #{payAmount}, #{deliveryType}, #{status}, #{createTime}, #{payExpireTime},
-            #{discountAmount}, #{deliveryFee}, #{seckillDiscount}, #{bargainDiscount},
-            #{couponDiscount}, #{pointsDeduction}, #{usedPoints}, #{pointsStatus},
-            #{couponUserId}, #{seckillId},
+            #{discountAmount}, #{deliveryFee}, #{seckillDiscount}, #{bargainDiscount}, #{promotionDiscount},
+            #{couponDiscount}, #{merchantCouponDiscount}, #{pointsDeduction}, #{usedPoints}, #{pointsStatus},
+            #{couponUserId}, #{merchantCouponUserId}, #{seckillId},
             #{bargainId}, #{promotionSnapshot}, #{pickupCode}, #{remark}, #{updateTime}
         )
     </insert>

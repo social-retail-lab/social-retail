@@ -73,7 +73,7 @@ public class SeckillServiceImpl implements SeckillService {
 
         int remaining = remainingStock(view);
         int limit = positive(view.getLimitQuantity(), 1);
-        int bought = Math.max(productMapper.sumBoughtQuantity(userId, view.getActivityId(), view.getSkuId()),
+        int bought = Math.max(productMapper.sumBoughtQuantity(userId, view.getSeckillProductId(), view.getSkuId()),
                 reservedQuantity(view, userId));
         LocalDateTime now = LocalDateTime.now();
         if (view.getStartTime() == null || view.getEndTime() == null)

@@ -16,14 +16,14 @@ public class CartCheckoutItemVO {
     private Long productId;
     private String productName;
     private String productImage;
-    private String skuSpec;
-    private BigDecimal originalPrice;
-    private BigDecimal salePrice;
+    private String skuSpecs;
+    private BigDecimal originPrice;
+    private BigDecimal finalPrice;
     private Integer quantity;
     private Integer stock;
-    private BigDecimal itemOriginalAmount;
-    private BigDecimal itemPayableAmount;
-    private String activityType;
+    private BigDecimal itemOriginAmount;
+    private BigDecimal itemFinalAmount;
+    private String promotionType;
     private BigDecimal activityDiscount;
     @JsonProperty("isValid")
     private Boolean isValid;

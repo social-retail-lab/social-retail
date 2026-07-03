@@ -7,10 +7,16 @@ import java.util.List;
 
 public record OrderPricingCommand(
         Long userId,
+        Long merchantId,
         List<CartItemVO> items,
-        Long couponUserId,
+        Boolean usePlatformCoupon,
+        Long platformCouponUserId,
+        Boolean useMerchantCoupon,
+        Long merchantCouponUserId,
         Boolean usePoints,
         Integer usePointsAmount,
-        OrderActivityContextRequest activityContext
+        OrderActivityContextRequest activityContext,
+        Boolean autoSelectBenefits,
+        Boolean allowAutoSelectActivities
 ) {
 }

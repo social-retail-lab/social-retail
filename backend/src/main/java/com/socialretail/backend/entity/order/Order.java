@@ -31,11 +31,14 @@ public class Order {
     private BigDecimal deliveryFee;
     private BigDecimal seckillDiscount;
     private BigDecimal bargainDiscount;
+    private BigDecimal promotionDiscount;
     private BigDecimal couponDiscount;
+    private BigDecimal merchantCouponDiscount;
     private BigDecimal pointsDeduction;
     private Integer usedPoints;
     private Integer pointsStatus;
     private Long couponUserId;
+    private Long merchantCouponUserId;
     private Long seckillId;
     private Long bargainId;
     private String promotionSnapshot;
@@ -90,8 +93,12 @@ public class Order {
     public void setSeckillDiscount(BigDecimal seckillDiscount) { this.seckillDiscount = seckillDiscount; }
     public BigDecimal getBargainDiscount() { return bargainDiscount; }
     public void setBargainDiscount(BigDecimal bargainDiscount) { this.bargainDiscount = bargainDiscount; }
+    public BigDecimal getPromotionDiscount() { return promotionDiscount; }
+    public void setPromotionDiscount(BigDecimal promotionDiscount) { this.promotionDiscount = promotionDiscount; }
     public BigDecimal getCouponDiscount() { return couponDiscount; }
     public void setCouponDiscount(BigDecimal couponDiscount) { this.couponDiscount = couponDiscount; }
+    public BigDecimal getMerchantCouponDiscount() { return merchantCouponDiscount; }
+    public void setMerchantCouponDiscount(BigDecimal merchantCouponDiscount) { this.merchantCouponDiscount = merchantCouponDiscount; }
     public BigDecimal getPointsDeduction() { return pointsDeduction; }
     public void setPointsDeduction(BigDecimal pointsDeduction) { this.pointsDeduction = pointsDeduction; }
     public Integer getUsedPoints() { return usedPoints; }
@@ -100,6 +107,8 @@ public class Order {
     public void setPointsStatus(Integer pointsStatus) { this.pointsStatus = pointsStatus; }
     public Long getCouponUserId() { return couponUserId; }
     public void setCouponUserId(Long couponUserId) { this.couponUserId = couponUserId; }
+    public Long getMerchantCouponUserId() { return merchantCouponUserId; }
+    public void setMerchantCouponUserId(Long merchantCouponUserId) { this.merchantCouponUserId = merchantCouponUserId; }
     public Long getSeckillId() { return seckillId; }
     public void setSeckillId(Long seckillId) { this.seckillId = seckillId; }
     public Long getBargainId() { return bargainId; }

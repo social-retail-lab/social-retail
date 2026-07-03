@@ -37,6 +37,15 @@ public final class MemberApiModels {
     public record Exchange(Long couponUserId, Long couponId, String couponTitle,
                            Integer usePoints, Integer currentPoints, String receiveTime,
                            String validStart, String validEnd) { }
+    public record ExchangeCouponItem(Long couponId, String title, Integer type, String typeText,
+                                     BigDecimal minConsume, BigDecimal discountAmount,
+                                     Integer exchangePoints, Boolean canExchange,
+                                     String exchangeStatusText, Integer totalCount,
+                                     Integer receivedCount, Integer remainingCount,
+                                     Integer perUserLimit, Integer alreadyExchangedCount,
+                                     String validStart, String validEnd) { }
+    public record ExchangeCouponPage(Integer pointsBalance, List<ExchangeCouponItem> list,
+                                     Long total, Long pages, Integer page, Integer pageSize) { }
     public record SignIn(Long userId, Integer rewardPoints, Integer currentPoints,
                          String signInDate) { }
     public record SignInStatus(Long userId, Boolean signedIn, String signInDate,
@@ -49,8 +58,6 @@ public final class MemberApiModels {
             @Positive(message = "使用积分必须大于0") Integer usePoints) { }
     public record ExchangeRequest(
             @NotNull(message = "优惠券ID不能为空")
-            @Positive(message = "优惠券ID必须大于0") Long couponId,
-            @NotNull(message = "使用积分不能为空")
-            @Positive(message = "使用积分必须大于0") Integer usePoints) { }
+            @Positive(message = "优惠券ID必须大于0") Long couponId) { }
     public record UpgradeRequest(@Positive(message = "用户ID必须大于0") Long userId) { }
 }
