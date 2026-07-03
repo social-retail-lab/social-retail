@@ -95,9 +95,9 @@
                 <text>去支付</text>
               </view>
               <view
-                v-if="['WAIT_PAY', 'WAIT_ACCEPT'].includes(order.status)"
+                v-if="order.status === 'WAIT_PAY'"
                 class="action-btn"
-                @click.stop="handleCancel(order)"
+                @click.stop="handleCancel"
               >
                 <text>取消订单</text>
               </view>
@@ -152,10 +152,10 @@ const hasMore = ref(true)
 const statusTabs = ref([
   { label: '全部', value: 'ALL', badge: 0 },
   { label: '待支付', value: 'WAIT_PAY', badge: 0 },
-  { label: '待接单', value: 'WAIT_ACCEPT', badge: 0 },
-  { label: '配送中', value: 'IN_PROGRESS', badge: 0 },
+  { label: '待发货', value: 'WAIT_ACCEPT', badge: 0 },
+  { label: '待收货', value: 'IN_PROGRESS', badge: 0 },
   { label: '已完成', value: 'COMPLETED', badge: 0 },
-  { label: '已取消', value: 'CANCELLED', badge: 0 }
+  { label: '已取消', value: 'CANCELLED', badge: 0 }  // 包含 CANCELLED 和 CLOSED
 ])
 
 const getStatusClass = (status) => {
@@ -211,15 +211,7 @@ const fetchOrders = async (isRefresh = false) => {
 
   if (data) {
     let list = data.list || []
-    // 客户端过滤兜底：如果后端未按status过滤，前端再过滤一次
-    if (activeTab.value !== 'ALL') {
-      if (activeTab.value === 'CANCELLED') {
-        // 已取消tab包含CANCELLED和CLOSED
-        list = list.filter(order => ['CANCELLED', 'CLOSED'].includes(order.status))
-      } else {
-        list = list.filter(order => order.status === activeTab.value)
-      }
-    }
+    // 不做客户端过滤，信任后端按status筛选返回的数据
 
     if (isRefresh || page.value === 1) {
       orderList.value = list

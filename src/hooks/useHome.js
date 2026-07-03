@@ -87,13 +87,31 @@ export function useHome() {
     }
 
     try {
-      const seckillRes = await promotionHook.loadSeckillActivity()
+      const seckillRes = await promotionHook.loadCurrentSeckillActivity()
       if (seckillRes) {
-        seckillData.value = seckillRes
+        // 首页秒杀组件需要商品列表，获取前 6 个商品用于横向滚动展示
+        const productsRes = await promotionHook.loadCurrentSeckillProducts({ page: 1, pageSize: 6 })
+        seckillData.value = {
+          ...seckillRes,
+          goods_list: (productsRes?.list || []).map(item => ({
+            id: item.seckillProductId,
+            productId: item.productId,
+            name: item.productName,
+            image: item.productImage,
+            skuSpecs: item.skuSpecs,
+            price: item.seckillPrice,
+            original_price: item.originPrice,
+            stock: item.remainingStock,
+            soldCount: item.soldCount,
+            limitQuantity: item.limitQuantity,
+            canBuy: item.canBuy,
+            buttonText: item.buttonText,
+            statusText: item.statusText
+          }))
+        }
         startCountdown()
       } else {
         seckillData.value = null
-        console.warn('秒杀接口返回数据为空')
       }
     } catch (seckillError) {
       console.warn('秒杀接口请求失败', seckillError)
@@ -145,15 +163,16 @@ export function useHome() {
     await fetchHomeData()
   }
 
+  // 秒杀倒计时：基于后端返回的 countdownSeconds 进行递减
+  // 预热中：倒计时表示距开始的秒数
+  // 进行中：倒计时表示距结束的秒数
   const startCountdown = () => {
-    if (!seckillData.value || !seckillData.value.end_time) return
+    if (!seckillData.value || !seckillData.value.countdownSeconds) return
+
+    let remainSeconds = Number(seckillData.value.countdownSeconds) || 0
 
     const updateCountdown = () => {
-      const now = new Date().getTime()
-      const end = new Date(seckillData.value.end_time).getTime()
-      const diff = end - now
-
-      if (diff <= 0) {
+      if (remainSeconds <= 0) {
         seckillTimeLeft.value = '已结束'
         if (countdownTimer) {
           clearInterval(countdownTimer)
@@ -162,11 +181,12 @@ export function useHome() {
         return
       }
 
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+      const hours = Math.floor(remainSeconds / 3600)
+      const minutes = Math.floor((remainSeconds % 3600) / 60)
+      const seconds = remainSeconds % 60
 
       seckillTimeLeft.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+      remainSeconds--
     }
 
     updateCountdown()

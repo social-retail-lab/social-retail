@@ -16,30 +16,37 @@ const baseUrl = process.env.NODE_ENV === 'development' ? '' : "http://172.20.10.
 const request = (options) => {
   const { url, method = "GET", data = {}, params = {}, headers = {}, timeout = 30000 } = options
   const token = uni.getStorageSync('token')
-  
+
   const defaultHeader = {
     "Content-Type": "application/json"
   }
-  
+
   if (token) {
     defaultHeader.Authorization = `Bearer ${token}`
   }
-  
+
   const requestHeader = { ...defaultHeader, ...headers }
-  
+
+  // uni.request 不支持 params 参数，GET 请求的查询参数需要放在 data 中
+  const requestData = method.toUpperCase() === 'GET' ? { ...params, ...data } : data
+
   return new Promise((resolve, reject) => {
     uni.request({
       url: `${baseUrl}${url}`,
       method,
-      data,
-      params,
+      data: requestData,
       header: requestHeader,
       timeout,
       success: (res) => {
         const { data: responseData, statusCode } = res
         
         if (statusCode !== 200) {
-          reject({ statusCode, message: `HTTP ${statusCode}` })
+          // 读取后端返回的错误信息，而不是只返回 HTTP 状态码
+          if (responseData && typeof responseData === 'object') {
+            reject({ ...responseData, statusCode })
+          } else {
+            reject({ statusCode, message: `HTTP ${statusCode}` })
+          }
           return
         }
         

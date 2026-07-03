@@ -80,9 +80,16 @@ const handleMessage = () => {
   display: flex;
   align-items: center;
   padding: 20rpx 24rpx;
-  background: $bg-card;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
-  transition: all 0.3s ease;
+  // 玻璃拟态背景(高级感)
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  box-shadow: $shadow-sm;
+  transition: all $duration-base $ease-out-quart;
+  // GPU 加速避免滑动卡顿
+  transform: translateZ(0);
+  will-change: transform;
+  padding-top: calc(20rpx + env(safe-area-inset-top));
 
   // 吸顶样式
   &.search-bar-fixed {
@@ -91,7 +98,7 @@ const handleMessage = () => {
     left: 0;
     right: 0;
     z-index: 999;
-    box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+    box-shadow: $shadow-md;
   }
 }
 
@@ -101,19 +108,20 @@ const handleMessage = () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 80rpx;
+  width: 84rpx;
   height: 72rpx;
-  background: $bg-page-light;
-  border-radius: $radius-base;
-  transition: all 0.2s ease;
+  background: linear-gradient(135deg, rgba(255, 106, 0, 0.08) 0%, rgba(255, 77, 79, 0.05) 100%);
+  border-radius: $radius-md;
+  transition: all $duration-fast $ease-out-quart;
 
   &:active {
-    transform: scale(0.95);
-    opacity: 0.8;
+    transform: scale(0.92);
+    opacity: 0.85;
+    background: linear-gradient(135deg, rgba(255, 106, 0, 0.16) 0%, rgba(255, 77, 79, 0.10) 100%);
   }
 
   .icon-menu {
-    font-size: 32rpx;
+    font-size: 30rpx;
     color: $color-primary;
     margin-bottom: 4rpx;
   }
@@ -121,6 +129,7 @@ const handleMessage = () => {
   .category-text {
     font-size: 20rpx;
     color: $text-sub;
+    font-weight: 500;
   }
 }
 
@@ -132,25 +141,28 @@ const handleMessage = () => {
   height: 72rpx;
   margin: 0 20rpx;
   padding: 0 24rpx;
-  background: $bg-card;
-  border: 2rpx solid $color-primary;
+  background: $neutral-100;
+  border: 2rpx solid transparent;
   border-radius: $radius-full;
-  transition: all 0.2s ease;
+  transition: all $duration-fast $ease-out-quart;
 
   &:active {
-    border-color: $color-primary-danger;
-    background: rgba($color-primary, 0.05);
+    border-color: rgba(255, 106, 0, 0.3);
+    background: #FFFFFF;
+    box-shadow: 0 4rpx 16rpx rgba(255, 106, 0, 0.12);
   }
 
   .icon-search {
-    width: 48rpx;
-    height: 48rpx;
+    width: 44rpx;
+    height: 44rpx;
     margin-right: 12rpx;
+    opacity: 0.6;
   }
 
   .placeholder {
     font-size: 28rpx;
     color: $text-weak;
+    letter-spacing: 0.5rpx;
   }
 }
 
@@ -162,32 +174,36 @@ const handleMessage = () => {
   justify-content: center;
   width: 80rpx;
   height: 72rpx;
-  transition: all 0.2s ease;
+  border-radius: $radius-md;
+  transition: all $duration-fast $ease-out-quart;
 
   &:active {
-    transform: scale(0.95);
+    transform: scale(0.92);
+    background: $neutral-100;
   }
 
   .icon-bell {
-    width: 56rpx;
-    height: 56rpx;
+    width: 52rpx;
+    height: 52rpx;
   }
 
   // 消息数量徽章
   .badge {
     position: absolute;
-    top: 8rpx;
-    right: 8rpx;
-    min-width: 32rpx;
-    height: 32rpx;
+    top: 6rpx;
+    right: 6rpx;
+    min-width: 30rpx;
+    height: 30rpx;
     padding: 0 8rpx;
-    background: $color-primary-danger;
+    background: $gradient-warm;
     border-radius: $radius-full;
     font-size: 20rpx;
     color: #FFFFFF;
     text-align: center;
-    line-height: 32rpx;
+    line-height: 30rpx;
     font-weight: 600;
+    box-shadow: 0 4rpx 10rpx rgba(255, 77, 79, 0.35);
+    border: 2rpx solid #FFFFFF;
   }
 }
 </style>

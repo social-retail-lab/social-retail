@@ -65,7 +65,7 @@ const handleCartListError = (error) => {
 
 export const addCartItemApi = (data) => {
   const validatedData = validateAddCartParams(data)
-  
+
   return request({
     url: '/api/cart/items',
     method: 'post',
@@ -75,7 +75,8 @@ export const addCartItemApi = (data) => {
       return {
         ...response,
         data: response.data ? {
-          cartItemId: response.data.cartItemId || null,
+          cartItemId: response.data.cartItemId || response.data.cartId || null,
+          cartId: response.data.cartId || response.data.cartItemId || null,
           skuId: response.data.skuId || null,
           quantity: Number(response.data.quantity) || 0
         } : null

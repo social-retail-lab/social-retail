@@ -1,5 +1,5 @@
 // 页面全局重置样式
-// 包含：通用样式重置、页面基础样式、组件基础样式
+// 包含：通用样式重置、页面基础样式、组件基础样式、现代化动效
 
 // 注意：variable.scss 和 mixin.scss 已通过 uni.scss 全局注入，此处不再重复导入
 
@@ -12,6 +12,7 @@ page {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-overflow-scrolling: touch;  // iOS 平滑滚动
 }
 
 view, text, image {
@@ -29,26 +30,86 @@ button::after {
   display: none;
 }
 
-// 通用卡片统一样式
+// ============ 通用卡片样式 ============
 .card-wrap {
   background: $bg-card;
   border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
 }
 
-// 全局文字默认层级
+// 现代化卡片(高级感分层阴影)
+.card-modern {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  transition: transform $duration-base $ease-out-quart, box-shadow $duration-base $ease-out-quart;
+}
+
+// ============ 全局文字层级 ============
 .text-main { color: $text-main; }
 .text-sub { color: $text-sub; }
 .text-weak { color: $text-weak; }
+.text-ink { color: $ink-900; }
+.text-gradient {
+  background: $gradient-warm;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
 
-// 主按钮通用样式（下单/加购/结算）
+// ============ 按钮通用样式 ============
 .btn-primary {
   background: $color-primary;
   color: #fff;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    transform: scale(0.97);
+    background: $color-primary-dark;
+  }
 }
 
 .btn-danger {
   background: $color-primary-danger;
   color: #fff;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}
+
+// 现代化主按钮(渐变 + 阴影)
+.btn-modern {
+  background: $gradient-warm;
+  color: #FFFFFF;
+  border-radius: $radius-full;
+  box-shadow: $shadow-primary;
+  transition: all $duration-fast $ease-out-quart;
+  @include gpu-accelerate;
+
+  &:active {
+    transform: scale(0.96);
+    box-shadow: $shadow-sm;
+  }
+}
+
+// 玻璃拟态按钮
+.btn-glass {
+  background: $glass-bg;
+  backdrop-filter: blur(20rpx);
+  -webkit-backdrop-filter: blur(20rpx);
+  border: 2rpx solid $glass-border;
+  color: $color-primary;
+  border-radius: $radius-full;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    transform: scale(0.96);
+    background: rgba(255, 106, 0, 0.12);
+  }
 }
 
 // 辅助文字/标签
@@ -56,4 +117,163 @@ button::after {
 .tag-assist {
   color: $color-assist;
   border: 1rpx solid $color-assist;
+}
+
+// ============ 点击反馈(全局 active 类) ============
+// 用法：<view class="hover-feedback" hover-class="hover-active" :hover-stay-time="100">
+.hover-active {
+  opacity: 0.75;
+  transform: scale(0.97);
+  transition: all $duration-fast $ease-out-quart;
+}
+
+// 卡片悬浮抬升反馈
+.hover-card {
+  transform: translateY(-4rpx);
+  box-shadow: $shadow-md;
+  transition: all $duration-base $ease-out-quart;
+}
+
+// ============ 入场动效工具类 ============
+.anim-fade-up {
+  animation: fadeUp $duration-slow $ease-out-quart both;
+  @include gpu-accelerate;
+}
+.anim-fade-scale {
+  animation: fadeScale $duration-base $ease-out-back both;
+  @include gpu-accelerate;
+}
+.anim-slide-left {
+  animation: slideLeft $duration-slow $ease-out-quart both;
+  @include gpu-accelerate;
+}
+
+// 错峰入场(用于列表卡片,搭配 :nth-child 使用)
+.anim-stagger {
+  animation: fadeUp $duration-slow $ease-out-quart both;
+  @include gpu-accelerate;
+}
+
+// ============ 骨架屏 ============
+.skeleton {
+  background: linear-gradient(90deg, $neutral-100 25%, $neutral-200 37%, $neutral-100 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+.skeleton-text {
+  @extend .skeleton;
+  border-radius: $radius-sm;
+  height: 28rpx;
+}
+
+.skeleton-circle {
+  @extend .skeleton;
+  border-radius: 50%;
+}
+
+// ============ 玻璃拟态工具类 ============
+.glass {
+  background: $glass-bg;
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border: 2rpx solid $glass-border;
+  box-shadow: $shadow-md, inset 0 2rpx 0 rgba(255, 255, 255, 0.25);
+}
+
+.glass-dark {
+  background: $glass-bg-dark;
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border: 2rpx solid rgba(255, 255, 255, 0.08);
+  box-shadow: $shadow-lg;
+}
+
+// ============ 价格样式 ============
+.price-symbol {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: $color-primary-danger;
+}
+
+.price-integer {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: $color-primary-danger;
+  line-height: 1;
+}
+
+.price-decimal {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: $color-primary-danger;
+}
+
+// 价格原价(删除线)
+.price-original {
+  font-size: 22rpx;
+  color: $text-weak;
+  text-decoration: line-through;
+}
+
+// ============ 滚动容器(隐藏滚动条) ============
+.scroll-hide-scrollbar {
+  ::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    color: transparent;
+  }
+}
+
+// ============ 安全区 ============
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+// ============ 关键帧动画 ============
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(60rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }

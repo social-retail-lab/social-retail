@@ -14,6 +14,7 @@ const transformProductItem = (item) => ({
   tags: item.tags || [],
   merchantId: item.merchantId,
   merchantName: item.merchantName,
+  promotionTitle: item.promotionTitle || '',
   productId: item.productId,
   productName: item.productName,
   productImage: getValidImageUrl(item.productImage)

@@ -8,8 +8,22 @@
       <view class="header-right"></view>
     </view>
 
-    <scroll-view 
-      scroll-y 
+    <view class="tabs-bar">
+      <view class="tabs-inner">
+        <view
+          v-for="tab in statusTabs"
+          :key="tab.value"
+          class="tab-item"
+          :class="{ 'tab-active': activeTab === tab.value }"
+          @click="switchTab(tab.value)"
+        >
+          <text class="tab-text">{{ tab.label }}</text>
+        </view>
+      </view>
+    </view>
+
+    <scroll-view
+      scroll-y
       class="page-content"
       :refresher-enabled="true"
       :refresher-triggered="refreshing"
@@ -20,80 +34,59 @@
         <view class="empty-icon">
           <text class="empty-text">🔄</text>
         </view>
-        <text class="empty-title">暂无售后订单</text>
-        <text class="empty-desc">如有售后需求，请在订单详情页申请</text>
-        <view class="empty-btn" @click="goShopping">
-          <text>去逛逛</text>
+        <text class="empty-title">暂无售后申请</text>
+        <text class="empty-desc">暂无售后申请，有问题可去订单页发起售后</text>
+        <view class="empty-btn" @click="goOrderList">
+          <text>查看订单</text>
         </view>
       </view>
 
       <view v-else class="after-sale-list">
-        <view v-for="item in afterSaleList" :key="item.id" class="after-sale-card">
+        <view
+          v-for="item in afterSaleList"
+          :key="item.afterSaleId"
+          class="after-sale-card"
+          @click="goToDetail(item.afterSaleId)"
+        >
           <view class="after-sale-header">
-            <text class="after-sale-sn">售后编号：{{ item.sn }}</text>
-            <text class="after-sale-status" :class="getStatusClass(item.status)">{{ getStatusText(item.status) }}</text>
+            <view class="after-sale-header-left">
+              <text class="after-sale-sn">售后编号：{{ item.afterSaleId }}</text>
+              <text class="order-sn">订单编号：{{ item.orderSn }}</text>
+            </view>
+            <text class="after-sale-status" :class="getStatusClass(item.status)">{{ item.statusText }}</text>
           </view>
 
           <view class="after-sale-goods">
-            <image :src="getValidImageUrl(item.productImage)" class="goods-image" mode="aspectFill" />
+            <image
+              :src="getValidImageUrl(item.productImage)"
+              class="goods-image"
+              mode="aspectFill"
+            />
             <view class="goods-info">
               <text class="goods-name">{{ item.productName }}</text>
-              <text class="goods-spec">{{ item.skuSpecs }}</text>
-              <text class="goods-price">¥{{ item.finalPrice.toFixed(2) }}</text>
+              <view class="goods-meta">
+                <text class="goods-type">{{ item.typeText }}</text>
+                <view class="goods-amount">
+                  <text class="amount-label">退款：</text>
+                  <text class="amount-value">¥{{ formatPrice(item.refundAmount) }}</text>
+                </view>
+              </view>
             </view>
           </view>
 
-          <view class="after-sale-detail">
-            <view class="detail-row">
-              <text class="detail-label">申请类型</text>
-              <text class="detail-value">{{ getTypeText(item.type) }}</text>
-            </view>
-            <view class="detail-row">
-              <text class="detail-label">申请金额</text>
-              <text class="detail-value amount">¥{{ item.amount.toFixed(2) }}</text>
-            </view>
-            <view class="detail-row">
-              <text class="detail-label">申请原因</text>
-              <text class="detail-value">{{ item.reason }}</text>
-            </view>
-            <view class="detail-row">
-              <text class="detail-label">申请时间</text>
-              <text class="detail-value">{{ item.createTime }}</text>
-            </view>
-            <view v-if="item.rejectReason" class="detail-row reject-row">
-              <text class="detail-label">驳回原因</text>
-              <text class="detail-value reject">{{ item.rejectReason }}</text>
-            </view>
-          </view>
-
-          <view class="after-sale-actions">
-            <view 
-              v-if="item.status === 'PENDING'" 
-              class="action-btn"
-              @click="handleCancel(item)"
-            >
-              <text>取消申请</text>
-            </view>
-            <view 
-              v-if="item.status === 'AGREED'" 
-              class="action-btn primary-btn"
-              @click="handleShip(item)"
-            >
-              <text>确认发货</text>
-            </view>
-            <view 
-              v-if="item.status === 'SHIPPED'" 
-              class="action-btn"
-              @click="handleTrack(item)"
-            >
-              <text>查看物流</text>
-            </view>
-            <view 
-              v-if="['COMPLETED', 'REJECTED'].includes(item.status)" 
-              class="action-btn"
-              @click="handleDetail(item)"
-            >
-              <text>查看详情</text>
+          <view class="after-sale-footer">
+            <text class="apply-time">{{ item.applyTime }}</text>
+            <view class="after-sale-actions">
+              <view class="action-btn" @click.stop="goToDetail(item.afterSaleId)">
+                <text>查看详情</text>
+              </view>
+              <view
+                v-if="item.status === 'APPLYING'"
+                class="action-btn cancel-btn"
+                @click.stop="handleCancel(item)"
+              >
+                <text>取消售后</text>
+              </view>
             </view>
           </view>
         </view>
@@ -106,145 +99,107 @@
         </view>
       </view>
     </scroll-view>
-
-    <custom-tab-bar />
   </view>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { showToast, getValidImageUrl } from '@/utils/common'
-import CustomTabBar from '@/components/global/CustomTabBar.vue'
+import { showToast, getValidImageUrl, formatPrice } from '@/utils/common'
+import { getAfterSaleListApi, cancelAfterSaleApi } from '@/api/afterSale'
 
+const activeTab = ref('ALL')
 const afterSaleList = ref([])
 const loading = ref(false)
 const refreshing = ref(false)
 const page = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const hasMore = ref(true)
 
-const statusMap = {
-  PENDING: '待审核',
-  AGREED: '待发货',
-  SHIPPED: '待收货',
-  COMPLETED: '已完成',
-  REJECTED: '已驳回'
-}
+const statusTabs = ref([
+  { label: '全部', value: 'ALL' },
+  { label: '申请中', value: 'APPLYING' },
+  { label: '已取消', value: 'CANCELLED' },
+  { label: '已退款', value: 'REFUNDED' }
+])
 
-const typeMap = {
-  REFUND: '仅退款',
-  RETURN: '退货退款',
-  EXCHANGE: '换货'
+const getStatusClass = (status) => {
+  const classMap = {
+    APPLYING: 'status-applying',
+    CANCELLED: 'status-cancelled',
+    REFUNDED: 'status-refunded'
+  }
+  return classMap[status] || ''
 }
 
 const handleBack = () => {
   uni.navigateBack()
 }
 
-const goShopping = () => {
-  uni.switchTab({ url: '/pages/index/index' })
+const goOrderList = () => {
+  uni.navigateTo({ url: '/pagesSub/order/orderList' })
 }
 
-const getStatusText = (status) => {
-  return statusMap[status] || status
-}
-
-const getStatusClass = (status) => {
-  const classMap = {
-    PENDING: 'status-pending',
-    AGREED: 'status-agreed',
-    SHIPPED: 'status-shipped',
-    COMPLETED: 'status-completed',
-    REJECTED: 'status-rejected'
+const goToDetail = (afterSaleId) => {
+  if (!afterSaleId) {
+    showToast('售后ID缺失')
+    return
   }
-  return classMap[status] || ''
+  uni.navigateTo({ url: `/pagesSub/order/afterSale/afterSaleDetail?afterSaleId=${afterSaleId}` })
 }
 
-const getTypeText = (type) => {
-  return typeMap[type] || type
+const switchTab = (value) => {
+  if (activeTab.value === value) return
+  activeTab.value = value
+  page.value = 1
+  hasMore.value = true
+  afterSaleList.value = []
+  fetchAfterSales()
 }
 
 const fetchAfterSales = async (isRefresh = false) => {
   if (loading.value) return
-  
+
   loading.value = true
-  
-  const mockData = [
-    {
-      id: 1,
-      sn: 'AFS202607031530001',
-      orderId: 13,
-      status: 'PENDING',
-      type: 'REFUND',
-      productId: 6001,
-      productName: '新疆阿克苏冰糖心苹果 5斤装',
-      productImage: 'http://172.20.10.11:8081/uploads/temp/upload/E8C8E3A43B7AA5723A3DFF4BA8FE9D70.jpg',
-      skuSpecs: '规格：5斤装，果径：80-85mm',
-      finalPrice: 39.90,
-      amount: 39.90,
-      reason: '商品质量问题',
-      createTime: '2026-07-03 15:30'
-    },
-    {
-      id: 2,
-      sn: 'AFS202607021120002',
-      orderId: 10,
-      status: 'AGREED',
-      type: 'RETURN',
-      productId: 6003,
-      productName: '智利车厘子 2斤装',
-      productImage: 'https://cdn.example.com/product/cherry.jpg',
-      skuSpecs: '规格：2斤装，果径：JJ级',
-      finalPrice: 128.00,
-      amount: 128.00,
-      reason: '商品与描述不符',
-      createTime: '2026-07-02 11:20'
-    },
-    {
-      id: 3,
-      sn: 'AFS202606300910003',
-      orderId: 8,
-      status: 'COMPLETED',
-      type: 'REFUND',
-      productId: 6002,
-      productName: '云南褚橙 10斤装',
-      productImage: 'https://cdn.example.com/product/main_02.jpg',
-      skuSpecs: '规格：10斤装，等级：特级果',
-      finalPrice: 85.00,
-      amount: 85.00,
-      reason: '拍多了',
-      createTime: '2026-06-30 09:10'
-    },
-    {
-      id: 4,
-      sn: 'AFS202606281400004',
-      orderId: 6,
-      status: 'REJECTED',
-      type: 'RETURN',
-      productId: 6004,
-      productName: '泰国金枕头榴莲 3斤装',
-      productImage: 'https://cdn.example.com/product/durian.jpg',
-      skuSpecs: '规格：3斤装，成熟度：8成熟',
-      finalPrice: 199.00,
-      amount: 199.00,
-      reason: '商品不好吃',
-      rejectReason: '口感问题不属于售后范围',
-      createTime: '2026-06-28 14:00'
+
+  try {
+    const params = {
+      status: activeTab.value,
+      page: page.value,
+      pageSize: pageSize.value
     }
-  ]
-  
-  setTimeout(() => {
-    if (isRefresh || page.value === 1) {
-      afterSaleList.value = mockData
+
+    const response = await getAfterSaleListApi(params)
+
+    if (response.code === 0) {
+      const data = response.data || {}
+      const list = Array.isArray(data.list) ? data.list : []
+
+      if (isRefresh || page.value === 1) {
+        afterSaleList.value = list
+      } else {
+        afterSaleList.value = [...afterSaleList.value, ...list]
+      }
+
+      const total = Number(data.total) || 0
+      hasMore.value = list.length > 0 && afterSaleList.value.length < total
     } else {
-      afterSaleList.value = [...afterSaleList.value, ...mockData]
+      if (isRefresh || page.value === 1) {
+        afterSaleList.value = []
+      }
+      hasMore.value = false
+      showToast(response.message || '获取售后列表失败')
     }
-    
-    hasMore.value = afterSaleList.value.length < 10
+  } catch (error) {
+    if (isRefresh || page.value === 1) {
+      afterSaleList.value = []
+    }
+    hasMore.value = false
+    showToast(error?.message || '获取售后列表失败')
+  } finally {
     loading.value = false
     refreshing.value = false
-  }, 800)
+  }
 }
 
 const onRefresh = () => {
@@ -262,36 +217,42 @@ const onLoadMore = () => {
 
 const handleCancel = (item) => {
   uni.showModal({
-    title: '确认取消',
-    content: '确定要取消此售后申请吗？',
-    success: (res) => {
-      if (res.confirm) {
-        showToast('已取消')
-        fetchAfterSales(true)
+    title: '取消售后',
+    editable: true,
+    placeholderText: '请输入取消原因',
+    confirmText: '确认取消',
+    cancelText: '再想想',
+    success: async (res) => {
+      if (!res.confirm) return
+
+      const cancelReason = (res.content || '').trim()
+      if (!cancelReason) {
+        showToast('请输入取消原因')
+        return
+      }
+
+      try {
+        const response = await cancelAfterSaleApi(item.afterSaleId, { cancelReason })
+        if (response.code === 0) {
+          showToast('已取消售后', 'success')
+          onRefresh()
+        } else {
+          showToast(response.message || '取消失败')
+        }
+      } catch (error) {
+        if (error?.code === 40932) {
+          uni.showModal({
+            title: '提示',
+            content: '当前状态不允许取消',
+            showCancel: false,
+            confirmText: '我知道了'
+          })
+        } else {
+          showToast(error?.message || '取消失败')
+        }
       }
     }
   })
-}
-
-const handleShip = (item) => {
-  uni.showModal({
-    title: '确认发货',
-    content: '请确认已将商品寄回商家',
-    success: (res) => {
-      if (res.confirm) {
-        showToast('已确认发货')
-        fetchAfterSales(true)
-      }
-    }
-  })
-}
-
-const handleTrack = (item) => {
-  showToast('物流跟踪功能开发中')
-}
-
-const handleDetail = (item) => {
-  uni.navigateTo({ url: `/pagesSub/order/afterSale/afterSaleDetail?id=${item.id}` })
 }
 
 let isFirstShow = true
@@ -330,19 +291,19 @@ onMounted(() => {
   padding: 0 32rpx;
   padding-top: calc(env(safe-area-inset-top));
   background: $bg-card;
-  
+
   .header-left, .header-right {
     width: 80rpx;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   .back-icon {
     font-size: 56rpx;
     color: $text-main;
   }
-  
+
   .header-title {
     font-size: 36rpx;
     font-weight: 600;
@@ -350,10 +311,61 @@ onMounted(() => {
   }
 }
 
+.tabs-bar {
+  position: fixed;
+  top: calc(88rpx + env(safe-area-inset-top));
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background: $bg-card;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+
+  .tabs-inner {
+    display: flex;
+    padding: 0 16rpx;
+  }
+
+  .tab-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24rpx 0;
+    position: relative;
+
+    &.tab-active {
+      .tab-text {
+        color: $color-primary;
+        font-weight: 600;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 48rpx;
+        height: 4rpx;
+        background: $color-primary;
+        border-radius: 2rpx;
+      }
+    }
+
+    .tab-text {
+      font-size: 28rpx;
+      color: $text-sub;
+      transition: all 0.2s ease;
+    }
+  }
+}
+
 .page-content {
   flex: 1;
-  padding-top: calc(88rpx + env(safe-area-inset-top));
-  padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: calc(176rpx + env(safe-area-inset-top));
+  padding-bottom: calc(40rpx + env(safe-area-inset-bottom));
 }
 
 .empty-after-sale {
@@ -361,8 +373,8 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-top: 300rpx;
-  
+  padding-top: 240rpx;
+
   .empty-icon {
     width: 200rpx;
     height: 200rpx;
@@ -370,34 +382,41 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     margin-bottom: 32rpx;
-    
+
     .empty-text {
       font-size: 120rpx;
     }
   }
-  
+
   .empty-title {
     font-size: 36rpx;
     color: $text-main;
     font-weight: 500;
     margin-bottom: 16rpx;
   }
-  
+
   .empty-desc {
     font-size: 26rpx;
     color: $text-weak;
     margin-bottom: 64rpx;
+    padding: 0 60rpx;
+    text-align: center;
+    line-height: 1.5;
   }
-  
+
   .empty-btn {
     padding: 24rpx 80rpx;
     background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
     border-radius: 48rpx;
-    
+
     text {
       font-size: 30rpx;
       color: #FFFFFF;
       font-weight: 500;
+    }
+
+    &:active {
+      opacity: 0.9;
     }
   }
 }
@@ -412,42 +431,60 @@ onMounted(() => {
   margin-bottom: 24rpx;
   overflow: hidden;
   box-shadow: $category-shadow-sm;
+
+  &:active {
+    opacity: 0.95;
+  }
 }
 
 .after-sale-header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 24rpx;
   border-bottom: 1rpx solid $bg-page-light;
-  
+
+  .after-sale-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+    flex: 1;
+    min-width: 0;
+  }
+
   .after-sale-sn {
     font-size: 26rpx;
     color: $text-sub;
     font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  
+
+  .order-sn {
+    font-size: 24rpx;
+    color: $text-weak;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   .after-sale-status {
     font-size: 28rpx;
     font-weight: 500;
-    
-    &.status-pending {
+    flex-shrink: 0;
+    margin-left: 16rpx;
+
+    &.status-applying {
       color: $color-primary;
     }
-    
-    &.status-agreed {
-      color: $color-success;
-    }
-    
-    &.status-shipped {
-      color: $color-warning;
-    }
-    
-    &.status-completed {
+
+    &.status-cancelled {
       color: $text-weak;
     }
-    
-    &.status-rejected {
-      color: $color-primary-danger;
+
+    &.status-refunded {
+      color: $color-success;
     }
   }
 }
@@ -455,21 +492,23 @@ onMounted(() => {
 .after-sale-goods {
   display: flex;
   padding: 24rpx;
-  
+
   .goods-image {
     width: 160rpx;
     height: 160rpx;
     border-radius: 16rpx;
     margin-right: 20rpx;
     background: $bg-page-light;
+    flex-shrink: 0;
   }
-  
+
   .goods-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    
+    min-width: 0;
+
     .goods-name {
       font-size: 28rpx;
       color: $text-main;
@@ -481,90 +520,85 @@ onMounted(() => {
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    
-    .goods-spec {
-      font-size: 24rpx;
-      color: $text-weak;
-      margin-top: 8rpx;
-    }
-    
-    .goods-price {
-      font-size: 30rpx;
-      color: $color-primary-danger;
-      font-weight: 600;
+
+    .goods-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       margin-top: 12rpx;
-    }
-  }
-}
 
-.after-sale-detail {
-  padding: 0 24rpx;
-  
-  .detail-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 16rpx 0;
-    
-    &:not(:last-child) {
-      border-bottom: 1rpx solid $bg-page-light;
-    }
-    
-    &.reject-row {
-      background: rgba(255, 77, 79, 0.05);
-      margin: 0 -24rpx;
-      padding: 16rpx 24rpx;
-      
-      .detail-value.reject {
-        color: $color-primary-danger;
+      .goods-type {
+        font-size: 24rpx;
+        color: $text-weak;
+        padding: 4rpx 16rpx;
+        background: $bg-page-light;
+        border-radius: 8rpx;
       }
-    }
-    
-    .detail-label {
-      font-size: 26rpx;
-      color: $text-sub;
-    }
-    
-    .detail-value {
-      font-size: 26rpx;
-      color: $text-main;
-      
-      &.amount {
-        color: $color-primary-danger;
-        font-weight: 600;
+
+      .goods-amount {
+        display: flex;
+        align-items: baseline;
+
+        .amount-label {
+          font-size: 24rpx;
+          color: $text-sub;
+        }
+
+        .amount-value {
+          font-size: 32rpx;
+          color: $color-primary-danger;
+          font-weight: 600;
+        }
       }
     }
   }
 }
 
-.after-sale-actions {
+.after-sale-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 16rpx;
+  align-items: center;
+  justify-content: space-between;
   padding: 20rpx 24rpx;
   background: $bg-page-light;
-  
-  .action-btn {
-    padding: 16rpx 36rpx;
-    border: 1rpx solid $gray-300;
-    border-radius: 32rpx;
-    
-    text {
-      font-size: 26rpx;
-      color: $text-main;
-    }
-    
-    &.primary-btn {
-      background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
-      border-color: transparent;
-      
+
+  .apply-time {
+    font-size: 24rpx;
+    color: $text-weak;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .after-sale-actions {
+    display: flex;
+    gap: 16rpx;
+    flex-shrink: 0;
+
+    .action-btn {
+      padding: 12rpx 28rpx;
+      border: 1rpx solid $gray-300;
+      border-radius: 24rpx;
+      background: $bg-card;
+
       text {
-        color: #FFFFFF;
-        font-weight: 500;
+        font-size: 26rpx;
+        color: $text-main;
       }
-    }
-    
-    &:active {
-      transform: scale(0.96);
+
+      &.cancel-btn {
+        border-color: $gray-300;
+        background: $bg-card;
+
+        text {
+          color: $text-weak;
+        }
+      }
+
+      &:active {
+        transform: scale(0.96);
+      }
     }
   }
 }
@@ -572,7 +606,7 @@ onMounted(() => {
 .loading-more, .no-more {
   padding: 32rpx;
   text-align: center;
-  
+
   .loading-text, .no-more-text {
     font-size: 26rpx;
     color: $text-weak;

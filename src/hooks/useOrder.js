@@ -1,6 +1,13 @@
 import { ref } from 'vue'
 import { useOrderStore } from '@/store/order'
 import { useUserStore } from '@/store/user'
+import {
+  createAlipayApi,
+  getPayStatusApi,
+  mockPaySuccessApi,
+  mockPayFailApi,
+  getPaymentDetailApi
+} from '@/api/pay'
 
 export const useOrder = () => {
   const orderStore = useOrderStore()
@@ -47,7 +54,7 @@ export const useOrder = () => {
       if (res) {
         return res
       } else {
-        uni.showToast({ title: '获取订单预览失败', icon: 'none' })
+        // base.js handleError 已弹出 toast，不重复弹
         return null
       }
     } catch (error) {
@@ -59,13 +66,13 @@ export const useOrder = () => {
         40913: '优惠券不满足使用条件'
       }
 
-      if (errorCodeMap[error?.code]) {
-        uni.showToast({ title: errorCodeMap[error.code], icon: 'none' })
-      } else if (error?.message) {
+      // 仅在 base.js 未处理时弹 toast（非200状态码的错误）
+      if (error?.statusCode && error?.message && !error?.code) {
         uni.showToast({ title: error.message, icon: 'none' })
-      } else {
-        uni.showToast({ title: '获取订单预览失败，请重试', icon: 'none' })
+      } else if (errorCodeMap[error?.code]) {
+        uni.showToast({ title: errorCodeMap[error.code], icon: 'none' })
       }
+      // base.js handleError 已处理过的业务错误不重复弹 toast
 
       return null
     } finally {
@@ -193,7 +200,7 @@ export const useOrder = () => {
   }
 
   // 取消订单
-  // 仅 WAIT_PAY、WAIT_ACCEPT 可调用
+  // 仅 WAIT_PAY 可调用（后端限制：仅待支付订单可以取消）
   const cancelOrder = async (orderId, reason) => {
     if (!checkLogin()) {
       return false
@@ -352,6 +359,113 @@ export const useOrder = () => {
     }
   }
 
+  // ============ 支付相关方法 ============
+
+  // 创建支付宝支付
+  const createAlipay = async (orderId, payType = 'WAP') => {
+    if (!checkLogin()) return null
+
+    try {
+      const params = { orderId, payType }
+
+      // #ifdef H5
+      // 构建支付完成后返回前端页面的地址
+      if (typeof window !== 'undefined' && window.location) {
+        params.returnUrl = `${window.location.origin}${window.location.pathname}#/pagesSub/order/pay/payOrder?orderId=${orderId}`
+      }
+      // #endif
+
+      const res = await createAlipayApi(params)
+      if (res.code === 0 && res.data) {
+        return res.data
+      }
+      return null
+    } catch (error) {
+      console.error('创建支付宝支付失败:', error)
+      const errorCodeMap = {
+        40924: '当前订单状态不允许支付'
+      }
+      if (errorCodeMap[error?.code]) {
+        uni.showToast({ title: errorCodeMap[error.code], icon: 'none' })
+      } else if (error?.message && !error?.code) {
+        uni.showToast({ title: error.message, icon: 'none' })
+      }
+      return null
+    }
+  }
+
+  // 查询支付状态
+  const loadPayStatus = async (orderId) => {
+    if (!checkLogin()) return null
+
+    try {
+      const res = await getPayStatusApi(orderId)
+      if (res.code === 0 && res.data) {
+        return res.data
+      }
+      return null
+    } catch (error) {
+      console.error('查询支付状态失败:', error)
+      return null
+    }
+  }
+
+  // 模拟支付成功
+  const mockPaySuccess = async (orderId, payAmount) => {
+    if (!checkLogin()) return null
+
+    try {
+      const res = await mockPaySuccessApi({ orderId, payAmount })
+      if (res.code === 0 && res.data) {
+        return res.data
+      }
+      return null
+    } catch (error) {
+      console.error('模拟支付成功失败:', error)
+      const errorCodeMap = {
+        40925: '支付金额与订单应付金额不一致'
+      }
+      if (errorCodeMap[error?.code]) {
+        uni.showToast({ title: errorCodeMap[error.code], icon: 'none' })
+      } else if (error?.message && !error?.code) {
+        uni.showToast({ title: error.message, icon: 'none' })
+      }
+      return null
+    }
+  }
+
+  // 模拟支付失败
+  const mockPayFail = async (orderId, failReason) => {
+    if (!checkLogin()) return null
+
+    try {
+      const res = await mockPayFailApi({ orderId, failReason })
+      if (res.code === 0 && res.data) {
+        return res.data
+      }
+      return null
+    } catch (error) {
+      console.error('模拟支付失败:', error)
+      return null
+    }
+  }
+
+  // 查询支付流水详情
+  const loadPaymentDetail = async (paymentId) => {
+    if (!checkLogin()) return null
+
+    try {
+      const res = await getPaymentDetailApi(paymentId)
+      if (res.code === 0 && res.data) {
+        return res.data
+      }
+      return null
+    } catch (error) {
+      console.error('查询支付流水失败:', error)
+      return null
+    }
+  }
+
   return {
     loading,
     previewLoading,
@@ -365,6 +479,11 @@ export const useOrder = () => {
     createOrder,
     cancelOrder,
     deleteOrder,
-    confirmOrder
+    confirmOrder,
+    createAlipay,
+    loadPayStatus,
+    mockPaySuccess,
+    mockPayFail,
+    loadPaymentDetail
   }
 }

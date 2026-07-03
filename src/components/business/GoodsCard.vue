@@ -95,13 +95,16 @@ const handleClick = () => {
 // 商品卡片容器
 .goods-card {
   background: $bg-card;
-  border-radius: $radius-lg;
+  border-radius: $radius-xl;
   overflow: hidden;
-  transition: all 0.2s ease;
+  box-shadow: $shadow-sm;
+  transition: transform $duration-base $ease-out-quart, box-shadow $duration-base $ease-out-quart;
+  // GPU 加速
+  transform: translateZ(0);
 
   &:active {
-    transform: scale(0.98);
-    opacity: 0.9;
+    transform: scale(0.97) translateY(2rpx);
+    box-shadow: $shadow-xs;
   }
 }
 
@@ -111,7 +114,7 @@ const handleClick = () => {
   width: 100%;
   padding-top: 100%; // 1:1 比例
   overflow: hidden;
-  background: $bg-page-light;
+  background: $neutral-100;
 
   .goods-image {
     position: absolute;
@@ -119,13 +122,14 @@ const handleClick = () => {
     left: 0;
     width: 100%;
     height: 100%;
+    transition: transform $duration-slow $ease-out-quart;
   }
 
   // 商品标签
   .goods-tags {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 16rpx;
     display: flex;
     z-index: 1;
     flex-direction: column;
@@ -133,11 +137,13 @@ const handleClick = () => {
 
   .tag-item {
     padding: 8rpx 16rpx;
-    background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
+    background: $gradient-warm;
     border-radius: 0 0 $radius-base $radius-base;
     font-size: 20rpx;
     color: #FFFFFF;
     font-weight: 600;
+    letter-spacing: 0.5rpx;
+    box-shadow: 0 4rpx 10rpx rgba(255, 77, 79, 0.25);
 
     &:not(:first-child) {
       margin-top: 8rpx;
@@ -151,7 +157,9 @@ const handleClick = () => {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(8rpx);
+    -webkit-backdrop-filter: blur(8rpx);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -161,20 +169,24 @@ const handleClick = () => {
       font-size: 28rpx;
       color: #FFFFFF;
       font-weight: 600;
+      padding: 12rpx 28rpx;
+      border: 2rpx solid rgba(255, 255, 255, 0.4);
+      border-radius: $radius-full;
+      letter-spacing: 2rpx;
     }
   }
 }
 
 // 商品信息
 .goods-info {
-  padding: 16rpx;
+  padding: 20rpx 18rpx 18rpx;
 }
 
 // 商品标题
 .goods-title {
   display: block;
   font-size: 28rpx;
-  color: $text-main;
+  color: $ink-800;
   line-height: 1.4;
   margin-bottom: 12rpx;
   overflow: hidden;
@@ -183,12 +195,13 @@ const handleClick = () => {
   -webkit-line-clamp: 2;
   line-clamp: 2;
   -webkit-box-orient: vertical;
+  letter-spacing: 0.3rpx;
 }
 
 // 商品底部（价格和销量）
 .goods-bottom {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   margin-bottom: 8rpx;
 
@@ -198,15 +211,17 @@ const handleClick = () => {
     align-items: baseline;
 
     .price-symbol {
-      font-size: 24rpx;
+      font-size: 22rpx;
       color: $color-primary-danger;
       font-weight: 600;
     }
 
     .price-value {
-      font-size: 32rpx;
+      font-size: 36rpx;
       color: $color-primary-danger;
       font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.5rpx;
     }
   }
 

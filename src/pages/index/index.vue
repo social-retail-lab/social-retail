@@ -190,14 +190,19 @@ const handleRecommendMore = () => {
 // 页面内容区域
 .page-content {
   flex: 1;
-  height: calc(100vh - 112rpx - 100rpx); // 减去搜索栏和TabBar高度
+  height: calc(100vh - 112rpx - 110rpx); // 减去搜索栏和TabBar高度
   background-color: $bg-page;
   padding-top: 112rpx; // 防止内容被固定搜索栏遮挡
+  // GPU 加速滚动
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
 }
 
 // 底部安全区域
 .safe-bottom {
   height: constant(safe-area-inset-bottom);
   height: env(safe-area-inset-bottom);
+  // 增加 TabBar 上方间距
+  min-height: 40rpx;
 }
 </style>

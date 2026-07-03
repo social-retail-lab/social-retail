@@ -65,12 +65,12 @@
           <view class="benefits-grid">
             <view
               v-for="(item, index) in benefits"
-              :key="index"
+              :key="item.benefitCode || index"
               class="benefit-item"
             >
-              <text class="benefit-icon">{{ item.icon }}</text>
+              <text class="benefit-icon">{{ getBenefitIcon(item.benefitCode) }}</text>
               <view class="benefit-text">
-                <text class="benefit-name">{{ item.name }}</text>
+                <text class="benefit-name">{{ item.benefitName || item.name }}</text>
                 <text class="benefit-desc">{{ item.description }}</text>
               </view>
             </view>
@@ -194,6 +194,17 @@ const signInRewardPoints = computed(() => signInStatus.value?.rewardPoints || 0)
 const cardGradient = computed(() => {
   return memberStore.getLevelTheme(levelName.value).gradient
 })
+
+// 权益图标映射（接口6.1.1返回的benefitCode映射到emoji图标）
+const benefitIconMap = {
+  'POINTS_ACCELERATE': '⚡',
+  'MEMBER_DISCOUNT': '🏷',
+  'COUPON_GIFT': '🎁',
+  'FREE_SHIPPING': '🚚',
+  'BIRTHDAY_GIFT': '🎂',
+  'BASIC_POINTS': '💰'
+}
+const getBenefitIcon = (code) => benefitIconMap[code] || '✨'
 
 // 升级所需成长值差距
 const growthGap = computed(() => {

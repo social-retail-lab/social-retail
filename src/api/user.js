@@ -154,21 +154,25 @@ export const wxBindPhoneApi = (data) => {
 
 export const normalizeUserInfo = (data) => {
   if (!data) return null
+  const mi = data.memberInfo || null
   return {
     userId: data.userId || '',
     phone: data.phone || '',
     nickname: data.nickname || '',
     avatar: data.avatar || '',
     status: data.status || 'NORMAL',
-    memberInfo: data.memberInfo ? {
-      memberId: data.memberInfo.memberId || '',
-      levelId: data.memberInfo.levelId || 0,
-      levelName: data.memberInfo.levelName || '普通会员',
-      points: data.memberInfo.points || 0,
-      totalGrowth: data.memberInfo.totalGrowth || 0,
-      nextLevelGrowth: data.memberInfo.nextLevelGrowth || 0,
-      discountRate: data.memberInfo.discountRate || 1.00,
-      freeShipping: data.memberInfo.freeShipping || false
+    // 以数据库字段为准：growthValue(成长值)、pointsBalance(积分余额)、memberLevel(等级)、memberLevelName(等级名称)
+    memberInfo: mi ? {
+      memberId: mi.memberId || '',
+      levelId: mi.memberLevel || mi.levelId || 0,
+      memberLevel: mi.memberLevel || 0,
+      memberLevelName: mi.memberLevelName || mi.levelName || '普通会员',
+      levelName: mi.memberLevelName || mi.levelName || '普通会员',
+      pointsBalance: Number(mi.pointsBalance ?? 0),
+      growthValue: Number(mi.growthValue ?? 0),
+      nextLevelGrowth: Number(mi.nextLevelGrowth ?? 0),
+      discountRate: mi.discountRate || 1.00,
+      freeShipping: mi.freeShipping || false
     } : null,
     distributorInfo: data.distributorInfo || null,
     orderCount: data.orderCount || {

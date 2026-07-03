@@ -16,45 +16,39 @@ export const getBannerList = (params) => {
 
 // ============ 秒杀接口 ============
 
-// 获取秒杀活动列表
-export const getSeckillList = () => {
+// 获取当前可展示的秒杀活动详情（预热中/进行中）
+// 用户端同一时间仅展示一个秒杀活动，无需传 activityId
+// 返回 data: null 表示暂无秒杀活动
+export const getCurrentSeckillActivityApi = () => {
   return request({
-    url: '/api/seckill/list',
+    url: '/api/seckill/activities/current',
     method: 'get'
   })
 }
 
-// 获取秒杀活动详情（包含商品列表）
-export const getSeckillActivity = () => {
+// 获取当前秒杀活动下的商品列表（分页）
+// 预热期和进行期均可查看商品列表；预热期 canBuy=false
+// 无活动时返回空列表，不返回 404
+export const getCurrentSeckillProductsApi = (params) => {
+  const data = {
+    page: Number(params?.page) || 1,
+    pageSize: Number(params?.pageSize) || 10
+  }
   return request({
-    url: '/api/seckill/activity',
-    method: 'get'
-  })
-}
-
-// 获取秒杀商品列表
-export const getSeckillGoods = (params) => {
-  return request({
-    url: '/api/seckill/goods',
+    url: '/api/seckill/activities/current/products',
     method: 'get',
-    params
-  })
-}
-
-// 获取秒杀商品详情
-export const getSeckillDetail = (id) => {
-  return request({
-    url: `/api/seckill/detail/${id}`,
-    method: 'get'
-  })
-}
-
-// 秒杀下单
-export const seckillOrder = (data) => {
-  return request({
-    url: '/api/seckill/order',
-    method: 'post',
     data
+  })
+}
+
+// 秒杀资格校验
+// 判断当前用户是否具备指定秒杀商品的抢购资格
+// 校验项：活动是否存在/进行中、商品是否启用、库存是否充足、是否超过限购数量
+// 返回 { canBuy, reason, remainingStock, limitQuantity, alreadyBoughtQuantity }
+export const checkSeckillQualificationApi = (seckillProductId) => {
+  return request({
+    url: `/api/seckill/products/${seckillProductId}/check`,
+    method: 'get'
   })
 }
 

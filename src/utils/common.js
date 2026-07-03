@@ -71,7 +71,27 @@ export const navigateTo = (url, params = {}) => {
       .join('&')
     url = `${url}?${queryString}`
   }
-  uni.navigateTo({ url })
+  uni.navigateTo({ url, animationType: 'slide-in-right', animationDuration: 200 })
+}
+
+// 跳转节流锁(防止快速连点产生多页面堆栈)
+let _navLock = false
+let _navLockTimer = null
+
+/**
+ * 节流跳转(防止快速连点)
+ * @param {string} url - 页面路径
+ * @param {Object} params - 参数
+ * @param {number} interval - 节流间隔(ms)
+ */
+export const throttleNavigate = (url, params = {}, interval = 500) => {
+  if (_navLock) return
+  _navLock = true
+  if (_navLockTimer) clearTimeout(_navLockTimer)
+  _navLockTimer = setTimeout(() => {
+    _navLock = false
+  }, interval)
+  navigateTo(url, params)
 }
 
 /**
@@ -79,6 +99,12 @@ export const navigateTo = (url, params = {}) => {
  * @param {string} url - 页面路径
  */
 export const switchTab = (url) => {
+  if (_navLock) return
+  _navLock = true
+  if (_navLockTimer) clearTimeout(_navLockTimer)
+  _navLockTimer = setTimeout(() => {
+    _navLock = false
+  }, 400)
   uni.switchTab({ url })
 }
 
@@ -87,7 +113,13 @@ export const switchTab = (url) => {
  * @param {number} delta - 返回的页面数
  */
 export const navigateBack = (delta = 1) => {
-  uni.navigateBack({ delta })
+  if (_navLock) return
+  _navLock = true
+  if (_navLockTimer) clearTimeout(_navLockTimer)
+  _navLockTimer = setTimeout(() => {
+    _navLock = false
+  }, 400)
+  uni.navigateBack({ delta, animationType: 'slide-out-right', animationDuration: 200 })
 }
 
 /**

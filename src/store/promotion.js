@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { 
-  getBannerList, 
-  getSeckillActivity, 
-  getSeckillList, 
-  getSeckillGoods, 
-  getSeckillDetail,
-  seckillOrder,
+import {
+  getBannerList,
+  getCurrentSeckillActivityApi,
+  getCurrentSeckillProductsApi,
+  checkSeckillQualificationApi,
   getCouponList,
   receiveCoupon,
   getMyCouponList,
@@ -16,8 +14,14 @@ import {
 
 export const usePromotionStore = defineStore('promotion', () => {
   const bannerList = ref([])
+  // 当前秒杀活动信息（预热中/进行中），null 表示暂无活动
   const seckillActivity = ref(null)
-  const seckillList = ref([])
+  // 当前秒杀活动商品列表
+  const seckillProductList = ref([])
+  const seckillTotal = ref(0)
+  const seckillPage = ref(1)
+  const seckillPageSize = ref(10)
+  const seckillPages = ref(0)
   const couponList = ref([])
   const myCouponList = ref([])
   const promotionRule = ref(null)
@@ -32,42 +36,47 @@ export const usePromotionStore = defineStore('promotion', () => {
     return []
   }
 
-  const fetchSeckillActivity = async () => {
-    const res = await getSeckillActivity()
-    if (res.code === 0 && res.data) {
-      seckillActivity.value = res.data
+  // 获取当前秒杀活动详情
+  // 返回 null 表示暂无活动
+  const fetchCurrentSeckillActivity = async () => {
+    const res = await getCurrentSeckillActivityApi()
+    if (res.code === 0) {
+      seckillActivity.value = res.data || null
       return seckillActivity.value
     }
     return null
   }
 
-  const fetchSeckillList = async () => {
-    const res = await getSeckillList()
+  // 获取当前秒杀活动商品列表（分页）
+  // 无活动时返回空列表
+  const fetchCurrentSeckillProducts = async (params) => {
+    const res = await getCurrentSeckillProductsApi(params)
     if (res.code === 0 && res.data) {
-      seckillList.value = Array.isArray(res.data) ? res.data : (res.data.list || [])
-      return seckillList.value
-    }
-    return []
-  }
-
-  const fetchSeckillGoods = async (params) => {
-    const res = await getSeckillGoods(params)
-    if (res.code === 0 && res.data) {
-      return res.data
-    }
-    return null
-  }
-
-  const fetchSeckillDetail = async (id) => {
-    const res = await getSeckillDetail(id)
-    if (res.code === 0 && res.data) {
-      return res.data
+      const data = res.data
+      seckillProductList.value = Array.isArray(data.list) ? data.list : []
+      seckillTotal.value = data.total || 0
+      seckillPage.value = data.page || 1
+      seckillPageSize.value = data.pageSize || 10
+      seckillPages.value = data.pages || 0
+      return data
     }
     return null
   }
 
-  const fetchSeckillOrder = async (data) => {
-    const res = await seckillOrder(data)
+  // 清空秒杀数据（切换活动或退出时调用）
+  const clearSeckillData = () => {
+    seckillActivity.value = null
+    seckillProductList.value = []
+    seckillTotal.value = 0
+    seckillPage.value = 1
+    seckillPages.value = 0
+  }
+
+  // 秒杀资格校验
+  // 返回 { canBuy, reason, remainingStock, limitQuantity, alreadyBoughtQuantity }
+  // canBuy=false 时 reason 字段说明不可购买原因
+  const fetchCheckSeckillQualification = async (seckillProductId) => {
+    const res = await checkSeckillQualificationApi(seckillProductId)
     if (res.code === 0 && res.data) {
       return res.data
     }
@@ -121,17 +130,20 @@ export const usePromotionStore = defineStore('promotion', () => {
   return {
     bannerList,
     seckillActivity,
-    seckillList,
+    seckillProductList,
+    seckillTotal,
+    seckillPage,
+    seckillPageSize,
+    seckillPages,
     couponList,
     myCouponList,
     promotionRule,
     recommendGoods,
     fetchBannerList,
-    fetchSeckillActivity,
-    fetchSeckillList,
-    fetchSeckillGoods,
-    fetchSeckillDetail,
-    fetchSeckillOrder,
+    fetchCurrentSeckillActivity,
+    fetchCurrentSeckillProducts,
+    clearSeckillData,
+    fetchCheckSeckillQualification,
     fetchCouponList,
     fetchReceiveCoupon,
     fetchMyCouponList,

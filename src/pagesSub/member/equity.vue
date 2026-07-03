@@ -61,12 +61,12 @@
               </view>
               <view
                 v-for="(benefit, idx) in level.benefits"
-                :key="idx"
+                :key="benefit.benefitCode || idx"
                 class="benefit-item"
               >
                 <text class="benefit-check">✓</text>
                 <view class="benefit-content">
-                  <text class="benefit-name">{{ benefit.name }}</text>
+                  <text class="benefit-name">{{ benefit.benefitName || benefit.name }}</text>
                   <text class="benefit-desc">{{ benefit.description }}</text>
                 </view>
               </view>

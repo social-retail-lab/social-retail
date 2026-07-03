@@ -46,22 +46,28 @@
             <view class="option-icon-wrap">
               <text class="option-icon">🔷</text>
             </view>
-            <text class="option-text">支付宝支付</text>
+            <view class="option-info">
+              <text class="option-text">支付宝支付</text>
+              <text class="option-desc">沙箱环境</text>
+            </view>
             <view class="option-check">
               <view v-if="paymentType === 'ALIPAY'" class="check-dot"></view>
             </view>
           </view>
           <view
             class="payment-option"
-            :class="{ 'payment-active': paymentType === 'WECHAT' }"
-            @click="paymentType = 'WECHAT'"
+            :class="{ 'payment-active': paymentType === 'MOCK' }"
+            @click="paymentType = 'MOCK'"
           >
             <view class="option-icon-wrap">
-              <text class="option-icon">💚</text>
+              <text class="option-icon">🧪</text>
             </view>
-            <text class="option-text">微信支付</text>
+            <view class="option-info">
+              <text class="option-text">模拟支付</text>
+              <text class="option-desc">测试快速完成支付</text>
+            </view>
             <view class="option-check">
-              <view v-if="paymentType === 'WECHAT'" class="check-dot"></view>
+              <view v-if="paymentType === 'MOCK'" class="check-dot"></view>
             </view>
           </view>
         </view>
@@ -109,6 +115,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { onHide, onShow } from '@dcloudio/uni-app'
 import { showToast, getValidImageUrl } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 
@@ -125,6 +132,13 @@ const isPaying = ref(false)
 const remainSeconds = ref(0)
 
 const orderItems = ref([])
+const paymentId = ref(null)
+
+// 标记是否已跳转到支付宝，用于检测返回
+const hasRedirectedToAlipay = ref(false)
+
+// 用于保存 H5 事件监听器的清理函数
+const _cleanupListeners = ref(null)
 
 let pollTimer = null
 let countdownTimer = null
@@ -214,25 +228,40 @@ const stopAllTimers = () => {
 const startPolling = () => {
   if (pollTimer) return
   if (!orderId.value) return
-  pollTimer = setInterval(pollOrderStatus, 3000)
+  // 支付后每3秒轮询支付状态
+  pollTimer = setInterval(pollPayStatus, 3000)
 }
 
 const redirectToDetail = () => {
-  uni.navigateTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
+  uni.redirectTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
 }
 
-const pollOrderStatus = async () => {
+// 轮询支付状态（使用支付状态查询接口）
+const pollPayStatus = async () => {
   if (!orderId.value) return
-  const statusData = await orderHook.loadOrderStatus(orderId.value)
+  const statusData = await orderHook.loadPayStatus(orderId.value)
   if (!statusData) return
-  if (statusData.status && statusData.status !== 'WAIT_PAY') {
+
+  // 支付成功
+  if (statusData.payStatus === 'PAID') {
     stopAllTimers()
-    const successStatuses = ['WAIT_SHIP', 'WAIT_RECEIVE', 'IN_PROGRESS', 'COMPLETED']
-    if (successStatuses.includes(statusData.status)) {
-      showToast('支付成功', 'success')
-    } else {
-      showToast(statusData.statusText || '订单状态已变更')
-    }
+    showToast('支付成功')
+    setTimeout(redirectToDetail, 1500)
+    return
+  }
+
+  // 支付失败
+  if (statusData.payStatus === 'FAILED') {
+    stopAllTimers()
+    showToast('支付失败，请重试')
+    isPaying.value = false
+    return
+  }
+
+  // 订单状态已离开待支付（兼容旧轮询逻辑）
+  if (statusData.orderStatus && statusData.orderStatus !== 'WAIT_PAY') {
+    stopAllTimers()
+    showToast('支付成功')
     setTimeout(redirectToDetail, 1500)
   }
 }
@@ -257,14 +286,129 @@ const fetchOrderDetailData = async () => {
   return true
 }
 
-const handlePay = () => {
+// H5 环境跳转支付宝沙箱支付
+const redirectAlipayH5 = (payPayload) => {
+  // #ifdef H5
+  // 支付宝沙箱返回的是 form HTML，需要写入页面自动提交
+  const div = document.createElement('div')
+  div.style.display = 'none'
+  div.innerHTML = payPayload
+  document.body.appendChild(div)
+  // 自动提交表单跳转到支付宝
+  const form = div.querySelector('form')
+  if (form) {
+    form.submit()
+  } else {
+    // 如果不是 form 而是 URL，直接跳转
+    window.location.href = payPayload
+  }
+  // 标记已跳转，用于检测返回
+  hasRedirectedToAlipay.value = true
+  // 跳转后启动轮询，用户支付完成后回来时检测状态
+  startPolling()
+  // #endif
+
+  // #ifndef H5
+  // 非 H5 环境暂不支持支付宝跳转，提示用户使用模拟支付
+  showToast('当前环境暂不支持支付宝跳转，请使用模拟支付')
+  // #endif
+}
+
+const handlePay = async () => {
   if (isPaying.value || isExpired.value) return
   isPaying.value = true
-  uni.showLoading({ title: '正在跳转支付...', mask: true })
-  // 实际项目中这里应该调用后端支付下单接口获取支付参数
-  uni.hideLoading()
-  showToast('支付功能对接中，请稍后')
-  // 继续轮询订单状态，轮询到状态变化后自动跳转订单详情
+
+  if (paymentType.value === 'ALIPAY') {
+    // 支付宝沙箱支付
+    uni.showLoading({ title: '正在创建支付...', mask: true })
+
+    try {
+      const payData = await orderHook.createAlipay(orderId.value, 'WAP')
+
+      uni.hideLoading()
+
+      if (!payData) {
+        isPaying.value = false
+        return
+      }
+
+      // 保存支付流水ID
+      paymentId.value = payData.paymentId
+
+      // 跳转支付宝沙箱支付页面
+      if (payData.payPayload) {
+        redirectAlipayH5(payData.payPayload)
+      } else {
+        showToast('支付创建异常，请重试')
+        isPaying.value = false
+      }
+    } catch (error) {
+      uni.hideLoading()
+      isPaying.value = false
+    }
+  } else if (paymentType.value === 'MOCK') {
+    // 模拟支付成功
+    uni.showLoading({ title: '模拟支付中...', mask: true })
+
+    try {
+      const result = await orderHook.mockPaySuccess(orderId.value, payAmount.value)
+
+      uni.hideLoading()
+
+      if (result && result.payStatus === 'PAID') {
+        stopAllTimers()
+        showToast('支付成功')
+        setTimeout(redirectToDetail, 1500)
+      } else {
+        isPaying.value = false
+      }
+    } catch (error) {
+      uni.hideLoading()
+      isPaying.value = false
+    }
+  }
+}
+
+// 检查支付状态（从支付宝返回时调用）
+const checkPayStatusOnReturn = async () => {
+  // 只有已跳转到支付宝的情况才需要检查
+  if (!hasRedirectedToAlipay.value) return
+  if (!orderId.value) return
+
+  // 先调用一次支付状态查询
+  const statusData = await orderHook.loadPayStatus(orderId.value)
+  if (!statusData) {
+    // 查询失败，启动轮询继续尝试
+    startPolling()
+    return
+  }
+
+  // 支付成功
+  if (statusData.payStatus === 'PAID') {
+    stopAllTimers()
+    showToast('支付成功')
+    setTimeout(redirectToDetail, 1500)
+    return
+  }
+
+  // 支付失败
+  if (statusData.payStatus === 'FAILED') {
+    stopAllTimers()
+    showToast('支付失败，请重试')
+    isPaying.value = false
+    hasRedirectedToAlipay.value = false
+    return
+  }
+
+  // 订单状态已离开待支付（兼容旧逻辑）
+  if (statusData.orderStatus && statusData.orderStatus !== 'WAIT_PAY') {
+    stopAllTimers()
+    showToast('支付成功')
+    setTimeout(redirectToDetail, 1500)
+    return
+  }
+
+  // 仍未支付，启动轮询等待
   startPolling()
 }
 
@@ -281,12 +425,68 @@ onMounted(async () => {
   const stay = await fetchOrderDetailData()
   if (stay === false) return
 
+  // 只启动倒计时
   startCountdown()
-  startPolling()
+
+  // #ifdef H5
+  // 监听 pageshow 事件（用户从支付宝返回时触发，包括 bfcache 恢复）
+  const handlePageShow = (event) => {
+    // event.persisted 为 true 表示从 bfcache 恢复（浏览器前进/后退）
+    if (event.persisted || hasRedirectedToAlipay.value) {
+      checkPayStatusOnReturn()
+    }
+  }
+
+  // 监听 visibilitychange 事件（页面从隐藏变为可见）
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible' && hasRedirectedToAlipay.value) {
+      // 延迟一点，确保页面已完全恢复
+      setTimeout(checkPayStatusOnReturn, 300)
+    }
+  }
+
+  window.addEventListener('pageshow', handlePageShow)
+  window.addEventListener('visibilitychange', handleVisibilityChange)
+
+  // 保存引用以便卸载时移除
+  _cleanupListeners.value = () => {
+    window.removeEventListener('pageshow', handlePageShow)
+    window.removeEventListener('visibilitychange', handleVisibilityChange)
+  }
+
+  // 如果通过浏览器前进/后退返回（非首次加载）
+  if (window.performance) {
+    const navEntries = performance.getEntriesByType('navigation')
+    if (navEntries.length > 0 && navEntries[0].type === 'back_forward') {
+      // 从支付宝返回，检查支付状态
+      hasRedirectedToAlipay.value = true
+      checkPayStatusOnReturn()
+    }
+  }
+  // #endif
+})
+
+// uni-app onShow 生命周期（页面从后台到前台时触发）
+onShow(() => {
+  // #ifdef H5
+  if (hasRedirectedToAlipay.value) {
+    checkPayStatusOnReturn()
+  }
+  // #endif
+})
+
+// 页面隐藏时停止轮询
+onHide(() => {
+  stopPolling()
 })
 
 onUnmounted(() => {
   stopAllTimers()
+  // #ifdef H5
+  if (_cleanupListeners.value) {
+    _cleanupListeners.value()
+  }
+  // #endif
 })
 </script>
 
@@ -311,19 +511,19 @@ onUnmounted(() => {
   padding: 0 32rpx;
   padding-top: calc(env(safe-area-inset-top));
   background: $bg-card;
-  
+
   .header-left, .header-right {
     width: 80rpx;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   .back-icon {
     font-size: 56rpx;
     color: $text-main;
   }
-  
+
   .header-title {
     font-size: 36rpx;
     font-weight: 600;
@@ -342,29 +542,29 @@ onUnmounted(() => {
   padding: 24rpx;
   background: $bg-card;
   border-radius: 24rpx;
-  
+
   .order-info-top, .order-info-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12rpx 0;
-    
+
     &:not(:last-child) {
       border-bottom: 1rpx solid $bg-page-light;
     }
-    
+
     .order-label {
       font-size: 28rpx;
       color: $text-sub;
     }
-    
+
     .order-sn {
       font-size: 28rpx;
       color: $text-main;
       font-weight: 500;
       font-family: monospace;
     }
-    
+
     .order-time {
       font-size: 28rpx;
       color: $text-main;
@@ -378,47 +578,47 @@ onUnmounted(() => {
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
   border-radius: 24rpx;
   text-align: center;
-  
+
   .amount-label {
     display: block;
     font-size: 28rpx;
     color: rgba(255, 255, 255, 0.8);
     margin-bottom: 16rpx;
   }
-  
+
   .amount-value-wrap {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    
+
     .amount-symbol {
       font-size: 40rpx;
       color: #FFFFFF;
       font-weight: 600;
     }
-    
+
     .amount-value {
       font-size: 72rpx;
       color: #FFFFFF;
       font-weight: 700;
     }
   }
-  
+
   .expire-info {
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 24rpx;
-    
+
     .expire-icon {
       font-size: 28rpx;
       margin-right: 8rpx;
     }
-    
+
     .expire-text {
       font-size: 24rpx;
       color: rgba(255, 255, 255, 0.8);
-      
+
       .expire-time {
         color: #FFFFFF;
         font-weight: 600;
@@ -432,45 +632,45 @@ onUnmounted(() => {
   background: $bg-card;
   border-radius: 24rpx;
   overflow: hidden;
-  
+
   .section-header {
     padding: 24rpx;
     border-bottom: 1rpx solid $bg-page-light;
-    
+
     .section-title {
       font-size: 30rpx;
       font-weight: 600;
       color: $text-main;
     }
   }
-  
+
   .payment-options {
     padding: 16rpx 24rpx;
-    
+
     .payment-option {
       display: flex;
       align-items: center;
       padding: 24rpx 0;
       border-bottom: 1rpx solid $bg-page-light;
-      
+
       &:last-child {
         border-bottom: none;
       }
-      
+
       &.payment-active {
         .option-icon-wrap {
           background: rgba($color-primary, 0.1);
         }
-        
+
         .option-check {
           border-color: $color-primary;
-          
+
           .check-dot {
             background: $color-primary;
           }
         }
       }
-      
+
       .option-icon-wrap {
         width: 72rpx;
         height: 72rpx;
@@ -480,18 +680,29 @@ onUnmounted(() => {
         align-items: center;
         justify-content: center;
         margin-right: 20rpx;
-        
+
         .option-icon {
           font-size: 40rpx;
         }
       }
-      
-      .option-text {
+
+      .option-info {
         flex: 1;
-        font-size: 32rpx;
-        color: $text-main;
+        display: flex;
+        flex-direction: column;
+
+        .option-text {
+          font-size: 32rpx;
+          color: $text-main;
+        }
+
+        .option-desc {
+          font-size: 22rpx;
+          color: $text-weak;
+          margin-top: 4rpx;
+        }
       }
-      
+
       .option-check {
         width: 40rpx;
         height: 40rpx;
@@ -500,7 +711,7 @@ onUnmounted(() => {
         display: flex;
         align-items: center;
         justify-content: center;
-        
+
         .check-dot {
           width: 24rpx;
           height: 24rpx;
@@ -517,31 +728,31 @@ onUnmounted(() => {
   background: $bg-card;
   border-radius: 24rpx;
   overflow: hidden;
-  
+
   .section-header {
     padding: 24rpx;
     border-bottom: 1rpx solid $bg-page-light;
-    
+
     .section-title {
       font-size: 30rpx;
       font-weight: 600;
       color: $text-main;
     }
   }
-  
+
   .goods-list {
     padding: 16rpx;
   }
-  
+
   .goods-item {
     display: flex;
     padding: 16rpx 0;
     border-bottom: 1rpx solid $bg-page-light;
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     .goods-image {
       width: 160rpx;
       height: 160rpx;
@@ -549,13 +760,13 @@ onUnmounted(() => {
       margin-right: 20rpx;
       background: $bg-page-light;
     }
-    
+
     .goods-info {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      
+
       .goods-name {
         font-size: 26rpx;
         color: $text-main;
@@ -567,25 +778,25 @@ onUnmounted(() => {
         overflow: hidden;
         text-overflow: ellipsis;
       }
-      
+
       .goods-sku {
         font-size: 22rpx;
         color: $text-weak;
         margin-top: 8rpx;
       }
-      
+
       .goods-bottom {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 16rpx;
-        
+
         .goods-price {
           font-size: 28rpx;
           color: $color-primary-danger;
           font-weight: 600;
         }
-        
+
         .goods-count {
           font-size: 24rpx;
           color: $text-sub;
@@ -608,16 +819,16 @@ onUnmounted(() => {
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
   background: $bg-card;
   box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
-  
+
   .footer-left {
     display: flex;
     align-items: baseline;
-    
+
     .footer-label {
       font-size: 28rpx;
       color: $text-sub;
     }
-    
+
     .footer-amount {
       font-size: 44rpx;
       color: $color-primary-danger;
@@ -625,22 +836,22 @@ onUnmounted(() => {
       margin-left: 8rpx;
     }
   }
-  
+
   .pay-btn {
     padding: 28rpx 80rpx;
     background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
     border-radius: 48rpx;
-    
+
     text {
       font-size: 34rpx;
       color: #FFFFFF;
       font-weight: 600;
     }
-    
+
     &.btn-disabled {
       opacity: 0.6;
     }
-    
+
     &.btn-expired {
       background: #CCCCCC;
       opacity: 0.7;

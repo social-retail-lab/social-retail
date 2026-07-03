@@ -16,6 +16,12 @@
       "delay": 0
     },
     "modules": {},
+    "gpuaccelerator": "auto",
+    "scrollIndicator": "none",
+    "animation": "slide-in-right",
+    "animationType": "slide-in-right",
+    "animationDuration": 200,
+    "popGesture": "close",
     "distribute": {
       "android": {
         "permissions": [

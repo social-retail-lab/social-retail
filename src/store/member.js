@@ -40,24 +40,49 @@ export const useMemberStore = defineStore('member', () => {
 
   // ============ 成长值进度计算 ============
   const growthValue = computed(() => {
-    return Number(memberInfo.value?.growthValue || memberInfo.value?.totalGrowth || 0)
+    return Number(memberInfo.value?.growthValue ?? 0)
   })
 
   const currentLevel = computed(() => {
-    return getLevelByGrowth(growthValue.value)
+    return memberInfo.value?.memberLevel || getLevelByGrowth(growthValue.value)
   })
 
   const currentLevelInfo = computed(() => {
+    // 优先使用接口返回的等级信息
+    if (memberInfo.value?.memberLevelName) {
+      return {
+        level: memberInfo.value.memberLevel,
+        name: memberInfo.value.memberLevelName,
+        benefits: memberInfo.value.benefits || []
+      }
+    }
     const level = currentLevel.value
     return MEMBER_LEVEL_LIST.find(item => item.level === level) || MEMBER_LEVEL_LIST[0]
   })
 
+  // 下一等级信息（优先使用接口6.1.1返回的nextLevel对象）
   const nextLevelInfo = computed(() => {
+    const nextLevel = memberInfo.value?.nextLevel
+    if (nextLevel) {
+      return {
+        memberLevel: nextLevel.memberLevel,
+        name: nextLevel.memberLevelName,
+        requiredGrowthValue: nextLevel.requiredGrowthValue,
+        needGrowth: nextLevel.needGrowthValue
+      }
+    }
+    // 兜底：从本地常量计算
     return getNextLevelInfo(growthValue.value)
   })
 
+  // 达到下一等级所需的总成长值
   const nextLevelGrowth = computed(() => {
-    return nextLevelInfo.value?.threshold || 0
+    return memberInfo.value?.nextLevelGrowth || nextLevelInfo.value?.requiredGrowthValue || nextLevelInfo.value?.threshold || 0
+  })
+
+  // 距下一等级还需的成长值
+  const nextLevelNeedGrowth = computed(() => {
+    return memberInfo.value?.nextLevelNeedGrowth || nextLevelInfo.value?.needGrowth || 0
   })
 
   const growthProgress = computed(() => {
@@ -74,13 +99,13 @@ export const useMemberStore = defineStore('member', () => {
     const res = await getMemberInfoApi()
     if (res.code === 0 && res.data) {
       memberInfo.value = res.data
-      pointsBalance.value = Number(res.data.pointsBalance ?? res.data.balance ?? res.data.points ?? 0)
+      pointsBalance.value = Number(res.data.pointsBalance ?? 0)
       return res.data
     }
     return null
   }
 
-  // 获取会员等级列表
+  // 获取会员等级列表（接口6.1.2）
   const fetchMemberLevels = async () => {
     const res = await getMemberLevelsApi()
     if (res.code === 0 && res.data) {
@@ -88,13 +113,20 @@ export const useMemberStore = defineStore('member', () => {
       // 规范化字段名，确保 levelName 和 benefits 都有值
       memberLevels.value = rawList.map((level, index) => {
         const name = level.memberLevelName || level.levelName || getFallbackLevelName(index)
+        const benefits = (level.benefits && level.benefits.length > 0)
+          ? level.benefits.map(b => ({
+              benefitCode: b.benefitCode || '',
+              benefitName: b.benefitName || b.name || '',
+              description: b.description || ''
+            }))
+          : getFallbackBenefits(name)
         return {
           ...level,
           levelName: name,
           memberLevelName: name,
-          requiredGrowthValue: level.requiredGrowthValue || 0,
+          requiredGrowthValue: Number(level.requiredGrowthValue || 0),
           description: level.description || getFallbackDescription(name),
-          benefits: (level.benefits && level.benefits.length > 0) ? level.benefits : getFallbackBenefits(name)
+          benefits
         }
       })
       return memberLevels.value
@@ -123,38 +155,38 @@ export const useMemberStore = defineStore('member', () => {
     return descMap['普通']
   }
 
-  // fallback 权益数据
+  // fallback 权益数据（使用接口6.1.2规范字段：benefitCode/benefitName/description）
   const getFallbackBenefits = (name) => {
-    if (!name) return [{ name: '基础积分', description: '消费后可按规则获得积分' }]
+    if (!name) return [{ benefitCode: 'BASIC_POINTS', benefitName: '基础积分', description: '消费后可按规则获得积分' }]
     if (name.includes('钻石')) {
       return [
-        { name: '2倍积分累计', description: '消费积分按2倍累计' },
-        { name: '会员专属折扣', description: '部分商品享受更高等级会员折扣' },
-        { name: '部分订单包邮', description: '部分订单享受会员包邮权益' },
-        { name: '生日礼包', description: '生日当月可领取专属礼包' }
+        { benefitCode: 'POINTS_ACCELERATE', benefitName: '积分加速', description: '消费积分按2倍累计' },
+        { benefitCode: 'MEMBER_DISCOUNT', benefitName: '会员折扣', description: '部分商品享受更高等级会员折扣' },
+        { benefitCode: 'FREE_SHIPPING', benefitName: '包邮权益', description: '部分订单享受会员包邮权益' },
+        { benefitCode: 'BIRTHDAY_GIFT', benefitName: '生日礼包', description: '生日当月可领取专属礼包' }
       ]
     }
     if (name.includes('金')) {
       return [
-        { name: '1.5倍积分累计', description: '消费积分按1.5倍累计' },
-        { name: '会员专属折扣', description: '部分商品享受会员专属折扣' },
-        { name: '金卡专属优惠券', description: '每月可领取金卡会员专属优惠券' }
+        { benefitCode: 'POINTS_ACCELERATE', benefitName: '积分加速', description: '消费积分按1.5倍累计' },
+        { benefitCode: 'MEMBER_DISCOUNT', benefitName: '会员折扣', description: '部分商品享受会员专属折扣' },
+        { benefitCode: 'COUPON_GIFT', benefitName: '专属优惠券', description: '每月可领取金卡会员专属优惠券' }
       ]
     }
     if (name.includes('银')) {
       return [
-        { name: '1.2倍积分累计', description: '消费积分按1.2倍累计' },
-        { name: '会员专属优惠券', description: '每月可领取会员专属优惠券' }
+        { benefitCode: 'POINTS_ACCELERATE', benefitName: '积分加速', description: '消费积分按1.2倍累计' },
+        { benefitCode: 'COUPON_GIFT', benefitName: '专属优惠券', description: '每月可领取会员专属优惠券' }
       ]
     }
-    return [{ name: '基础积分', description: '消费后可按规则获得积分' }]
+    return [{ benefitCode: 'BASIC_POINTS', benefitName: '基础积分', description: '消费后可按规则获得积分' }]
   }
 
   // 获取积分余额
   const fetchPointsBalance = async () => {
     const res = await getPointsBalanceApi()
     if (res.code === 0 && res.data) {
-      pointsBalance.value = Number(res.data.pointsBalance ?? res.data.balance ?? res.data ?? 0)
+      pointsBalance.value = Number(res.data.pointsBalance ?? 0)
       return pointsBalance.value
     }
     return 0
@@ -192,9 +224,13 @@ export const useMemberStore = defineStore('member', () => {
   }
 
   // 获取可兑换优惠券列表
-  const fetchExchangeCoupons = async () => {
-    const res = await getExchangeCouponsApi()
+  const fetchExchangeCoupons = async (params) => {
+    const res = await getExchangeCouponsApi(params)
     if (res.code === 0 && res.data) {
+      // 接口返回 pointsBalance 字段，同步更新积分余额
+      if (res.data.pointsBalance !== undefined) {
+        pointsBalance.value = Number(res.data.pointsBalance) || 0
+      }
       exchangeCoupons.value = Array.isArray(res.data) ? res.data : (res.data.list || [])
       return exchangeCoupons.value
     }

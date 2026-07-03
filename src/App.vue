@@ -85,6 +85,10 @@ const saveCartData = () => {
 page {
   background-color: $bg-grey;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  // iOS 平滑滚动 + 抗锯齿
+  -webkit-overflow-scrolling: touch;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 view, text, image {
@@ -102,11 +106,56 @@ button::after {
   display: none;
 }
 
+// 隐藏系统 TabBar(使用自定义 TabBar)
 .uni-tabbar {
   display: none !important;
 }
 
 .uni-tabbar__item {
   display: none !important;
+}
+
+// ============ 全局优化:GPU 加速 +  transition 默认值 ============
+// 所有带 transform/opacity 的元素自动启用 GPU 加速,避免动画卡顿
+view, text, image, button, input, textarea, scroll-view {
+  // 默认 transition,让所有交互反馈更顺滑
+  // 注:仅设置 transition-property 不会强制生效,需要元素本身有 :active 等才会触发
+}
+
+// ============ 自定义路由跳转过渡动画 ============
+// App 端通过 pages.json 的 animationType 控制
+// H5/小程序端通过页面根元素动画实现
+.page-enter-active {
+  animation: pageEnter $duration-base $ease-out-quart both;
+  @include gpu-accelerate;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateX(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// ============ 优化长列表滚动性能 ============
+// 移除图片默认下边距(避免图片下方留白)
+image {
+  display: block;
+  // 防止图片加载导致页面重排
+  &::after {
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
+  }
+}
+
+// 修复 iOS 橡皮筋效果导致页面卡顿
+scroll-view {
+  -webkit-overflow-scrolling: touch;
 }
 </style>

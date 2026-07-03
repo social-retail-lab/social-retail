@@ -288,7 +288,7 @@
         </view>
       </view>
       <view class="bottom-right">
-        <!-- WAIT_PAY：【去支付】【取消订单】 -->
+        <!-- WAIT_PAY：【取消订单】【去支付】 -->
         <view
           v-if="orderDetail.status === 'WAIT_PAY'"
           class="action-btn"
@@ -302,14 +302,6 @@
           @click="handlePay"
         >
           <text>去支付</text>
-        </view>
-        <!-- WAIT_ACCEPT：【取消订单】 -->
-        <view
-          v-if="orderDetail.status === 'WAIT_ACCEPT'"
-          class="action-btn"
-          @click="handleCancel"
-        >
-          <text>取消订单</text>
         </view>
         <!-- ACCEPTED：【催发货】（与订单列表一致） -->
         <view
@@ -382,7 +374,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onHide } from '@dcloudio/uni-app'
 import { showToast, getValidImageUrl } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 
@@ -550,7 +542,7 @@ const stopCountdown = () => {
   }
 }
 
-// 8. 配套轮询逻辑：待支付状态每3秒刷新订单状态
+// 8. 配套轮询逻辑：待支付状态每10秒刷新订单状态
 const startStatusPolling = () => {
   if (orderDetail.value.status !== 'WAIT_PAY') return
   stopStatusPolling()
@@ -560,20 +552,14 @@ const startStatusPolling = () => {
     const statusData = await loadOrderStatus(orderId.value)
     if (!statusData) return
 
-    // 状态发生变化
-    if (statusData.status !== orderDetail.value.status) {
-      orderDetail.value.status = statusData.status
-      orderDetail.value.statusText = statusData.statusText
-
-      // 支付成功或状态离开待支付，停止轮询并刷新整页
-      if (statusData.status !== 'WAIT_PAY') {
-        stopStatusPolling()
-        stopCountdown()
-        showToast('订单状态已更新')
-        fetchOrderDetailData()
-      }
+    // 只有状态真正变化且离开待支付时才更新
+    if (statusData.status !== orderDetail.value.status && statusData.status !== 'WAIT_PAY') {
+      stopStatusPolling()
+      stopCountdown()
+      // 静默刷新整页，不弹toast
+      fetchOrderDetailData()
     }
-  }, 3000)
+  }, 10000)
 }
 
 const stopStatusPolling = () => {
@@ -620,7 +606,7 @@ const fetchOrderDetailData = async () => {
   }
 }
 
-// 轻量刷新订单状态（onShow 时调用）
+// 轻量刷新订单状态（onShow 时调用，从其他页面返回）
 const refreshOrderStatus = async () => {
   if (!orderId.value) return
 
@@ -628,16 +614,18 @@ const refreshOrderStatus = async () => {
 
   if (statusData) {
     const oldStatus = orderDetail.value.status
-    orderDetail.value.status = statusData.status
-    orderDetail.value.statusText = statusData.statusText
 
     if (oldStatus !== statusData.status) {
-      if (statusData.status === 'WAIT_PAY') {
-        startCountdown()
+      // 状态发生变化，刷新整页数据
+      orderDetail.value.status = statusData.status
+      orderDetail.value.statusText = statusData.statusText
+      fetchOrderDetailData()
+    } else if (statusData.status === 'WAIT_PAY') {
+      // 状态未变仍是待支付，仅重启倒计时（不重复启动轮询）
+      startCountdown()
+      // 只在轮询未运行时才启动
+      if (!statusPollingTimer) {
         startStatusPolling()
-      } else {
-        stopCountdown()
-        stopStatusPolling()
       }
     }
   }
@@ -706,14 +694,28 @@ const handleDelete = async () => {
   }
 }
 
+let isFirstShow = true
+
 onMounted(() => {
   fetchOrderDetailData()
 })
 
 onShow(() => {
+  // 首次进入跳过，避免与 onMounted 重复请求
+  if (isFirstShow) {
+    isFirstShow = false
+    return
+  }
+  // 从其他页面返回时，轻量刷新状态
   if (orderId.value) {
     refreshOrderStatus()
   }
+})
+
+// 页面隐藏时停止轮询，避免后台持续请求
+onHide(() => {
+  stopCountdown()
+  stopStatusPolling()
 })
 
 onUnmounted(() => {

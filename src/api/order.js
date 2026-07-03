@@ -2,6 +2,7 @@
 // 包含：订单预览、提交订单、订单列表、订单详情、订单状态查询、取消/确认收货/删除
 
 import request from './base'
+import { STATUS_TO_CODE, CODE_TO_STATUS, ORDER_STATUS_MAP } from '@/constants/order'
 
 // ============ 订单预览接口 ============
 
@@ -101,6 +102,8 @@ const validateOrderPreviewParams = (data) => {
   if (data?.remark) {
     params.remark = data.remark
   }
+
+  console.log('订单预览请求参数:', JSON.stringify(params))
   
   return params
 }
@@ -354,8 +357,8 @@ const normalizeSubmitOrderData = (data) => {
   return {
     orderId: data.orderId || null,
     orderSn: data.orderSn || '',
-    status: data.status || 'WAIT_PAY',
-    statusText: data.statusText || '待支付',
+    status: normalizeStatus(data.status) || 'WAIT_PAY',
+    statusText: data.statusText || getStatusTextByCode(data.status) || '待支付',
     payAmount: Number(data.payAmount) || 0,
     expireTime: data.expireTime || ''
   }
@@ -406,7 +409,11 @@ const validateOrderListParams = (params) => {
     pageSize: Number(params?.pageSize) || 10
   }
   if (params?.status && params.status !== 'ALL') {
-    validated.status = params.status
+    // 将前端字符串状态转为后端数字状态
+    const statusCode = STATUS_TO_CODE[params.status]
+    if (statusCode !== undefined) {
+      validated.status = statusCode
+    }
   }
   return validated
 }
@@ -423,12 +430,31 @@ const normalizeOrderListData = (data) => {
   }
 }
 
+// 将后端数字状态转为前端字符串状态
+const normalizeStatus = (status) => {
+  // 如果已经是字符串（如 WAIT_PAY），直接返回
+  if (typeof status === 'string' && isNaN(status)) return status
+  // 数字状态码转字符串
+  const numStatus = Number(status)
+  return CODE_TO_STATUS[numStatus] || String(status || '')
+}
+
+// 根据数字状态码获取状态文本
+const getStatusTextByCode = (status) => {
+  const numStatus = Number(status)
+  if (!isNaN(numStatus) && ORDER_STATUS_MAP[numStatus]) {
+    return ORDER_STATUS_MAP[numStatus].label
+  }
+  return ''
+}
+
 const normalizeOrderListItem = (order) => {
+  const normalizedStatus = normalizeStatus(order.status)
   return {
     orderId: order.orderId || null,
     orderSn: order.orderSn || '',
-    status: order.status || '',
-    statusText: order.statusText || '',
+    status: normalizedStatus,
+    statusText: order.statusText || getStatusTextByCode(order.status),
     totalAmount: Number(order.totalAmount) || 0,
     payAmount: Number(order.payAmount) || 0,
     deliveryType: order.deliveryType || 1,
@@ -481,8 +507,8 @@ const normalizeOrderDetailData = (data) => {
   return {
     orderId: data.orderId || null,
     orderSn: data.orderSn || '',
-    status: data.status || '',
-    statusText: data.statusText || '',
+    status: normalizeStatus(data.status),
+    statusText: data.statusText || getStatusTextByCode(data.status),
     totalAmount: Number(data.totalAmount) || 0,
     discountAmount: Number(data.discountAmount) || 0,
     deliveryFee: Number(data.deliveryFee) || 0,
@@ -665,8 +691,8 @@ export const getOrderStatusApi = (orderId) => {
         data: response.data ? {
           orderId: response.data.orderId || null,
           orderSn: response.data.orderSn || '',
-          status: response.data.status || '',
-          statusText: response.data.statusText || '',
+          status: normalizeStatus(response.data.status),
+          statusText: response.data.statusText || getStatusTextByCode(response.data.status),
           updateTime: response.data.updateTime || ''
         } : null
       }

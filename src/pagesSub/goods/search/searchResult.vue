@@ -1,17 +1,19 @@
 <template>
   <view class="page-container">
+    <!-- 顶部搜索栏 -->
     <view class="header-bar">
       <view class="header-left">
         <view class="back-btn" @click="goBack">
           <text class="back-icon">‹</text>
         </view>
         <view class="search-input-wrap">
-          <text class="search-icon">🔍</text>
+          <image src="/static/fonts/search.svg" class="search-icon" mode="aspectFit" />
           <input
             class="search-input"
             type="text"
             v-model="keyword"
             placeholder="搜索商品"
+            placeholder-class="placeholder"
             confirm-type="search"
             @confirm="handleSearch"
           />
@@ -27,22 +29,41 @@
       </view>
     </view>
 
+    <!-- 筛选栏 -->
     <view class="filter-bar">
       <view
-        v-for="item in filterOptions"
-        :key="item.key"
         class="filter-item"
-        :class="{ active: activeFilter === item.key }"
-        @click="handleFilter(item.key)"
+        :class="{ active: activeFilter === 'default' }"
+        @click="selectSort('default')"
       >
-        <text class="filter-text">{{ item.label }}</text>
-        <text v-if="item.key === 'price' && priceOrder" class="filter-arrow">
-          {{ priceOrder === 'asc' ? '↑' : '↓' }}
-        </text>
-        <view v-if="hasFilterDot(item.key)" class="filter-dot"></view>
+        <text class="filter-text">综合</text>
+      </view>
+      <view
+        class="filter-item"
+        :class="{ active: activeFilter === 'sales' }"
+        @click="selectSort('sales')"
+      >
+        <text class="filter-text">销量</text>
+      </view>
+      <view
+        class="filter-item"
+        :class="{ active: ['price_asc', 'price_desc'].includes(activeFilter) }"
+        @click="togglePriceSort"
+      >
+        <text class="filter-text">价格</text>
+        <view class="sort-arrows">
+          <text class="arrow-up" :class="{ 'arrow-active': activeFilter === 'price_asc' }">▲</text>
+          <text class="arrow-down" :class="{ 'arrow-active': activeFilter === 'price_desc' }">▼</text>
+        </view>
+      </view>
+      <view class="filter-item filter-more" @click="handleFilter('filter')">
+        <text class="filter-text">筛选</text>
+        <text class="filter-icon">⚙</text>
+        <view v-if="hasActiveFilter" class="filter-dot"></view>
       </view>
     </view>
 
+    <!-- 商品列表 -->
     <scroll-view
       class="goods-scroll"
       scroll-y
@@ -51,19 +72,33 @@
       @refresherrefresh="handleRefresh"
       @scrolltolower="handleScrollToLower"
     >
+      <!-- 加载中（首次） -->
       <view v-if="loading && goodsList.length === 0" class="loading-state">
-        <text class="loading-text">加载中...</text>
+        <view class="loading-skeleton">
+          <view v-for="i in 4" :key="i" class="skeleton-card">
+            <view class="skeleton-image"></view>
+            <view class="skeleton-info">
+              <view class="skeleton-line long"></view>
+              <view class="skeleton-line short"></view>
+              <view class="skeleton-line medium"></view>
+            </view>
+          </view>
+        </view>
       </view>
 
+      <!-- 空状态 -->
       <view v-else-if="goodsList.length === 0" class="empty-state">
-        <text class="empty-icon">📦</text>
-        <text class="empty-title">暂无相关商品</text>
+        <view class="empty-icon">
+          <text class="empty-emoji">🔍</text>
+        </view>
+        <text class="empty-title">未找到相关商品</text>
         <text class="empty-desc">换个关键词试试吧</text>
         <view class="go-shopping-btn" @click="goShopping">
           <text class="go-shopping-text">去逛逛</text>
         </view>
       </view>
 
+      <!-- 商品网格 -->
       <view v-else class="goods-grid">
         <view
           v-for="item in goodsList"
@@ -73,97 +108,73 @@
         >
           <view class="goods-image-wrap">
             <image
-              :src="item.productImage"
+              :src="item.productImage || item.image"
               mode="aspectFill"
               class="goods-image"
               lazy-load
             />
+            <!-- 标签 -->
             <view v-if="item.tags && item.tags.length > 0" class="goods-tags">
               <text
                 v-for="(tag, index) in item.tags.slice(0, 2)"
                 :key="index"
                 class="tag-item"
-                :class="{ 'tag-hot': tag === '热卖' }"
+                :class="{ 'tag-hot': tag === '热卖', 'tag-new': tag === '新品' }"
               >{{ tag }}</text>
             </view>
           </view>
           <view class="goods-info">
-            <text class="goods-title">{{ item.productName || '' }}</text>
-            <view class="goods-price-row">
-              <text class="goods-price">¥{{ item.price?.toFixed(2) || '0.00' }}</text>
-              <text v-if="item.originalPrice" class="goods-original-price">¥{{ item.originalPrice?.toFixed(2) || '0.00' }}</text>
+            <text class="goods-title">{{ item.productName || item.name || '' }}</text>
+            <!-- 促销信息 -->
+            <view v-if="item.promotionTitle" class="goods-promotion">
+              <text class="promotion-tag">促销</text>
+              <text class="promotion-text">{{ item.promotionTitle }}</text>
             </view>
+            <!-- 店铺名称 -->
+            <view v-if="item.merchantName" class="goods-shop">
+              <text class="shop-icon">🏪</text>
+              <text class="shop-name">{{ item.merchantName }}</text>
+            </view>
+            <!-- 价格区域 -->
+            <view class="goods-price-row">
+              <view class="price-left">
+                <text class="price-symbol">¥</text>
+                <text class="goods-price">{{ formatPrice(item.price) }}</text>
+                <text v-if="item.originalPrice && item.originalPrice > item.price" class="goods-original-price">¥{{ formatPrice(item.originalPrice) }}</text>
+              </view>
+            </view>
+            <!-- 销量 -->
             <view class="goods-sales-row">
-              <text class="goods-sales">已售{{ item.soldCount || 0 }}</text>
+              <text class="goods-sales">已售{{ item.soldCount || 0 }}件</text>
+              <text v-if="item.stock !== undefined && item.stock <= 10 && item.stock > 0" class="goods-stock-low">仅剩{{ item.stock }}件</text>
             </view>
           </view>
         </view>
       </view>
 
+      <!-- 加载更多 -->
       <view v-if="!loading && goodsList.length > 0" class="load-more">
-        <text v-if="hasMore" class="load-more-text">加载中...</text>
-        <text v-else class="no-more-text">没有更多商品了</text>
+        <text v-if="hasMore" class="load-more-text">上拉加载更多</text>
+        <text v-else class="no-more-text">— 已经到底了 —</text>
       </view>
 
       <view class="safe-bottom"></view>
     </scroll-view>
 
+    <!-- 筛选抽屉 -->
     <view class="filter-drawer" :class="{ show: showFilterDrawer }" @click="closeFilterDrawer">
       <view class="drawer-mask"></view>
       <view class="drawer-content" @click.stop>
         <view class="drawer-header">
-          <text class="drawer-title">{{ drawerTitle }}</text>
+          <text class="drawer-title">筛选条件</text>
           <view class="drawer-close" @click="closeFilterDrawer">
             <text>×</text>
           </view>
         </view>
         <view class="drawer-body">
-          <view v-if="currentDrawer === 'category'" class="category-section">
-            <view
-              class="category-option"
-              :class="{ 'category-option-active': !selectedCategoryId }"
-              @click="selectCategory(null)"
-            >
-              <text>不限</text>
-            </view>
-            <view
-              v-for="category in categoryTree"
-              :key="category.categoryId"
-              class="category-group"
-            >
-              <text class="category-group-title">{{ category.categoryName }}</text>
-              <view
-                v-for="sub in category.children"
-                :key="sub.categoryId"
-                class="category-option"
-                :class="{ 'category-option-active': selectedCategoryId === sub.categoryId }"
-                @click="selectCategory(sub.categoryId)"
-              >
-                <text>{{ sub.categoryName }}</text>
-              </view>
-            </view>
-          </view>
-
-          <view v-if="currentDrawer === 'brand'" class="brand-section">
-            <view
-              class="brand-option"
-              :class="{ 'brand-option-active': !selectedBrandId }"
-              @click="selectBrand(null)"
-            >
-              <text>不限</text>
-            </view>
-            <view
-              v-for="brand in brandList"
-              :key="brand.brandId"
-              class="brand-option"
-              :class="{ 'brand-option-active': selectedBrandId === brand.brandId }"
-              @click="selectBrand(brand.brandId)"
-            >
-              <text>{{ brand.brandName }}</text>
-            </view>
-          </view>
-
-          <view v-if="currentDrawer === 'price'" class="price-section">
+          <!-- 价格区间 -->
+          <view class="filter-section">
+            <text class="filter-section-title">价格区间</text>
             <view class="price-input-row">
               <view class="price-input-wrap">
                 <text class="price-label">¥</text>
@@ -171,46 +182,101 @@
                   class="price-input"
                   type="digit"
                   v-model="minPrice"
-                  placeholder="最低"
+                  placeholder="最低价"
+                  placeholder-class="price-placeholder"
                   @blur="validatePrice"
                 />
               </view>
-              <text class="price-separator">-</text>
+              <text class="price-separator">—</text>
               <view class="price-input-wrap">
                 <text class="price-label">¥</text>
                 <input
                   class="price-input"
                   type="digit"
                   v-model="maxPrice"
-                  placeholder="最高"
+                  placeholder="最高价"
+                  placeholder-class="price-placeholder"
                   @blur="validatePrice"
                 />
               </view>
             </view>
-            <view class="price-tips" v-if="priceError">
+            <view class="price-quick">
+              <view
+                v-for="item in priceRanges"
+                :key="item.label"
+                class="price-quick-item"
+                @click="setPriceRange(item.min, item.max)"
+              >
+                <text>{{ item.label }}</text>
+              </view>
+            </view>
+            <view v-if="priceError" class="price-tips">
               <text class="price-error-text">{{ priceError }}</text>
             </view>
           </view>
 
-          <view v-if="currentDrawer === 'sort'" class="sort-section">
-            <view
-              v-for="item in sortOptions"
-              :key="item.key"
-              class="sort-option"
-              :class="{ 'sort-option-active': activeFilter === item.key }"
-              @click="selectSort(item.key)"
-            >
-              <text>{{ item.label }}</text>
-              <text v-if="activeFilter === item.key" class="sort-check">✓</text>
+          <!-- 分类筛选 -->
+          <view class="filter-section">
+            <text class="filter-section-title">分类</text>
+            <view class="filter-options">
+              <view
+                class="filter-option"
+                :class="{ 'option-active': !selectedCategoryId }"
+                @click="selectCategory(null)"
+              >
+                <text>不限</text>
+              </view>
+              <template v-for="category in categoryTree" :key="category.categoryId">
+                <view
+                  class="filter-option"
+                  :class="{ 'option-active': selectedCategoryId === category.categoryId }"
+                  @click="selectCategory(category.categoryId)"
+                >
+                  <text>{{ category.categoryName }}</text>
+                </view>
+                <view
+                  v-for="sub in category.children"
+                  :key="sub.categoryId"
+                  class="filter-option"
+                  :class="{ 'option-active': selectedCategoryId === sub.categoryId }"
+                  @click="selectCategory(sub.categoryId)"
+                >
+                  <text>{{ sub.categoryName }}</text>
+                </view>
+              </template>
+            </view>
+          </view>
+
+          <!-- 品牌筛选 -->
+          <view class="filter-section">
+            <text class="filter-section-title">品牌</text>
+            <view class="filter-options">
+              <view
+                class="filter-option"
+                :class="{ 'option-active': !selectedBrandId }"
+                @click="selectBrand(null)"
+              >
+                <text>不限</text>
+              </view>
+              <view
+                v-for="brand in brandList"
+                :key="brand.brandId"
+                class="filter-option"
+                :class="{ 'option-active': selectedBrandId === brand.brandId }"
+                @click="selectBrand(brand.brandId)"
+              >
+                <text>{{ brand.brandName }}</text>
+              </view>
             </view>
           </view>
         </view>
         <view class="drawer-footer">
-          <view v-if="currentDrawer !== 'sort'" class="btn-reset" @click="resetCurrentFilter">
+          <view class="btn-reset" @click="resetAllFilter">
             <text>重置</text>
           </view>
           <view class="btn-confirm" @click="confirmFilter">
             <text>确定</text>
+            <text v-if="getActiveFilterCount > 0" class="btn-count">{{ getActiveFilterCount }}</text>
           </view>
         </view>
       </view>
@@ -236,39 +302,40 @@ const pageSize = 10
 const totalPages = ref(1)
 
 const activeFilter = ref('default')
-const priceOrder = ref('')
 const selectedCategoryId = ref(null)
 const selectedBrandId = ref(null)
 
 const showFilterDrawer = ref(false)
-const currentDrawer = ref('filter')
 const minPrice = ref('')
 const maxPrice = ref('')
 const priceError = ref('')
 
-const filterOptions = [
-  { key: 'category', label: '分类' },
-  { key: 'brand', label: '品牌' },
-  { key: 'price', label: '价格' },
-  { key: 'sort', label: '排序' }
+const priceRanges = [
+  { label: '0-50元', min: 0, max: 50 },
+  { label: '50-100元', min: 50, max: 100 },
+  { label: '100-300元', min: 100, max: 300 },
+  { label: '300-1000元', min: 300, max: 1000 },
+  { label: '1000元以上', min: 1000, max: null }
 ]
 
-const sortOptions = [
-  { key: 'default', label: '综合排序' },
-  { key: 'sales', label: '销量从高到低' },
-  { key: 'price_asc', label: '价格从低到高' },
-  { key: 'price_desc', label: '价格从高到低' }
-]
-
-const drawerTitle = computed(() => {
-  const titles = {
-    category: '分类筛选',
-    brand: '品牌筛选',
-    price: '价格区间',
-    sort: '排序方式'
-  }
-  return titles[currentDrawer.value] || '筛选'
+const hasActiveFilter = computed(() => {
+  return selectedCategoryId.value !== null ||
+    selectedBrandId.value !== null ||
+    minPrice.value !== '' ||
+    maxPrice.value !== ''
 })
+
+const getActiveFilterCount = computed(() => {
+  let count = 0
+  if (selectedCategoryId.value !== null) count++
+  if (selectedBrandId.value !== null) count++
+  if (minPrice.value !== '' || maxPrice.value !== '') count++
+  return count
+})
+
+const formatPrice = (price) => {
+  return (Number(price) || 0).toFixed(2)
+}
 
 const goBack = () => {
   uni.navigateBack({
@@ -297,14 +364,30 @@ const handleSearch = () => {
   minPrice.value = ''
   maxPrice.value = ''
   activeFilter.value = 'default'
-  priceOrder.value = ''
   resetPage()
   loadGoods()
   loadBrandListWithKeyword()
 }
 
+const selectSort = (key) => {
+  activeFilter.value = key
+  resetPage()
+  loadGoods()
+}
+
+const togglePriceSort = () => {
+  if (activeFilter.value === 'price_asc') {
+    activeFilter.value = 'price_desc'
+  } else if (activeFilter.value === 'price_desc') {
+    activeFilter.value = 'price_asc'
+  } else {
+    activeFilter.value = 'price_asc'
+  }
+  resetPage()
+  loadGoods()
+}
+
 const handleFilter = (key) => {
-  currentDrawer.value = key
   showFilterDrawer.value = true
 }
 
@@ -316,10 +399,16 @@ const selectBrand = (brandId) => {
   selectedBrandId.value = brandId
 }
 
+const setPriceRange = (min, max) => {
+  minPrice.value = min !== null ? String(min) : ''
+  maxPrice.value = max !== null ? String(max) : ''
+  priceError.value = ''
+}
+
 const validatePrice = () => {
   const min = parseFloat(minPrice.value)
   const max = parseFloat(maxPrice.value)
-  
+
   if (!isNaN(min) && min < 0) {
     priceError.value = '最低价格不能为负数'
     minPrice.value = ''
@@ -337,51 +426,22 @@ const validatePrice = () => {
   priceError.value = ''
 }
 
-const selectSort = (key) => {
-  activeFilter.value = key
-  if (key === 'default') {
-    priceOrder.value = ''
-  } else if (key === 'sales') {
-    priceOrder.value = ''
-  } else if (key === 'price_asc') {
-    priceOrder.value = 'asc'
-  } else if (key === 'price_desc') {
-    priceOrder.value = 'desc'
-  }
-  closeFilterDrawer()
-  resetPage()
-  loadGoods()
-}
-
-const hasFilterDot = (key) => {
-  if (key === 'category') return selectedCategoryId.value !== null
-  if (key === 'brand') return selectedBrandId.value !== null
-  if (key === 'price') return minPrice.value || maxPrice.value
-  return false
-}
-
 const closeFilterDrawer = () => {
   showFilterDrawer.value = false
   priceError.value = ''
 }
 
-const resetCurrentFilter = () => {
-  if (currentDrawer.value === 'category') {
-    selectedCategoryId.value = null
-  } else if (currentDrawer.value === 'brand') {
-    selectedBrandId.value = null
-  } else if (currentDrawer.value === 'price') {
-    minPrice.value = ''
-    maxPrice.value = ''
-    priceError.value = ''
-  }
+const resetAllFilter = () => {
+  selectedCategoryId.value = null
+  selectedBrandId.value = null
+  minPrice.value = ''
+  maxPrice.value = ''
+  priceError.value = ''
 }
 
 const confirmFilter = () => {
-  if (currentDrawer.value === 'price') {
-    validatePrice()
-    if (priceError.value) return
-  }
+  validatePrice()
+  if (priceError.value) return
   closeFilterDrawer()
   resetPage()
   loadGoods()
@@ -413,9 +473,6 @@ const loadGoods = async () => {
     } else if (activeFilter.value === 'price_desc') {
       params.sortField = 'price'
       params.sortOrder = 'desc'
-    } else if (activeFilter.value === 'price') {
-      params.sortField = 'price'
-      params.sortOrder = priceOrder.value || 'asc'
     } else {
       params.sortField = 'createTime'
       params.sortOrder = 'desc'
@@ -476,15 +533,9 @@ const loadCategoryTreeData = async () => {
 }
 
 const handleRefresh = () => {
-  selectedCategoryId.value = null
-  selectedBrandId.value = null
-  minPrice.value = ''
-  maxPrice.value = ''
-  activeFilter.value = 'default'
-  priceOrder.value = ''
+  refreshing.value = true
   resetPage()
   loadGoods()
-  loadBrandListWithKeyword()
 }
 
 const handleScrollToLower = () => {
@@ -502,10 +553,10 @@ onMounted(() => {
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const options = currentPage.options || {}
-  
+
   const initKeyword = options.keyword || ''
   keyword.value = decodeURIComponent(initKeyword)
-  
+
   loadCategoryTreeData()
   loadGoods()
   loadBrandListWithKeyword()
@@ -518,6 +569,7 @@ onMounted(() => {
   background-color: $bg-page;
 }
 
+/* ============ 顶部搜索栏 ============ */
 .header-bar {
   position: fixed;
   top: 0;
@@ -527,8 +579,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20rpx 24rpx;
-  padding-top: calc(20rpx + env(safe-area-inset-top));
+  padding: 16rpx 24rpx;
+  padding-top: calc(16rpx + env(safe-area-inset-top));
   background: $bg-card;
   box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 }
@@ -552,12 +604,14 @@ onMounted(() => {
   &:active {
     opacity: 0.6;
   }
-}
 
-.back-icon {
-  font-size: 48rpx;
-  color: $text-main;
-  font-weight: 300;
+  .back-icon {
+    font-size: 48rpx;
+    color: $text-main;
+    font-weight: 300;
+    line-height: 1;
+    margin-top: -4rpx;
+  }
 }
 
 .search-input-wrap {
@@ -566,31 +620,41 @@ onMounted(() => {
   align-items: center;
   background: $bg-page-light;
   border-radius: $radius-full;
-  padding: 16rpx 24rpx;
-}
+  padding: 12rpx 24rpx;
+  height: 64rpx;
 
-.search-icon {
-  font-size: 32rpx;
-  margin-right: 12rpx;
-}
+  .search-icon {
+    width: 32rpx;
+    height: 32rpx;
+    margin-right: 12rpx;
+    opacity: 0.5;
+  }
 
-.search-input {
-  flex: 1;
-  font-size: 28rpx;
-  color: $text-main;
-}
+  .search-input {
+    flex: 1;
+    font-size: 28rpx;
+    color: $text-main;
+  }
 
-.clear-icon {
-  width: 40rpx;
-  height: 40rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $text-weak;
-  font-size: 36rpx;
+  .placeholder {
+    color: $text-weak;
+    font-size: 28rpx;
+  }
 
-  &:active {
-    opacity: 0.6;
+  .clear-icon {
+    width: 36rpx;
+    height: 36rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-weak;
+    font-size: 32rpx;
+    background: rgba($text-weak, 0.2);
+    border-radius: 50%;
+
+    &:active {
+      opacity: 0.6;
+    }
   }
 }
 
@@ -600,27 +664,30 @@ onMounted(() => {
 
 .search-btn {
   padding: 0 32rpx;
-  height: 88rpx;
+  height: 64rpx;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
   border-radius: $radius-full;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4rpx 12rpx rgba($color-primary-danger, 0.2);
 
   &:active {
-    opacity: 0.8;
+    opacity: 0.85;
+    transform: scale(0.97);
+  }
+
+  .search-btn-text {
+    font-size: 28rpx;
+    color: #FFFFFF;
+    font-weight: 600;
   }
 }
 
-.search-btn-text {
-  font-size: 30rpx;
-  color: #FFFFFF;
-  font-weight: 600;
-}
-
+/* ============ 筛选栏 ============ */
 .filter-bar {
   position: fixed;
-  top: calc(88rpx + env(safe-area-inset-top));
+  top: calc(96rpx + env(safe-area-inset-top));
   left: 0;
   right: 0;
   z-index: 99;
@@ -635,106 +702,190 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
+  gap: 6rpx;
+  position: relative;
 
   &:active {
     opacity: 0.6;
   }
-}
 
-.filter-text {
-  font-size: 28rpx;
-  color: $text-sub;
-}
+  .filter-text {
+    font-size: 28rpx;
+    color: $text-sub;
+  }
 
-.filter-arrow {
-  font-size: 24rpx;
-  color: $text-sub;
-}
+  .filter-icon {
+    font-size: 24rpx;
+    color: $text-sub;
+  }
 
-.filter-dot {
-  width: 12rpx;
-  height: 12rpx;
-  background: $color-primary-danger;
-  border-radius: 50%;
-}
-
-.filter-item.active {
-  .filter-text,
-  .filter-arrow {
-    color: $color-primary;
-    font-weight: 600;
+  &.active {
+    .filter-text {
+      color: $color-primary;
+      font-weight: 600;
+    }
   }
 }
 
+.filter-more {
+  position: relative;
+}
+
+.sort-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: 4rpx;
+
+  .arrow-up,
+  .arrow-down {
+    font-size: 14rpx;
+    color: $text-weak;
+    line-height: 1;
+  }
+
+  .arrow-active {
+    color: $color-primary;
+  }
+}
+
+.filter-dot {
+  position: absolute;
+  top: 0;
+  right: 20%;
+  width: 14rpx;
+  height: 14rpx;
+  background: $color-primary-danger;
+  border-radius: 50%;
+  border: 2rpx solid $bg-card;
+}
+
+/* ============ 商品列表 ============ */
 .goods-scroll {
   height: calc(100vh - 168rpx - env(safe-area-inset-top));
   padding-top: calc(168rpx + env(safe-area-inset-top));
 }
 
-.loading-state,
+/* 骨架屏 */
+.loading-skeleton {
+  padding: 20rpx;
+}
+
+.skeleton-card {
+  display: flex;
+  background: $bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  margin-bottom: 16rpx;
+  padding: 20rpx;
+
+  .skeleton-image {
+    width: 200rpx;
+    height: 200rpx;
+    background: linear-gradient(90deg, $bg-page-light 25%, $bg-page 37%, $bg-page-light 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+    border-radius: $radius-base;
+    flex-shrink: 0;
+  }
+
+  .skeleton-info {
+    flex: 1;
+    margin-left: 20rpx;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .skeleton-line {
+    height: 24rpx;
+    background: linear-gradient(90deg, $bg-page-light 25%, $bg-page 37%, $bg-page-light 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+    border-radius: 8rpx;
+    margin-bottom: 16rpx;
+
+    &.long { width: 100%; }
+    &.medium { width: 70%; }
+    &.short { width: 40%; }
+  }
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* 空状态 */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 120rpx 0;
-}
 
-.loading-text {
-  font-size: 28rpx;
-  color: $text-weak;
-}
+  .empty-icon {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 50%;
+    background: rgba($text-weak, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32rpx;
 
-.empty-icon {
-  font-size: 100rpx;
-  margin-bottom: 24rpx;
-}
+    .empty-emoji {
+      font-size: 72rpx;
+    }
+  }
 
-.empty-title {
-  font-size: 32rpx;
-  color: $text-main;
-  font-weight: 600;
-  margin-bottom: 12rpx;
-}
+  .empty-title {
+    font-size: 32rpx;
+    color: $text-main;
+    font-weight: 600;
+    margin-bottom: 12rpx;
+  }
 
-.empty-desc {
-  font-size: 26rpx;
-  color: $text-weak;
-  margin-bottom: 40rpx;
-}
+  .empty-desc {
+    font-size: 26rpx;
+    color: $text-weak;
+    margin-bottom: 40rpx;
+  }
 
-.go-shopping-btn {
-  padding: 20rpx 60rpx;
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
-  border-radius: $radius-full;
+  .go-shopping-btn {
+    padding: 20rpx 60rpx;
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
+    border-radius: $radius-full;
+    box-shadow: 0 4rpx 12rpx rgba($color-primary-danger, 0.2);
 
-  &:active {
-    opacity: 0.8;
+    &:active {
+      opacity: 0.85;
+      transform: scale(0.97);
+    }
+
+    .go-shopping-text {
+      font-size: 28rpx;
+      color: #FFFFFF;
+      font-weight: 600;
+    }
   }
 }
 
-.go-shopping-text {
-  font-size: 30rpx;
-  color: #FFFFFF;
-  font-weight: 600;
-}
-
+/* 商品网格 */
 .goods-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16rpx;
-  padding: 0 20rpx;
+  padding: 20rpx;
 }
 
 .goods-card {
   background: $bg-card;
   border-radius: $radius-lg;
   overflow: hidden;
-  padding-bottom: 20rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
 
   &:active {
-    opacity: 0.8;
     transform: scale(0.98);
   }
 }
@@ -743,98 +894,172 @@ onMounted(() => {
   position: relative;
   width: 100%;
   padding-top: 100%;
-}
 
-.goods-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
+  .goods-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 
-.goods-tags {
-  position: absolute;
-  top: 12rpx;
-  left: 12rpx;
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-}
+  .goods-tags {
+    position: absolute;
+    top: 12rpx;
+    left: 12rpx;
+    display: flex;
+    flex-direction: column;
+    gap: 6rpx;
+  }
 
-.tag-item {
-  padding: 6rpx 16rpx;
-  background: rgba(0, 0, 0, 0.5);
-  color: #FFFFFF;
-  font-size: 22rpx;
-  border-radius: 8rpx;
-}
+  .tag-item {
+    padding: 4rpx 14rpx;
+    background: rgba(0, 0, 0, 0.5);
+    color: #FFFFFF;
+    font-size: 20rpx;
+    border-radius: 8rpx;
+    backdrop-filter: blur(4rpx);
+  }
 
-.tag-hot {
-  background: $color-primary-danger;
+  .tag-hot {
+    background: linear-gradient(135deg, $color-primary, $color-primary-danger);
+  }
+
+  .tag-new {
+    background: linear-gradient(135deg, #1890FF, #36CFC9);
+  }
 }
 
 .goods-info {
   padding: 16rpx;
+
+  .goods-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    font-size: 26rpx;
+    color: $text-main;
+    line-height: 1.4;
+    margin-bottom: 8rpx;
+    min-height: 72rpx;
+  }
 }
 
-.goods-title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+/* 促销信息 */
+.goods-promotion {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
   overflow: hidden;
-  font-size: 26rpx;
-  color: $text-main;
-  line-height: 1.4;
-  margin-bottom: 12rpx;
+
+  .promotion-tag {
+    font-size: 18rpx;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, $color-primary, $color-primary-danger);
+    padding: 2rpx 8rpx;
+    border-radius: 4rpx;
+    margin-right: 8rpx;
+    flex-shrink: 0;
+  }
+
+  .promotion-text {
+    font-size: 20rpx;
+    color: $color-primary-danger;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
+/* 店铺名称 */
+.goods-shop {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8rpx;
+  overflow: hidden;
+
+  .shop-icon {
+    font-size: 20rpx;
+    margin-right: 4rpx;
+  }
+
+  .shop-name {
+    font-size: 20rpx;
+    color: $text-sub;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* 价格区域 */
 .goods-price-row {
   display: flex;
   align-items: baseline;
-  gap: 12rpx;
   margin-bottom: 8rpx;
-}
 
-.goods-price {
-  font-size: 32rpx;
-  color: $color-primary-danger;
-  font-weight: 700;
-}
+  .price-left {
+    display: flex;
+    align-items: baseline;
+    gap: 8rpx;
+  }
 
-.goods-original-price {
-  font-size: 22rpx;
-  color: $text-weak;
-  text-decoration: line-through;
+  .price-symbol {
+    font-size: 22rpx;
+    font-weight: 700;
+    color: $color-primary-danger;
+  }
+
+  .goods-price {
+    font-size: 36rpx;
+    color: $color-primary-danger;
+    font-weight: 700;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .goods-original-price {
+    font-size: 22rpx;
+    color: $text-weak;
+    text-decoration: line-through;
+  }
 }
 
 .goods-sales-row {
   display: flex;
   align-items: center;
-  gap: 8rpx;
+  justify-content: space-between;
+
+  .goods-sales {
+    font-size: 20rpx;
+    color: $text-weak;
+  }
+
+  .goods-stock-low {
+    font-size: 20rpx;
+    color: $color-primary-danger;
+    font-weight: 500;
+  }
 }
 
-.goods-sales {
-  font-size: 22rpx;
-  color: $text-weak;
-}
-
+/* 加载更多 */
 .load-more {
   padding: 24rpx 0;
   text-align: center;
-}
 
-.load-more-text,
-.no-more-text {
-  font-size: 26rpx;
-  color: $text-weak;
+  .load-more-text,
+  .no-more-text {
+    font-size: 24rpx;
+    color: $text-weak;
+  }
 }
 
 .safe-bottom {
   height: env(safe-area-inset-bottom);
 }
 
+/* ============ 筛选抽屉 ============ */
 .filter-drawer {
   position: fixed;
   top: 0;
@@ -866,7 +1091,7 @@ onMounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  max-height: 70vh;
+  max-height: 75vh;
   background: $bg-card;
   border-radius: $radius-xl $radius-xl 0 0;
   transform: translateY(100%);
@@ -885,92 +1110,127 @@ onMounted(() => {
   justify-content: space-between;
   padding: 32rpx 24rpx;
   border-bottom: 2rpx solid $bg-page-light;
-}
 
-.drawer-title {
-  font-size: 34rpx;
-  font-weight: 600;
-  color: $text-main;
-}
+  .drawer-title {
+    font-size: 34rpx;
+    font-weight: 700;
+    color: $text-main;
+  }
 
-.drawer-close {
-  width: 48rpx;
-  height: 48rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $text-sub;
-  font-size: 40rpx;
+  .drawer-close {
+    width: 48rpx;
+    height: 48rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-sub;
+    font-size: 40rpx;
 
-  &:active {
-    opacity: 0.6;
+    &:active {
+      opacity: 0.6;
+    }
   }
 }
 
 .drawer-body {
   flex: 1;
   overflow-y: auto;
-  padding: 32rpx 24rpx;
+  padding: 24rpx;
 }
 
-.category-section {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-
-.category-group {
-  width: 100%;
-  margin-bottom: 20rpx;
+.filter-section {
+  margin-bottom: 32rpx;
 
   &:last-child {
     margin-bottom: 0;
   }
-}
 
-.category-group-title {
-  display: block;
-  font-size: 28rpx;
-  font-weight: 600;
-  color: $text-main;
-  margin-bottom: 16rpx;
-  padding-left: 8rpx;
-}
-
-.category-option {
-  padding: 16rpx 28rpx;
-  background: $bg-page-light;
-  border-radius: $radius-full;
-  border: 2rpx solid transparent;
-
-  &:active {
-    opacity: 0.8;
-  }
-
-  text {
+  .filter-section-title {
+    display: block;
     font-size: 28rpx;
+    font-weight: 600;
     color: $text-main;
+    margin-bottom: 20rpx;
   }
 }
 
-.category-option-active {
-  background: rgba($color-primary, 0.05);
-  border-color: $color-primary;
+/* 价格区间 */
+.price-input-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
 
-  text {
-    color: $color-primary;
-    font-weight: 500;
+  .price-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: $bg-page-light;
+    border-radius: $radius-base;
+    padding: 16rpx 20rpx;
+
+    .price-label {
+      font-size: 28rpx;
+      color: $text-sub;
+      margin-right: 8rpx;
+    }
+
+    .price-input {
+      flex: 1;
+      font-size: 28rpx;
+      color: $text-main;
+    }
+
+    .price-placeholder {
+      color: $text-weak;
+    }
+  }
+
+  .price-separator {
+    font-size: 28rpx;
+    color: $text-sub;
   }
 }
 
-.brand-section {
+.price-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+
+  .price-quick-item {
+    padding: 12rpx 24rpx;
+    background: $bg-page-light;
+    border-radius: $radius-full;
+
+    &:active {
+      background: rgba($color-primary, 0.06);
+    }
+
+    text {
+      font-size: 24rpx;
+      color: $text-sub;
+    }
+  }
+}
+
+.price-tips {
+  margin-top: 16rpx;
+
+  .price-error-text {
+    font-size: 24rpx;
+    color: $color-primary-danger;
+  }
+}
+
+/* 分类/品牌选项 */
+.filter-options {
   display: flex;
   flex-wrap: wrap;
   gap: 16rpx;
 }
 
-.brand-option {
-  padding: 16rpx 28rpx;
+.filter-option {
+  padding: 14rpx 28rpx;
   background: $bg-page-light;
   border-radius: $radius-full;
   border: 2rpx solid transparent;
@@ -980,139 +1240,72 @@ onMounted(() => {
   }
 
   text {
-    font-size: 28rpx;
+    font-size: 26rpx;
     color: $text-main;
   }
 }
 
-.brand-option-active {
-  background: rgba($color-primary, 0.05);
+.option-active {
+  background: rgba($color-primary, 0.06);
   border-color: $color-primary;
 
   text {
     color: $color-primary;
-    font-weight: 500;
-  }
-}
-
-.price-section {
-  padding-top: 8rpx;
-}
-
-.price-input-row {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-}
-
-.price-input-wrap {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  background: $bg-page-light;
-  border-radius: $radius-base;
-  padding: 16rpx;
-}
-
-.price-label {
-  font-size: 28rpx;
-  color: $text-sub;
-  margin-right: 8rpx;
-}
-
-.price-input {
-  flex: 1;
-  font-size: 28rpx;
-  color: $text-main;
-}
-
-.price-separator {
-  font-size: 28rpx;
-  color: $text-sub;
-}
-
-.price-tips {
-  margin-top: 16rpx;
-  padding-left: 8rpx;
-}
-
-.price-error-text {
-  font-size: 24rpx;
-  color: $color-primary-danger;
-}
-
-.sort-section {
-  padding-top: 8rpx;
-}
-
-.sort-option {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 24rpx 16rpx;
-  border-bottom: 2rpx solid $bg-page-light;
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &:active {
-    background: $bg-page-light;
-  }
-
-  text {
-    font-size: 30rpx;
-    color: $text-main;
-  }
-}
-
-.sort-option-active {
-  text:first-child {
-    color: $color-primary;
-    font-weight: 600;
-  }
-
-  .sort-check {
-    color: $color-primary;
     font-weight: 600;
   }
 }
 
-.sort-check {
-  color: transparent;
-}
-
+/* 底部按钮 */
 .drawer-footer {
   display: flex;
   gap: 16rpx;
   padding: 20rpx 24rpx;
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   border-top: 2rpx solid $bg-page-light;
-}
 
-.btn-reset,
-.btn-confirm {
-  flex: 1;
-  height: 88rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: $radius-full;
-  font-size: 30rpx;
-  font-weight: 600;
+  .btn-reset,
+  .btn-confirm {
+    flex: 1;
+    height: 84rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-full;
+    font-size: 30rpx;
+    font-weight: 600;
+    position: relative;
 
-  &:active {
-    opacity: 0.8;
+    &:active {
+      opacity: 0.85;
+      transform: scale(0.97);
+    }
   }
-}
 
-.btn-reset {
-  background: $bg-page-light;
-  color: $text-sub;
-}
+  .btn-reset {
+    background: $bg-page-light;
+    color: $text-sub;
+  }
 
-.btn-confirm {
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
-  color: #FFFFFF;
+  .btn-confirm {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4rpx 12rpx rgba($color-primary-danger, 0.2);
+
+    .btn-count {
+      position: absolute;
+      top: 8rpx;
+      right: 24rpx;
+      min-width: 32rpx;
+      height: 32rpx;
+      line-height: 32rpx;
+      text-align: center;
+      background: #FFFFFF;
+      color: $color-primary-danger;
+      font-size: 20rpx;
+      border-radius: 50%;
+      padding: 0 8rpx;
+      font-weight: 700;
+    }
+  }
 }
 </style>

@@ -73,16 +73,23 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 100rpx;
-  background: $bg-card;
+  height: 110rpx;
+  // 玻璃拟态背景(2026 流行元素)
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
   display: flex;
   align-items: center;
   justify-content: space-around;
-  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.06);
+  border-top: 2rpx solid rgba(255, 255, 255, 0.6);
   z-index: 999;
   padding-bottom: constant(safe-area-inset-bottom);
   padding-bottom: env(safe-area-inset-bottom);
   pointer-events: auto;
+  // GPU 加速避免滑动卡顿
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .tab-item {
@@ -92,25 +99,26 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $duration-base $ease-out-quart;
   cursor: pointer;
   user-select: none;
   -webkit-user-select: none;
 
   &:active {
     opacity: 0.7;
+    transform: scale(0.92);
   }
 
   &-click {
     .tab-icon-wrap {
-      animation: tabClick 0.2s ease;
+      animation: tabClick 200ms $ease-out-back;
     }
   }
 
   &-active {
     .tab-icon {
       color: $color-primary;
-      filter: drop-shadow(0 2rpx 4rpx rgba($color-primary, 0.3));
+      filter: drop-shadow(0 4rpx 8rpx rgba(255, 106, 0, 0.35));
     }
 
     .tab-text {
@@ -125,35 +133,36 @@ onUnmounted(() => {
     transform: scale(1);
   }
   50% {
-    transform: scale(0.9);
+    transform: scale(0.85);
   }
   100% {
-    transform: scale(1.05);
+    transform: scale(1.1);
   }
 }
 
 .tab-icon-wrap {
   position: relative;
   margin-bottom: 4rpx;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $duration-base $ease-out-back;
 }
 
 .tab-icon {
-  font-size: 52rpx;
+  font-size: 48rpx;
   color: $text-weak;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $duration-base $ease-out-back;
   line-height: 1;
 
   .tab-item-active & {
-    transform: translateY(-4rpx) scale(1.05);
+    transform: translateY(-6rpx) scale(1.08);
   }
 }
 
 .tab-text {
-  font-size: 24rpx;
+  font-size: 22rpx;
   color: $text-weak;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all $duration-base $ease-out-quart;
   line-height: 1;
+  letter-spacing: 0.5rpx;
 
   .tab-item-active & {
     transform: translateY(-2rpx);
@@ -162,27 +171,28 @@ onUnmounted(() => {
 
 .badge {
   position: absolute;
-  top: -12rpx;
-  right: -24rpx;
-  min-width: 36rpx;
-  height: 36rpx;
-  padding: 0 10rpx;
-  background: linear-gradient(135deg, $color-primary-danger 0%, $color-primary 100%);
+  top: -10rpx;
+  right: -22rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  background: $gradient-warm;
   border-radius: $radius-full;
   font-size: 20rpx;
   color: #FFFFFF;
   text-align: center;
-  line-height: 36rpx;
+  line-height: 32rpx;
   font-weight: 600;
-  box-shadow: 0 4rpx 12rpx rgba($color-primary-danger, 0.3);
-  animation: badgePop 0.3s ease;
+  box-shadow: 0 4rpx 12rpx rgba(255, 77, 79, 0.4);
+  border: 2rpx solid #FFFFFF;
+  animation: badgePop 300ms $ease-out-back;
 }
 
 @keyframes badgePop {
   0% {
     transform: scale(0);
   }
-  50% {
+  60% {
     transform: scale(1.2);
   }
   100% {

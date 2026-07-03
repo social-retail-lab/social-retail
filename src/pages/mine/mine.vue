@@ -485,7 +485,7 @@ const handleAddress = () => {
 
 const handlePointsMall = () => {
   if (!userStore.isLogin) return handleLogin()
-  uni.showToast({ title: '积分商城', icon: 'none' })
+  uni.navigateTo({ url: '/pagesSub/member/point/pointMall' })
 }
 
 const handleService = () => {
@@ -722,75 +722,128 @@ const handleService = () => {
 }
 
 .user-section {
-  padding: 32rpx 24rpx;
-  background: linear-gradient(180deg, #FFF3E8, #FFFFFF);
-  
+  padding: calc(40rpx + env(safe-area-inset-top)) 24rpx 32rpx;
+  // 现代化渐变背景(高级感)
+  background: linear-gradient(180deg, #FFE8D1 0%, #FFF3E8 30%, #FFFFFF 100%);
+  position: relative;
+  overflow: hidden;
+
+  // 装饰光晕(2026 流行元素)
+  &::before {
+    content: '';
+    position: absolute;
+    top: -120rpx;
+    right: -80rpx;
+    width: 320rpx;
+    height: 320rpx;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 106, 0, 0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -100rpx;
+    left: -60rpx;
+    width: 240rpx;
+    height: 240rpx;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 77, 79, 0.10) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
   .login-prompt {
     display: flex;
     align-items: center;
-    padding: 24rpx;
-    background: rgba(255,122,0,0.05);
-    border-radius: 24rpx;
-    
+    padding: 28rpx;
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20rpx);
+    -webkit-backdrop-filter: blur(20rpx);
+    border-radius: 28rpx;
+    border: 2rpx solid rgba(255, 255, 255, 0.6);
+    box-shadow: $shadow-md;
+    position: relative;
+    z-index: 1;
+    transition: all $duration-base $ease-out-quart;
+
+    &:active {
+      transform: scale(0.98);
+      box-shadow: $shadow-sm;
+    }
+
     .login-avatar {
-      width: 80rpx;
-      height: 80rpx;
+      width: 88rpx;
+      height: 88rpx;
       border-radius: 50%;
-      background: #FFFFFF;
+      background: $gradient-warm;
       display: flex;
       align-items: center;
       justify-content: center;
       margin-right: 24rpx;
-      
+      box-shadow: $shadow-primary;
+
       .avatar-icon {
-        font-size: 40rpx;
+        font-size: 44rpx;
+        color: #FFFFFF;
       }
     }
-    
+
     .login-info {
       flex: 1;
-      
+
       .login-title {
-        font-size: 32rpx;
-        font-weight: 600;
-        color: #333;
+        font-size: 34rpx;
+        font-weight: 700;
+        color: $ink-900;
         display: block;
         margin-bottom: 8rpx;
+        letter-spacing: 0.5rpx;
       }
-      
+
       .login-subtitle {
         font-size: 24rpx;
-        color: #FF7A00;
+        color: $color-primary;
+        font-weight: 500;
       }
     }
-    
+
     .login-arrow {
-      font-size: 40rpx;
-      color: #999;
+      font-size: 44rpx;
+      color: $text-weak;
+      font-weight: 300;
     }
   }
-  
+
   .user-info {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+    position: relative;
+    z-index: 1;
+
     .user-left {
       display: flex;
       align-items: center;
-      
+
       .user-avatar {
-        width: 96rpx;
-        height: 96rpx;
+        width: 112rpx;
+        height: 112rpx;
         border-radius: 50%;
         overflow: hidden;
         margin-right: 24rpx;
-        border: 2rpx solid rgba(255,122,0,0.2);
-        background: #F5F5F5;
+        border: 4rpx solid #FFFFFF;
+        background: $gradient-warm;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
+        box-shadow: $shadow-md;
+        transition: all $duration-base $ease-out-quart;
+
+        &:active {
+          transform: scale(0.95);
+        }
 
         image {
           width: 100%;
@@ -798,45 +851,49 @@ const handleService = () => {
         }
 
         .avatar-placeholder {
-          font-size: 48rpx;
-          color: #CCCCCC;
+          font-size: 52rpx;
+          color: #FFFFFF;
         }
       }
-      
+
       .user-detail {
         .user-name-row {
           display: flex;
           align-items: center;
-          margin-bottom: 8rpx;
-          
+          margin-bottom: 10rpx;
+
           .user-name {
-            font-size: 32rpx;
-            font-weight: 600;
-            color: #333;
+            font-size: 34rpx;
+            font-weight: 700;
+            color: $ink-900;
             margin-right: 16rpx;
+            letter-spacing: 0.5rpx;
           }
-          
+
           .user-tag {
-            padding: 4rpx 16rpx;
-            border-radius: 20rpx;
+            padding: 6rpx 16rpx;
+            border-radius: $radius-full;
             font-size: 20rpx;
-            
+            font-weight: 500;
+
             &.distributor {
-              background: rgba(255,122,0,0.15);
-              color: #FF7A00;
+              background: $gradient-warm;
+              color: #FFFFFF;
+              box-shadow: 0 4rpx 10rpx rgba(255, 106, 0, 0.25);
             }
-            
+
             &.member {
-              background: rgba(255,122,0,0.1);
-              color: #FF7A00;
+              background: rgba(255, 255, 255, 0.85);
+              color: $color-primary;
+              border: 2rpx solid rgba(255, 106, 0, 0.3);
             }
-            
+
             text {
               color: inherit;
             }
           }
         }
-        
+
         .user-id {
           font-size: 24rpx;
           color: #999;
@@ -846,25 +903,37 @@ const handleService = () => {
     
     .user-right {
       display: flex;
-      
+
       .user-icon-btn {
-        width: 64rpx;
-        height: 64rpx;
+        width: 72rpx;
+        height: 72rpx;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-left: 24rpx;
+        margin-left: 16rpx;
         position: relative;
-        
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(20rpx);
+        -webkit-backdrop-filter: blur(20rpx);
+        border-radius: 50%;
+        border: 2rpx solid rgba(255, 255, 255, 0.6);
+        transition: all $duration-fast $ease-out-quart;
+
+        &:active {
+          transform: scale(0.92);
+          background: rgba(255, 255, 255, 0.85);
+        }
+
         &.message-btn {
           .badge {
             position: absolute;
-            top: -4rpx;
-            right: -4rpx;
+            top: -2rpx;
+            right: -2rpx;
             min-width: 32rpx;
             height: 32rpx;
-            background: #FF4D4F;
+            background: $gradient-warm;
             border-radius: 16rpx;
+            border: 2rpx solid #FFFFFF;
             display: flex;
             align-items: center;
             justify-content: center;

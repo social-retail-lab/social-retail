@@ -253,14 +253,11 @@ const confirmSelectAddress = () => {
     isDefault: item.isDefault,
     fullAddress: `${item.province}${item.city}${item.district}${item.detailAddress}`
   }
+  // 使用 eventChannel 通信（uni-app 标准方式）
   const pages = getCurrentPages()
-  const prevPage = pages[pages.length - 2]
-  if (prevPage && prevPage.$vm) {
-    const prevVm = prevPage.$vm
-    if (prevVm.onSelectAddress) {
-      prevVm.onSelectAddress(addressData)
-    }
-  }
+  const currentPage = pages[pages.length - 1]
+  const eventChannel = currentPage.getOpenerEventChannel()
+  eventChannel.emit('selectAddress', addressData)
   uni.navigateBack()
 }
 

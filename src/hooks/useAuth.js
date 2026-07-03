@@ -82,14 +82,37 @@ export function useAuth() {
 
     try {
       const res = await userStore.fetchUserRegister({ phone, code, password, nickname })
-      if (res) {
-        showToast("注册成功")
+      if (!res) {
+        showToast('注册失败')
+        return
+      }
+
+      // 注册接口仅返回 userId/phone/nickname/status，不含 token
+      // 注册成功后自动调用登录接口获取 token，实现"注册即登录"
+      try {
+        const loginRes = await userStore.fetchUserLogin({ phone, code, loginType: 'CODE' })
+        if (loginRes) {
+          userStore.setUserInfo(loginRes)
+          showToast('注册成功，已自动登录')
+          setTimeout(() => {
+            uni.reLaunch({ url: '/pages/index/index' })
+          }, 1000)
+        } else {
+          // 登录接口未返回数据，跳转到登录页让用户手动登录
+          showToast('注册成功，请登录')
+          setTimeout(() => {
+            uni.reLaunch({ url: '/pages/login/login' })
+          }, 1000)
+        }
+      } catch (loginError) {
+        console.error('自动登录失败:', loginError)
+        showToast('注册成功，请登录')
         setTimeout(() => {
-          uni.reLaunch({ url: "/pages/index/index" })
+          uni.reLaunch({ url: '/pages/login/login' })
         }, 1000)
       }
     } catch (error) {
-      console.error("注册失败:", error)
+      console.error('注册失败:', error)
       showToast(error.message || '注册失败')
     }
   }
@@ -98,17 +121,18 @@ export function useAuth() {
     const { phone, code, password } = loginForm
 
     try {
-      const loginType = code ? "CODE" : "PASSWORD"
+      // 显式判断登录方式，默认验证码登录
+      const loginType = loginForm.loginType || (code ? 'CODE' : 'PASSWORD')
       const res = await userStore.fetchUserLogin({ phone, code, password, loginType })
       if (res) {
         userStore.setUserInfo(res)
-        showToast("登录成功")
+        showToast('登录成功')
         setTimeout(() => {
-          uni.switchTab({ url: "/pages/index/index" })
+          uni.reLaunch({ url: '/pages/index/index' })
         }, 1000)
       }
     } catch (error) {
-      console.error("登录失败:", error)
+      console.error('登录失败:', error)
       showToast(error.message || '登录失败')
     }
   }
@@ -183,9 +207,14 @@ export function useAuth() {
     } catch (error) {
       console.error("退出登录失败:", error)
     }
+    // 清除本地登录状态（token、userInfo、memberInfo 等）
     userStore.logout()
-    uni.reLaunch({ url: "/pages/index/index" })
     showToast("已退出登录")
+    // 退出登录后跳转到登录页，而非主页
+    // 避免未登录状态进入主页后，切换 Tab 触发登录跳转导致页面混乱
+    setTimeout(() => {
+      uni.reLaunch({ url: "/pages/login/login" })
+    }, 500)
   }
 
   const clearTimers = () => {

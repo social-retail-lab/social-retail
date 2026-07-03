@@ -1,5 +1,6 @@
 <template>
   <view class="page-container">
+    <!-- 顶部搜索栏 -->
     <view class="search-bar">
       <view class="back-btn" @click="handleBack">
         <text class="back-icon">‹</text>
@@ -9,7 +10,9 @@
         <input
           v-model="keyword"
           class="search-input"
-          placeholder="搜索商品/品牌"
+          placeholder="搜索商品/品牌/店铺"
+          placeholder-class="placeholder"
+          confirm-type="search"
           @confirm="handleSearch"
           @input="handleInput"
           focus
@@ -24,50 +27,8 @@
     </view>
 
     <scroll-view scroll-y class="search-content">
-      <view v-if="!keyword" class="search-history">
-        <view class="history-header">
-          <text class="history-title">搜索历史</text>
-          <view class="history-clear" @click="clearHistory">
-            <text class="clear-text">清空</text>
-          </view>
-        </view>
-        <view v-if="historyList.length > 0" class="history-tags">
-          <view
-            v-for="item in historyList"
-            :key="item"
-            class="history-tag"
-            @click="handleHistoryClick(item)"
-          >
-            <text class="tag-text">{{ item }}</text>
-          </view>
-        </view>
-        <view v-else class="history-empty">
-          <text class="empty-text">暂无搜索记录</text>
-        </view>
-      </view>
-
-      <view v-if="!keyword" class="hot-search">
-        <view class="hot-header">
-          <text class="hot-title">热门搜索</text>
-        </view>
-        <view class="hot-tags">
-          <view
-            v-for="(item, index) in hotList"
-            :key="item"
-            class="hot-tag"
-            :class="{ 'hot-tag-top': index < 3 }"
-            @click="handleHotClick(item)"
-          >
-            <text class="hot-index" v-if="index < 3">{{ index + 1 }}</text>
-            <text class="hot-text">{{ item }}</text>
-          </view>
-        </view>
-      </view>
-
-      <view v-if="keyword" class="search-suggest">
-        <view class="suggest-header">
-          <text class="suggest-title">搜索建议</text>
-        </view>
+      <!-- 搜索建议（输入关键词且有匹配建议时显示） -->
+      <view v-if="keyword && suggestList.length > 0" class="search-suggest">
         <view class="suggest-list">
           <view
             v-for="item in suggestList"
@@ -76,7 +37,84 @@
             @click="handleSuggestClick(item)"
           >
             <image src="/static/fonts/search.svg" class="suggest-icon" mode="aspectFit" />
-            <text class="suggest-text">{{ item }}</text>
+            <text class="suggest-text" v-if="item.includes(keyword)">
+              <text class="suggest-highlight">{{ keyword }}</text>{{ item.replace(keyword, '') }}
+            </text>
+            <text class="suggest-text" v-else>{{ item }}</text>
+            <text class="suggest-arrow">›</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 搜索历史 + 热门搜索（未输入关键词或无匹配建议时显示） -->
+      <view v-else class="search-panel">
+        <!-- 搜索历史 -->
+        <view class="section">
+          <view class="section-header">
+            <view class="section-title-wrap">
+              <text class="section-icon">🕐</text>
+              <text class="section-title">搜索历史</text>
+            </view>
+            <view v-if="historyList.length > 0" class="section-action" @click="showClearConfirm">
+              <text class="action-icon">🗑</text>
+            </view>
+          </view>
+          <view v-if="historyList.length > 0" class="history-tags">
+            <view
+              v-for="item in historyList"
+              :key="item"
+              class="history-tag"
+              @click="handleHistoryClick(item)"
+            >
+              <text class="tag-text">{{ item }}</text>
+            </view>
+          </view>
+          <view v-else class="empty-section">
+            <text class="empty-section-text">暂无搜索记录</text>
+          </view>
+        </view>
+
+        <!-- 热门搜索 -->
+        <view class="section">
+          <view class="section-header">
+            <view class="section-title-wrap">
+              <text class="section-icon">🔥</text>
+              <text class="section-title">热门搜索</text>
+            </view>
+          </view>
+          <view class="hot-list">
+            <view
+              v-for="(item, index) in hotList"
+              :key="item"
+              class="hot-item"
+              @click="handleHotClick(item)"
+            >
+              <view class="hot-rank" :class="getRankClass(index)">
+                <text class="rank-text">{{ index + 1 }}</text>
+              </view>
+              <text class="hot-text">{{ item }}</text>
+              <text v-if="index < 3" class="hot-badge">{{ ['热搜', '热门', '推荐'][index] }}</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 大家都在买 -->
+        <view class="section">
+          <view class="section-header">
+            <view class="section-title-wrap">
+              <text class="section-icon">🛒</text>
+              <text class="section-title">大家都在买</text>
+            </view>
+          </view>
+          <view class="recommend-tags">
+            <view
+              v-for="item in recommendList"
+              :key="item"
+              class="recommend-tag"
+              @click="handleHotClick(item)"
+            >
+              <text class="recommend-text">{{ item }}</text>
+            </view>
           </view>
         </view>
       </view>
@@ -91,22 +129,38 @@ const keyword = ref('')
 const historyList = ref([])
 const suggestList = ref([])
 
+// 热门搜索词
 const hotList = [
-  '蓝牙耳机',
-  '手机壳',
-  '充电宝',
-  'T恤',
-  '连衣裙',
-  '护肤品',
-  '智能手表',
-  '零食',
-  '家居用品',
-  '运动鞋'
+  '新疆阿克苏苹果',
+  '赣南脐橙',
+  '智利车厘子',
+  '五常大米',
+  '内蒙古牛肉',
+  '深海三文鱼',
+  '有机蔬菜',
+  '土鸡蛋',
+  '宁夏枸杞',
+  '云南普洱茶'
 ]
 
+// 大家都在买
+const recommendList = [
+  '限时秒杀',
+  '满减优惠',
+  '新品上市',
+  '产地直发',
+  '绿色有机',
+  '会员专享'
+]
+
+// 输入时生成搜索建议
 const handleInput = () => {
   if (keyword.value) {
-    suggestList.value = hotList.filter(item => item.includes(keyword.value))
+    // 从热门搜索 + 历史记录中匹配建议
+    const allSuggestions = [...hotList, ...historyList.value]
+    const matched = allSuggestions.filter(item => item.includes(keyword.value))
+    // 去重
+    suggestList.value = [...new Set(matched)].slice(0, 8)
   } else {
     suggestList.value = []
   }
@@ -157,21 +211,39 @@ const saveHistory = (keyword) => {
   let history = uni.getStorageSync('searchHistory') || []
   history = history.filter(item => item !== keyword)
   history.unshift(keyword)
-  if (history.length > 10) {
-    history = history.slice(0, 10)
+  if (history.length > 12) {
+    history = history.slice(0, 12)
   }
   uni.setStorageSync('searchHistory', history)
   historyList.value = history
 }
 
-const clearHistory = () => {
-  uni.removeStorageSync('searchHistory')
-  historyList.value = []
+const showClearConfirm = () => {
+  uni.showModal({
+    title: '清空搜索历史',
+    content: '确定要清空所有搜索记录吗？',
+    confirmText: '清空',
+    confirmColor: '#FF4D4F',
+    success: (res) => {
+      if (res.confirm) {
+        uni.removeStorageSync('searchHistory')
+        historyList.value = []
+        uni.showToast({ title: '已清空', icon: 'none' })
+      }
+    }
+  })
 }
 
 const loadHistory = () => {
   const history = uni.getStorageSync('searchHistory') || []
   historyList.value = history
+}
+
+const getRankClass = (index) => {
+  if (index === 0) return 'rank-top-1'
+  if (index === 1) return 'rank-top-2'
+  if (index === 2) return 'rank-top-3'
+  return 'rank-normal'
 }
 
 const handleBack = () => {
@@ -193,235 +265,139 @@ onMounted(() => {
 .page-container {
   min-height: 100vh;
   background-color: $bg-page;
+  display: flex;
+  flex-direction: column;
 }
 
+/* ============ 搜索栏 ============ */
 .search-bar {
   display: flex;
   align-items: center;
-  padding: 20rpx;
-  padding-top: calc(20rpx + env(safe-area-inset-top));
+  padding: 16rpx 24rpx;
+  padding-top: calc(16rpx + env(safe-area-inset-top));
   background: $bg-card;
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
 }
 
 .back-btn {
-  width: 60rpx;
-  height: 60rpx;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 16rpx;
+  flex-shrink: 0;
 
   &:active {
     opacity: 0.6;
   }
-}
 
-.back-icon {
-  font-size: 48rpx;
-  color: $text-main;
+  .back-icon {
+    font-size: 52rpx;
+    color: $text-main;
+    font-weight: 300;
+    line-height: 1;
+    margin-top: -4rpx;
+  }
 }
 
 .search-input-wrap {
   flex: 1;
   display: flex;
   align-items: center;
-  height: 88rpx;
-  padding: 0 24rpx;
+  height: 72rpx;
+  padding: 0 20rpx;
   background: $bg-page;
   border-radius: $radius-full;
 }
 
 .search-icon {
-  width: 48rpx;
-  height: 48rpx;
-  margin-right: 16rpx;
+  width: 36rpx;
+  height: 36rpx;
+  margin-right: 12rpx;
+  opacity: 0.5;
 }
 
 .search-input {
   flex: 1;
-  font-size: 30rpx;
+  font-size: 28rpx;
   color: $text-main;
 }
 
+.placeholder {
+  color: $text-weak;
+  font-size: 28rpx;
+}
+
 .clear-btn {
-  width: 48rpx;
-  height: 48rpx;
+  width: 40rpx;
+  height: 40rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-}
+  background: rgba($text-weak, 0.2);
+  border-radius: 50%;
+  margin-left: 8rpx;
 
-.clear-icon {
-  font-size: 40rpx;
-  color: $text-weak;
+  &:active {
+    opacity: 0.6;
+  }
+
+  .clear-icon {
+    font-size: 28rpx;
+    color: $text-sub;
+    line-height: 1;
+  }
 }
 
 .search-btn {
-  margin-left: 20rpx;
+  margin-left: 16rpx;
   padding: 0 32rpx;
-  height: 88rpx;
+  height: 72rpx;
   background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
   border-radius: $radius-full;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba($color-primary-danger, 0.2);
 
   &:active {
-    opacity: 0.8;
+    opacity: 0.85;
+    transform: scale(0.97);
+  }
+
+  .search-btn-text {
+    font-size: 28rpx;
+    color: #FFFFFF;
+    font-weight: 600;
   }
 }
 
-.search-btn-text {
-  font-size: 30rpx;
-  color: #FFFFFF;
-  font-weight: 600;
-}
-
+/* ============ 内容区域 ============ */
 .search-content {
-  height: calc(100vh - 128rpx - env(safe-area-inset-top));
-  padding: 20rpx;
+  flex: 1;
+  height: calc(100vh - 104rpx - env(safe-area-inset-top));
 }
 
-.search-history {
-  margin-bottom: 32rpx;
-}
-
-.history-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20rpx;
-}
-
-.history-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: $text-main;
-}
-
-.history-clear {
-  padding: 8rpx 20rpx;
-}
-
-.clear-text {
-  font-size: 26rpx;
-  color: $text-sub;
-}
-
-.history-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-
-.history-tag {
-  padding: 16rpx 24rpx;
-  background: $bg-card;
-  border-radius: $radius-full;
-
-  &:active {
-    opacity: 0.6;
-  }
-}
-
-.tag-text {
-  font-size: 28rpx;
-  color: $text-sub;
-}
-
-.history-empty {
-  padding: 40rpx;
-  text-align: center;
-}
-
-.empty-text {
-  font-size: 28rpx;
-  color: $text-weak;
-}
-
-.hot-search {
-  margin-bottom: 32rpx;
-}
-
-.hot-header {
-  margin-bottom: 20rpx;
-}
-
-.hot-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: $text-main;
-}
-
-.hot-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16rpx;
-}
-
-.hot-tag {
-  display: flex;
-  align-items: center;
-  padding: 16rpx 24rpx;
-  background: $bg-card;
-  border-radius: $radius-full;
-
-  &:active {
-    opacity: 0.6;
-  }
-}
-
-.hot-tag-top {
-  background: linear-gradient(135deg, rgba($color-primary, 0.1) 0%, rgba($color-primary-danger, 0.1) 100%);
-
-  .hot-text {
-    color: $color-primary;
-  }
-}
-
-.hot-index {
-  width: 36rpx;
-  height: 36rpx;
-  border-radius: 50%;
-  background: $color-primary-danger;
-  color: #FFFFFF;
-  font-size: 22rpx;
-  text-align: center;
-  line-height: 36rpx;
-  margin-right: 12rpx;
-}
-
-.hot-text {
-  font-size: 28rpx;
-  color: $text-sub;
-}
-
+/* ============ 搜索建议 ============ */
 .search-suggest {
-  margin-top: 20rpx;
-}
-
-.suggest-header {
-  margin-bottom: 20rpx;
-}
-
-.suggest-title {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: $text-main;
+  padding: 16rpx 24rpx;
 }
 
 .suggest-list {
   background: $bg-card;
   border-radius: $radius-lg;
   overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
 }
 
 .suggest-item {
   display: flex;
   align-items: center;
-  padding: 24rpx;
-  border-bottom: 1rpx solid rgba($text-weak, 0.1);
+  padding: 28rpx 24rpx;
+  border-bottom: 2rpx solid rgba($text-weak, 0.06);
 
   &:last-child {
     border-bottom: none;
@@ -430,17 +406,218 @@ onMounted(() => {
   &:active {
     background: $bg-page-light;
   }
+
+  .suggest-icon {
+    width: 36rpx;
+    height: 36rpx;
+    margin-right: 16rpx;
+    opacity: 0.4;
+  }
+
+  .suggest-text {
+    flex: 1;
+    font-size: 30rpx;
+    color: $text-main;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .suggest-highlight {
+    color: $color-primary-danger;
+    font-weight: 600;
+  }
+
+  .suggest-arrow {
+    font-size: 32rpx;
+    color: $text-weak;
+    margin-left: 12rpx;
+  }
 }
 
-.suggest-icon {
+/* ============ 搜索面板（历史+热门） ============ */
+.search-panel {
+  padding: 24rpx;
+}
+
+.section {
+  background: $bg-card;
+  border-radius: $radius-lg;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24rpx;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+
+  .section-icon {
+    font-size: 32rpx;
+    margin-right: 12rpx;
+  }
+
+  .section-title {
+    font-size: 30rpx;
+    font-weight: 700;
+    color: $text-main;
+  }
+}
+
+.section-action {
+  padding: 8rpx 16rpx;
+
+  &:active {
+    opacity: 0.6;
+  }
+
+  .action-icon {
+    font-size: 28rpx;
+  }
+}
+
+/* 搜索历史标签 */
+.history-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.history-tag {
+  padding: 14rpx 28rpx;
+  background: $bg-page-light;
+  border-radius: $radius-full;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+
+  &:active {
+    background: rgba($color-primary, 0.06);
+    border-color: rgba($color-primary, 0.2);
+  }
+
+  .tag-text {
+    font-size: 26rpx;
+    color: $text-sub;
+  }
+}
+
+.empty-section {
+  padding: 32rpx 0;
+  text-align: center;
+
+  .empty-section-text {
+    font-size: 26rpx;
+    color: $text-weak;
+  }
+}
+
+/* 热门搜索列表 */
+.hot-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.hot-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid rgba($text-weak, 0.04);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.hot-rank {
   width: 40rpx;
   height: 40rpx;
-  margin-right: 16rpx;
-  opacity: 0.5;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+
+  .rank-text {
+    font-size: 24rpx;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  &.rank-top-1 {
+    background: linear-gradient(135deg, #FF6A00, #FF4D4F);
+    box-shadow: 0 4rpx 8rpx rgba(255, 77, 79, 0.25);
+  }
+
+  &.rank-top-2 {
+    background: linear-gradient(135deg, #FF9500, #FF6A00);
+    box-shadow: 0 4rpx 8rpx rgba(255, 149, 0, 0.2);
+  }
+
+  &.rank-top-3 {
+    background: linear-gradient(135deg, #FFB800, #FF9500);
+    box-shadow: 0 4rpx 8rpx rgba(255, 184, 0, 0.2);
+  }
+
+  &.rank-normal {
+    background: $bg-page-light;
+
+    .rank-text {
+      color: $text-weak;
+    }
+  }
 }
 
-.suggest-text {
-  font-size: 30rpx;
+.hot-text {
+  flex: 1;
+  font-size: 28rpx;
   color: $text-main;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hot-badge {
+  font-size: 20rpx;
+  color: $color-primary-danger;
+  padding: 4rpx 12rpx;
+  background: rgba($color-primary-danger, 0.08);
+  border-radius: $radius-sm;
+  flex-shrink: 0;
+}
+
+/* 大家都在买 */
+.recommend-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.recommend-tag {
+  padding: 14rpx 28rpx;
+  background: linear-gradient(135deg, rgba($color-primary, 0.06) 0%, rgba($color-primary-danger, 0.06) 100%);
+  border-radius: $radius-full;
+  border: 2rpx solid rgba($color-primary, 0.12);
+
+  &:active {
+    background: linear-gradient(135deg, rgba($color-primary, 0.12) 0%, rgba($color-primary-danger, 0.12) 100%);
+  }
+
+  .recommend-text {
+    font-size: 26rpx;
+    color: $color-primary;
+    font-weight: 500;
+  }
 }
 </style>

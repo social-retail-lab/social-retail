@@ -89,7 +89,34 @@
     "navigationBarTitleText": "社交新零售商城",
     "navigationBarBackgroundColor": "#FFFFFF",
     "backgroundColor": "#F7F8FA",
-    "backgroundTextStyle": "dark"
+    "backgroundTextStyle": "dark",
+    "app-plus": {
+      "animationType": "slide-in-right",
+      "animationDuration": 200,
+      "background": "#F7F8FA",
+      "bounce": "vertical",
+      "titleNView": false
+    },
+    "h5": {
+      "titleNView": false
+    },
+    "mp-weixin": {
+      "background": "#F7F8FA"
+    }
+  },
+  "preloadRule": {
+    "pages/index/index": {
+      "network": "all",
+      "packages": ["pagesSub/goods", "pagesSub/order"]
+    },
+    "pages/mine/mine": {
+      "network": "all",
+      "packages": ["pagesSub/member", "pagesSub/order"]
+    },
+    "pages/cart/cart": {
+      "network": "all",
+      "packages": ["pagesSub/order"]
+    }
   },
   "tabBar": {
     "custom": true,

@@ -62,7 +62,7 @@ export const useMember = () => {
       return null
     } catch (error) {
       console.error('签到失败:', error)
-      if (error && error.code === 409) {
+      if (error && (error.code === 40954 || error.code === 409)) {
         showToast('今日已签到')
       } else {
         showToast('签到失败，请稍后重试')

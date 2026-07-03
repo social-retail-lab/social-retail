@@ -188,3 +188,207 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+// ============ 现代化玻璃拟态(2026 高级感) ============
+@mixin glassmorphism {
+  background: $glass-bg;
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border: 2rpx solid $glass-border;
+  box-shadow: $shadow-md, inset 0 2rpx 0 rgba(255, 255, 255, 0.25);
+}
+
+// 深色玻璃(用于深色背景上的卡片)
+@mixin glassmorphism-dark {
+  background: $glass-bg-dark;
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border: 2rpx solid rgba(255, 255, 255, 0.08);
+  box-shadow: $shadow-lg;
+}
+
+// ============ 现代化卡片(分层阴影 + 圆角) ============
+@mixin card-modern {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  transition: transform $duration-base $ease-out-quart, box-shadow $duration-base $ease-out-quart;
+  overflow: hidden;
+}
+
+// 可点击卡片(悬浮抬升动效)
+@mixin card-interactive {
+  @include card-modern;
+
+  &:active {
+    transform: scale(0.97) translateY(2rpx);
+    box-shadow: $shadow-xs;
+  }
+}
+
+// ============ 按钮微动效 ============
+// 主按钮(带渐变 + 阴影 + 按压反馈)
+@mixin btn-modern-primary {
+  background: $gradient-warm;
+  color: #FFFFFF;
+  border-radius: $radius-full;
+  box-shadow: $shadow-primary;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    transform: scale(0.96);
+    box-shadow: $shadow-sm;
+  }
+}
+
+// 次按钮(玻璃拟态描边)
+@mixin btn-modern-ghost {
+  background: rgba(255, 106, 0, 0.08);
+  color: $color-primary;
+  border: 2rpx solid rgba(255, 106, 0, 0.3);
+  border-radius: $radius-full;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    background: rgba(255, 106, 0, 0.16);
+    transform: scale(0.96);
+  }
+}
+
+// ============ 渐变背景工具 ============
+@mixin gradient-warm {
+  background: $gradient-warm;
+}
+
+@mixin gradient-sunset {
+  background: $gradient-sunset;
+}
+
+@mixin gradient-gold {
+  background: $gradient-gold;
+}
+
+@mixin gradient-dark {
+  background: $gradient-dark;
+}
+
+// ============ 文字层次 ============
+// 大标题(显示型)
+@mixin text-display {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: $ink-900;
+  letter-spacing: -0.5rpx;
+  line-height: 1.2;
+}
+
+// 主标题
+@mixin text-h1 {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: $ink-900;
+  letter-spacing: -0.3rpx;
+}
+
+// 副标题
+@mixin text-h2 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: $ink-800;
+}
+
+// 正文(强调)
+@mixin text-body-strong {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: $ink-800;
+}
+
+// 正文(常规)
+@mixin text-body {
+  font-size: 28rpx;
+  font-weight: 400;
+  color: $text-main;
+}
+
+// 辅助文字
+@mixin text-caption {
+  font-size: 24rpx;
+  font-weight: 400;
+  color: $text-weak;
+}
+
+// ============ 动效入场动画 ============
+// 淡入上移(常用于卡片入场)
+@mixin anim-fade-up {
+  animation: fadeUp $duration-slow $ease-out-quart both;
+}
+
+// 淡入缩放(常用于弹窗)
+@mixin anim-fade-scale {
+  animation: fadeScale $duration-base $ease-out-back both;
+}
+
+// 左侧滑入(常用于侧边栏)
+@mixin anim-slide-left {
+  animation: slideLeft $duration-slow $ease-out-quart both;
+}
+
+// ============ 骨架屏 ============
+@mixin skeleton {
+  background: linear-gradient(90deg, $neutral-100 25%, $neutral-200 37%, $neutral-100 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+// ============ 硬件加速(用于动画元素避免卡顿) ============
+@mixin gpu-accelerate {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+// ============ 关键帧动画定义 ============
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(60rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}

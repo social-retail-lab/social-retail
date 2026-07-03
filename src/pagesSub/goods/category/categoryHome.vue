@@ -486,7 +486,7 @@ onMounted(() => {
   gap: 8rpx;
   padding: 12rpx 28rpx;
   border-radius: $radius-full;
-  background: rgba($color-primary, 0.04);
+  background: $bg-page-light;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:active {
@@ -496,14 +496,17 @@ onMounted(() => {
 }
 
 .sort-item-active {
-  background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
-  box-shadow: 0 4rpx 16rpx rgba($color-primary, 0.3);
+  background: rgba($color-primary, 0.1);
 
   .sort-icon,
   .sort-text,
   .sort-active-mark,
   .sort-direction {
-    color: #fff;
+    color: $color-primary;
+  }
+
+  .sort-text {
+    font-weight: 600;
   }
 }
 

@@ -37,10 +37,12 @@ export const useUserStore = defineStore('user', () => {
   })
   const memberInfo = ref({
     memberId: '',
+    memberLevel: 0,
     levelId: 0,
     levelName: '普通会员',
-    points: 0,
-    totalGrowth: 0,
+    memberLevelName: '普通会员',
+    pointsBalance: 0,
+    growthValue: 0,
     nextLevelGrowth: 0,
     discountRate: 1.00,
     freeShipping: false
@@ -68,6 +70,9 @@ export const useUserStore = defineStore('user', () => {
       const normalized = normalizeUserInfo(data)
       if (normalized) {
         userInfo.value = { ...userInfo.value, ...normalized }
+        if (normalized.memberInfo) {
+          memberInfo.value = { ...memberInfo.value, ...normalized.memberInfo }
+        }
       }
     }
     isLogin.value = true
@@ -116,10 +121,12 @@ export const useUserStore = defineStore('user', () => {
     }
     memberInfo.value = {
       memberId: '',
+      memberLevel: 0,
       levelId: 0,
       levelName: '普通会员',
-      points: 0,
-      totalGrowth: 0,
+      memberLevelName: '普通会员',
+      pointsBalance: 0,
+      growthValue: 0,
       nextLevelGrowth: 0,
       discountRate: 1.00,
       freeShipping: false
@@ -138,12 +145,12 @@ export const useUserStore = defineStore('user', () => {
   }
   
   const updatePoint = (newPoint) => {
-    memberInfo.value.points = newPoint
+    memberInfo.value.pointsBalance = newPoint
     uni.setStorageSync('memberInfo', JSON.stringify(memberInfo.value))
   }
-  
+
   const updateGrowth = (newGrowth) => {
-    memberInfo.value.totalGrowth = newGrowth
+    memberInfo.value.growthValue = newGrowth
     uni.setStorageSync('memberInfo', JSON.stringify(memberInfo.value))
   }
 

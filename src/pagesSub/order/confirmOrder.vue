@@ -641,14 +641,18 @@ const onRemarkBlur = () => {
 // ==================== 默认地址加载 ====================
 const fetchDefaultAddress = async () => {
   const res = await addressHook.loadDefaultAddress()
-  if (res) {
+  // 只有当返回的地址有有效 addressId 时才设置
+  if (res && res.addressId) {
     addressInfo.value = {
       addressId: res.addressId,
-      receiverName: res.receiverName,
-      receiverPhone: res.receiverPhone,
+      receiverName: res.receiverName || '',
+      receiverPhone: res.receiverPhone || '',
       fullAddress: `${res.province || ''}${res.city || ''}${res.district || ''}${res.detailAddress || ''}`
     }
     addressId.value = res.addressId
+  } else {
+    addressInfo.value = null
+    addressId.value = null
   }
 }
 
@@ -668,8 +672,8 @@ const applyPreviewData = (data) => {
     availableCoupons: data.availableCoupons || { platformCoupons: [], merchantCoupons: [] }
   }
 
-  // 同步地址信息（后端返回的为权威值）
-  if (data.addressInfo && deliveryType.value === 1) {
+  // 同步地址信息：仅在用户未手动选择地址时，使用后端返回的默认地址
+  if (data.addressInfo && deliveryType.value === 1 && !addressId.value) {
     addressInfo.value = data.addressInfo
     addressId.value = data.addressInfo.addressId
   }
@@ -774,14 +778,25 @@ const submitOrder = async () => {
 const handleBuyNow = async (skuId, quantity) => {
   try {
     const result = await cartHook.cartStore.addCartItem({ skuId, quantity })
-    if (result && result.cartItemId) {
-      return result.cartItemId
+    if (result && (result.cartItemId || result.cartId)) {
+      const cartItemId = result.cartItemId || result.cartId
+      // 后端可能对相同 SKU 累加数量（如购物车已有2件，立即购买1件→变成3件）
+      // 修正为传入的购买数量，确保预览/下单只按用户指定数量计算
+      if (result.quantity && result.quantity !== quantity) {
+        try {
+          await cartHook.cartStore.updateCartItem(cartItemId, { quantity })
+        } catch (e) {
+          console.error('修正购买数量失败:', e)
+        }
+      }
+      return cartItemId
     }
+    console.error('addCartItem 返回数据异常:', result)
     showToast('添加购物车失败')
     return null
   } catch (error) {
     console.error('添加购物车失败:', error)
-    showToast('添加购物车失败')
+    showToast(error?.message || '添加购物车失败')
     return null
   }
 }
@@ -802,14 +817,16 @@ const initOrderData = async () => {
   if (source === 'buyNow') {
     const skuId = parseInt(options.skuId)
     const quantity = parseInt(options.quantity) || 1
-    if (skuId) {
-      const cartItemId = await handleBuyNow(skuId, quantity)
-      if (cartItemId) {
-        cartItemIds.value = [cartItemId]
-      } else {
-        showToast('创建订单失败，请重试')
-        return
-      }
+    if (!skuId || isNaN(skuId)) {
+      showToast('商品规格信息异常，请返回重试')
+      return
+    }
+    const cartItemId = await handleBuyNow(skuId, quantity)
+    if (cartItemId) {
+      cartItemIds.value = [cartItemId]
+    } else {
+      showToast('创建订单失败，请重试')
+      return
     }
   } else {
     if (options.cartItemId) {

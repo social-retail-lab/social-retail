@@ -57,7 +57,8 @@ const normalizeProductItem = (item) => {
     stock: item.stock !== undefined && item.stock !== null ? Number(item.stock) : undefined,
     tags: Array.isArray(item.tags) ? item.tags : [],
     merchantId: item.merchantId || null,
-    merchantName: item.merchantName || ''
+    merchantName: item.merchantName || '',
+    promotionTitle: item.promotionTitle || ''
   }
 }
 
@@ -65,9 +66,12 @@ export const searchProductsApi = (params = {}) => {
   if (!params?.keyword) {
     return Promise.reject(new Error('请输入搜索关键词'))
   }
-  
-  const validatedParams = validateProductListParams(params)
-  
+
+  const validatedParams = {
+    ...validateProductListParams(params),
+    keyword: params.keyword
+  }
+
   return request({
     url: '/api/products/search',
     method: 'get',
@@ -270,10 +274,11 @@ const normalizeCategoryProductsData = (data) => {
 export const getBrandListApi = (params = {}) => {
   const validatedParams = {
     categoryId: params?.categoryId || null,
+    keyword: params?.keyword || null,
     page: Number(params?.page) || 1,
     pageSize: Number(params?.pageSize) || 20
   }
-  
+
   return request({
     url: '/api/brands',
     method: 'get',

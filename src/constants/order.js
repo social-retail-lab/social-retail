@@ -3,39 +3,50 @@
 
 export const ORDER_STATUS = {
   // 待支付
-  PENDING_PAY: 10,
-  // 已支付/待接单
-  PAID: 20,
-  // 已接单/待发货
-  ACCEPTED: 30,
-  // 已发货/待配送
-  SHIPPED: 40,
-  // 配送中
-  DELIVERING: 50,
-  // 待自提
-  PENDING_PICKUP: 60,
+  WAIT_PAY: 0,
+  // 待接单
+  WAIT_ACCEPT: 1,
+  // 已接单
+  ACCEPTED: 2,
+  // 配送中/待自提
+  IN_PROGRESS: 3,
   // 已完成
-  COMPLETED: 70,
+  COMPLETED: 4,
   // 已取消
-  CANCELLED: 80,
-  // 售后中
-  REFUNDING: 90,
-  // 已退款
-  REFUNDED: 100
+  CANCELLED: 5,
+  // 已关闭（超时未支付自动关闭）
+  CLOSED: 6
+}
+
+// 前端字符串状态 → 后端数字状态映射（用于发送请求）
+export const STATUS_TO_CODE = {
+  'WAIT_PAY': ORDER_STATUS.WAIT_PAY,         // 0
+  'WAIT_ACCEPT': ORDER_STATUS.WAIT_ACCEPT,   // 1
+  'IN_PROGRESS': ORDER_STATUS.IN_PROGRESS,   // 3
+  'COMPLETED': ORDER_STATUS.COMPLETED,       // 4
+  'CANCELLED': ORDER_STATUS.CANCELLED        // 5
+}
+
+// 后端数字状态 → 前端字符串状态映射（用于解析响应）
+export const CODE_TO_STATUS = {
+  [ORDER_STATUS.WAIT_PAY]: 'WAIT_PAY',
+  [ORDER_STATUS.WAIT_ACCEPT]: 'WAIT_ACCEPT',
+  [ORDER_STATUS.ACCEPTED]: 'WAIT_ACCEPT',
+  [ORDER_STATUS.IN_PROGRESS]: 'IN_PROGRESS',
+  [ORDER_STATUS.COMPLETED]: 'COMPLETED',
+  [ORDER_STATUS.CANCELLED]: 'CANCELLED',
+  [ORDER_STATUS.CLOSED]: 'CLOSED'
 }
 
 // 订单状态映射
 export const ORDER_STATUS_MAP = {
-  [ORDER_STATUS.PENDING_PAY]: { label: '待支付', color: '#FAAD14' },
-  [ORDER_STATUS.PAID]: { label: '待接单', color: '#1890FF' },
-  [ORDER_STATUS.ACCEPTED]: { label: '待发货', color: '#1890FF' },
-  [ORDER_STATUS.SHIPPED]: { label: '待配送', color: '#1890FF' },
-  [ORDER_STATUS.DELIVERING]: { label: '配送中', color: '#1890FF' },
-  [ORDER_STATUS.PENDING_PICKUP]: { label: '待自提', color: '#FAAD14' },
+  [ORDER_STATUS.WAIT_PAY]: { label: '待支付', color: '#FAAD14' },
+  [ORDER_STATUS.WAIT_ACCEPT]: { label: '待接单', color: '#1890FF' },
+  [ORDER_STATUS.ACCEPTED]: { label: '已接单', color: '#1890FF' },
+  [ORDER_STATUS.IN_PROGRESS]: { label: '配送中', color: '#1890FF' },
   [ORDER_STATUS.COMPLETED]: { label: '已完成', color: '#52C41A' },
   [ORDER_STATUS.CANCELLED]: { label: '已取消', color: '#999999' },
-  [ORDER_STATUS.REFUNDING]: { label: '售后中', color: '#FF4D4F' },
-  [ORDER_STATUS.REFUNDED]: { label: '已退款', color: '#FF4D4F' }
+  [ORDER_STATUS.CLOSED]: { label: '已关闭', color: '#999999' }
 }
 
 // 订单类型

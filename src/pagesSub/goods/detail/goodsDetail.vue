@@ -167,7 +167,12 @@
             <text class="bottom-text">店铺</text>
           </view>
           <view class="bottom-item" @click="goCart">
-            <text class="bottom-icon-text">🛒</text>
+            <view class="cart-icon-wrap">
+              <text class="bottom-icon-text">🛒</text>
+              <view v-if="cartStore.totalQuantity > 0" class="cart-badge">
+                <text class="cart-badge-text">{{ cartStore.totalQuantity > 99 ? '99+' : cartStore.totalQuantity }}</text>
+              </view>
+            </view>
             <text class="bottom-text">购物车</text>
           </view>
         </view>
@@ -240,11 +245,11 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { getValidImageUrl } from '@/utils/common'
 import { useGoods } from '@/hooks/useGoods'
 import { useCart } from '@/hooks/useCart'
 import { useUserStore } from '@/store/user'
-import { useCartStore } from '@/store/cart'
 
 const productDetail = ref({})
 const isProductNotFound = ref(false)
@@ -259,9 +264,8 @@ const showSkuPopup = ref(false)
 const quantity = ref(1)
 
 const { loadProductDetail, loadProductSkus } = useGoods()
-const { loadAddToCart } = useCart()
+const { loadAddToCart, cartStore, loadCartData } = useCart()
 const userStore = useUserStore()
-const cartStore = useCartStore()
 
 const bannerImages = computed(() => {
   const images = productDetail.value.bannerImages || productDetail.value.images || []
@@ -430,45 +434,29 @@ const confirmBuy = async () => {
     uni.showToast({ title: '请选择规格', icon: 'none' })
     return
   }
-  
+
   const productId = productDetail.value.productId
-  const skuId = selectedSku.value?.skuId || null
+  // 优先使用已选 SKU；无规格商品尝试从 skuList 取第一个；都没有则提示
+  const skuId = selectedSku.value?.skuId || skuList.value[0]?.skuId || null
+  if (!skuId) {
+    uni.showToast({ title: '商品规格信息异常', icon: 'none' })
+    return
+  }
   const buyQuantity = quantity.value
-  
+
   const maxStock = selectedSku.value?.stock || productDetail.value.stock || 0
   if (buyQuantity > maxStock) {
     uni.showToast({ title: '库存不足', icon: 'none' })
     return
   }
-  
+
   showSkuPopup.value = false
 
-  uni.showLoading({ title: '处理中...' })
-  
-  try {
-    const success = await loadAddToCart(skuId, buyQuantity)
-    if (success) {
-      const cartData = await cartStore.fetchCartItems()
-      const cartList = cartData?.items || cartData?.list || []
-      const newItem = cartList.find(item => item.skuId === skuId)
-      
-      if (newItem?.cartItemId) {
-        uni.hideLoading()
-        uni.navigateTo({
-          url: `/pagesSub/order/confirmOrder?source=buyNow&cartItemId=${newItem.cartItemId}&productId=${productId}&skuId=${skuId}&quantity=${buyQuantity}`
-        })
-      } else {
-        uni.hideLoading()
-        uni.showToast({ title: '获取购物车数据失败', icon: 'none' })
-      }
-    } else {
-      uni.hideLoading()
-    }
-  } catch (error) {
-    uni.hideLoading()
-    console.error('立即购买失败:', error)
-    uni.showToast({ title: '处理失败，请重试', icon: 'none' })
-  }
+  // 直接跳转到订单确认页，由 confirmOrder 自动调用 addCartItem 生成临时 cartItemId
+  // 避免在此处重复加入购物车（confirmOrder 的 handleBuyNow 会处理）
+  uni.navigateTo({
+    url: `/pagesSub/order/confirmOrder?source=buyNow&productId=${productId}&skuId=${skuId}&quantity=${buyQuantity}`
+  })
 }
 
 const loadProductData = async (productId) => {
@@ -519,6 +507,13 @@ onMounted(() => {
 
   if (productId) {
     loadProductData(productId)
+  }
+})
+
+// 页面显示时刷新购物车数量（从购物车页返回后同步徽标）
+onShow(() => {
+  if (userStore.isLogin) {
+    loadCartData()
   }
 })
 </script>
@@ -1285,6 +1280,36 @@ onMounted(() => {
 
   &:active {
     opacity: 0.6;
+  }
+}
+
+.cart-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4rpx;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -16rpx;
+  min-width: 28rpx;
+  height: 28rpx;
+  padding: 0 6rpx;
+  background: $color-primary-danger;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid #fff;
+
+  .cart-badge-text {
+    font-size: 18rpx;
+    color: #fff;
+    font-weight: 600;
+    line-height: 1;
   }
 }
 
