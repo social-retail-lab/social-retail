@@ -8,8 +8,8 @@
       <view class="header-right"></view>
     </view>
 
-    <scroll-view 
-      scroll-y 
+    <scroll-view
+      scroll-y
       class="page-content"
       :refresher-enabled="true"
       :refresher-triggered="refreshing"
@@ -18,12 +18,12 @@
     >
       <scroll-view scroll-x class="tabs-bar" :show-scrollbar="false">
         <view class="tabs-inner">
-          <view 
-            v-for="tab in tabs" 
-            :key="tab.key"
+          <view
+            v-for="tab in statusTabs"
+            :key="tab.value"
             class="tab-item"
-            :class="{ 'tab-active': activeTab === tab.key }"
-            @click="switchTab(tab.key)"
+            :class="{ 'tab-active': activeTab === tab.value }"
+            @click="switchTab(tab.value)"
           >
             <text class="tab-text">{{ tab.label }}</text>
             <view v-if="tab.badge > 0" class="tab-badge">
@@ -45,75 +45,77 @@
       </view>
 
       <view v-else class="order-list">
-        <view v-for="order in orderList" :key="order.orderId" class="order-card">
+        <view
+          v-for="order in orderList"
+          :key="order.orderId"
+          class="order-card"
+          @click="goToDetail(order.orderId)"
+        >
           <view class="order-header-info">
-            <text class="order-sn">订单号：{{ order.orderSn }}</text>
+            <view class="order-header-left">
+              <text class="order-sn">订单号：{{ order.orderSn }}</text>
+              <text class="order-time">下单时间：{{ order.createTime }}</text>
+            </view>
             <text class="order-status" :class="getStatusClass(order.status)">{{ order.statusText }}</text>
           </view>
 
-          <view class="order-goods" @click="goToDetail(order.orderId)">
-            <view v-for="(item, index) in order.itemList" :key="index" class="goods-row">
-              <image :src="getValidImageUrl(item.productImage)" class="goods-image" mode="aspectFill" />
-              <view class="goods-info">
-                <text class="goods-name">{{ item.productName }}</text>
-                <text class="goods-sku">{{ item.skuSpecs }}</text>
-                <view class="goods-bottom">
-                  <text class="goods-price">¥{{ item.price.toFixed(2) }}</text>
-                  <text class="goods-count">×{{ item.quantity }}</text>
+          <view class="order-goods">
+            <view class="goods-thumbnails">
+              <view
+                v-for="(item, index) in order.itemList.slice(0, 3)"
+                :key="index"
+                class="thumbnail-item"
+              >
+                <image
+                  :src="getValidImageUrl(item.productImage)"
+                  class="thumbnail-image"
+                  mode="aspectFill"
+                />
+                <view v-if="index === 2 && order.itemList.length > 3" class="thumbnail-more">
+                  <text>+{{ order.itemList.length - 3 }}</text>
                 </view>
               </view>
+            </view>
+            <view class="goods-summary">
+              <text class="summary-text">共计 {{ getTotalQuantity(order) }} 件商品</text>
             </view>
           </view>
 
           <view class="order-footer">
             <view class="order-total">
-              <text class="total-label">共{{ order.itemList.reduce((sum, item) => sum + item.quantity, 0) }}件商品</text>
-              <text class="total-price">合计：¥{{ order.payAmount.toFixed(2) }}</text>
+              <text class="total-label">实付：</text>
+              <text class="total-price">¥{{ formatPrice(order.payAmount) }}</text>
             </view>
             <view class="order-actions">
-              <view 
-                v-if="order.status === 'WAIT_PAY'" 
+              <view
+                v-if="order.status === 'WAIT_PAY'"
                 class="action-btn primary-btn"
-                @click="handlePay(order)"
+                @click.stop="handlePay(order)"
               >
                 <text>去支付</text>
               </view>
-              <view 
-                v-if="['WAIT_PAY', 'WAIT_ACCEPT'].includes(order.status)" 
+              <view
+                v-if="['WAIT_PAY', 'WAIT_ACCEPT'].includes(order.status)"
                 class="action-btn"
-                @click="handleCancel(order)"
+                @click.stop="handleCancel(order)"
               >
                 <text>取消订单</text>
               </view>
-              <view 
-                v-if="order.status === 'ACCEPTED'" 
-                class="action-btn"
-                @click="handleRemind(order)"
-              >
-                <text>催发货</text>
-              </view>
-              <view 
-                v-if="order.status === 'IN_PROGRESS'" 
+              <view
+                v-if="order.status === 'IN_PROGRESS'"
                 class="action-btn primary-btn"
-                @click="handleConfirm(order)"
+                @click.stop="handleConfirm(order)"
               >
                 <text>确认收货</text>
               </view>
-              <view 
-                v-if="['COMPLETED', 'CANCELLED', 'CLOSED'].includes(order.status)" 
+              <view
+                v-if="['COMPLETED', 'CANCELLED', 'CLOSED'].includes(order.status)"
                 class="action-btn"
-                @click="handleDelete(order)"
+                @click.stop="handleDelete(order)"
               >
                 <text>删除订单</text>
               </view>
             </view>
-          </view>
-
-          <view 
-            class="order-detail-btn" 
-            @click="goToDetail(order.orderId)"
-          >
-            <text>查看详情 ›</text>
           </view>
         </view>
 
@@ -131,43 +133,46 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { showToast, getValidImageUrl } from '@/utils/common'
+import { getValidImageUrl, formatPrice } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
+
+const orderHook = useOrder()
 
 const activeTab = ref('ALL')
 const orderList = ref([])
 const loading = ref(false)
 const refreshing = ref(false)
 const page = ref(1)
-const pageSize = ref(20)
+const pageSize = ref(10)
 const hasMore = ref(true)
 
-const { loadOrderList, cancelOrder, deleteOrder, confirmOrder } = useOrder()
-
-const tabs = [
-  { key: 'ALL', label: '全部', badge: 0 },
-  { key: 'WAIT_PAY', label: '待支付', badge: 0 },
-  { key: 'WAIT_ACCEPT', label: '待接单', badge: 0 },
-  { key: 'ACCEPTED', label: '待发货', badge: 0 },
-  { key: 'IN_PROGRESS', label: '待收货', badge: 0 },
-  { key: 'COMPLETED', label: '已完成', badge: 0 },
-  { key: 'CANCELLED', label: '已取消', badge: 0 }
-]
+const statusTabs = ref([
+  { label: '全部', value: 'ALL', badge: 0 },
+  { label: '待支付', value: 'WAIT_PAY', badge: 0 },
+  { label: '待接单', value: 'WAIT_ACCEPT', badge: 0 },
+  { label: '配送中', value: 'IN_PROGRESS', badge: 0 },
+  { label: '已完成', value: 'COMPLETED', badge: 0 },
+  { label: '已取消', value: 'CANCELLED', badge: 0 }
+])
 
 const getStatusClass = (status) => {
   const classMap = {
     'WAIT_PAY': 'status-wait-pay',
     'WAIT_ACCEPT': 'status-wait-accept',
-    'ACCEPTED': 'status-accepted',
     'IN_PROGRESS': 'status-in-progress',
     'COMPLETED': 'status-completed',
     'CANCELLED': 'status-cancelled',
     'CLOSED': 'status-closed'
   }
   return classMap[status] || ''
+}
+
+const getTotalQuantity = (order) => {
+  if (order.totalQuantity) return order.totalQuantity
+  return (order.itemList || []).reduce((sum, item) => sum + (item.quantity || 0), 0)
 }
 
 const handleBack = () => {
@@ -182,9 +187,9 @@ const goToDetail = (orderId) => {
   uni.navigateTo({ url: `/pagesSub/order/orderDetail?orderId=${orderId}` })
 }
 
-const switchTab = (key) => {
-  if (activeTab.value === key) return
-  activeTab.value = key
+const switchTab = (value) => {
+  if (activeTab.value === value) return
+  activeTab.value = value
   page.value = 1
   hasMore.value = true
   orderList.value = []
@@ -193,27 +198,38 @@ const switchTab = (key) => {
 
 const fetchOrders = async (isRefresh = false) => {
   if (loading.value) return
-  
+
   loading.value = true
-  
+
   const params = {
     status: activeTab.value === 'ALL' ? undefined : activeTab.value,
     page: page.value,
     pageSize: pageSize.value
   }
-  
-  const data = await loadOrderList(params)
-  
+
+  const data = await orderHook.loadOrderList(params)
+
   if (data) {
-    if (isRefresh || page.value === 1) {
-      orderList.value = data.list || []
-    } else {
-      orderList.value = [...orderList.value, ...(data.list || [])]
+    let list = data.list || []
+    // 客户端过滤兜底：如果后端未按status过滤，前端再过滤一次
+    if (activeTab.value !== 'ALL') {
+      if (activeTab.value === 'CANCELLED') {
+        // 已取消tab包含CANCELLED和CLOSED
+        list = list.filter(order => ['CANCELLED', 'CLOSED'].includes(order.status))
+      } else {
+        list = list.filter(order => order.status === activeTab.value)
+      }
     }
-    
+
+    if (isRefresh || page.value === 1) {
+      orderList.value = list
+    } else {
+      orderList.value = [...orderList.value, ...list]
+    }
+
     const total = data.total || 0
-    hasMore.value = orderList.value.length < total
-    
+    hasMore.value = list.length > 0 && orderList.value.length < total
+
     if (data.badgeCounts) {
       updateBadgeCounts(data.badgeCounts)
     }
@@ -223,17 +239,19 @@ const fetchOrders = async (isRefresh = false) => {
     }
     hasMore.value = false
   }
-  
+
   loading.value = false
   refreshing.value = false
 }
 
 const updateBadgeCounts = (badgeCounts) => {
-  tabs.forEach(tab => {
-    if (tab.key === 'ALL') {
+  statusTabs.value.forEach(tab => {
+    if (tab.value === 'ALL') {
       tab.badge = Object.values(badgeCounts).reduce((sum, count) => sum + count, 0) || 0
+    } else if (tab.value === 'CANCELLED') {
+      tab.badge = (badgeCounts['CANCELLED'] || 0) + (badgeCounts['CLOSED'] || 0)
     } else {
-      tab.badge = badgeCounts[tab.key] || 0
+      tab.badge = badgeCounts[tab.value] || 0
     }
   })
 }
@@ -252,42 +270,32 @@ const onLoadMore = () => {
 }
 
 const handlePay = (order) => {
-  uni.navigateTo({ 
-    url: `/pagesSub/order/pay/payOrder?orderId=${order.orderId}&orderSn=${order.orderSn}&payAmount=${order.payAmount}` 
+  const expireTime = order.expireTime || ''
+  uni.navigateTo({
+    url: `/pagesSub/order/pay/payOrder?orderId=${order.orderId}&payAmount=${order.payAmount}&expireTime=${expireTime}`
   })
 }
 
 const handleCancel = async (order) => {
-  const success = await cancelOrder(order.orderId)
+  const success = await orderHook.cancelOrder(order.orderId)
   if (success) {
     fetchOrders(true)
   }
 }
 
-const handleRemind = () => {
-  showToast('已提醒商家发货')
-}
-
 const handleConfirm = async (order) => {
-  const success = await confirmOrder(order.orderId)
+  const success = await orderHook.confirmOrder(order.orderId)
   if (success) {
     fetchOrders(true)
   }
 }
 
 const handleDelete = async (order) => {
-  const success = await deleteOrder(order.orderId)
+  const success = await orderHook.deleteOrder(order.orderId)
   if (success) {
     fetchOrders(true)
   }
 }
-
-watch(activeTab, () => {
-  page.value = 1
-  hasMore.value = true
-  orderList.value = []
-  fetchOrders()
-})
 
 let isFirstShow = true
 
@@ -303,20 +311,15 @@ onMounted(() => {
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const status = currentPage.options?.status
-  
+
   if (status) {
-    const statusMap = {
-      'WAIT_PAY': 'WAIT_PAY',
-      'WAIT_ACCEPT': 'WAIT_ACCEPT',
-      'ACCEPTED': 'ACCEPTED',
-      'IN_PROGRESS': 'IN_PROGRESS',
-      'COMPLETED': 'COMPLETED',
-      'CANCELLED': 'CANCELLED',
-      'CLOSED': 'CLOSED'
+    const validStatuses = ['WAIT_PAY', 'WAIT_ACCEPT', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'CLOSED']
+    if (validStatuses.includes(status)) {
+      // CLOSED 归入已取消tab
+      activeTab.value = status === 'CLOSED' ? 'CANCELLED' : status
     }
-    activeTab.value = statusMap[status] || 'ALL'
   }
-  
+
   fetchOrders()
 })
 </script>
@@ -342,19 +345,19 @@ onMounted(() => {
   padding: 0 32rpx;
   padding-top: calc(env(safe-area-inset-top));
   background: $bg-card;
-  
+
   .header-left, .header-right {
     width: 80rpx;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
+
   .back-icon {
     font-size: 56rpx;
     color: $text-main;
   }
-  
+
   .header-title {
     font-size: 36rpx;
     font-weight: 600;
@@ -379,12 +382,12 @@ onMounted(() => {
   background: $bg-card;
   box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
   white-space: nowrap;
-  
+
   .tabs-inner {
     display: inline-flex;
     padding: 0 16rpx;
   }
-  
+
   .tab-item {
     display: inline-flex;
     align-items: center;
@@ -392,13 +395,13 @@ onMounted(() => {
     padding: 24rpx 28rpx;
     position: relative;
     flex-shrink: 0;
-    
+
     &.tab-active {
       .tab-text {
         color: $color-primary;
         font-weight: 600;
       }
-      
+
       &::after {
         content: '';
         position: absolute;
@@ -411,13 +414,13 @@ onMounted(() => {
         border-radius: 2rpx;
       }
     }
-    
+
     .tab-text {
       font-size: 28rpx;
       color: $text-sub;
       transition: all 0.2s ease;
     }
-    
+
     .tab-badge {
       min-width: 32rpx;
       height: 32rpx;
@@ -429,7 +432,7 @@ onMounted(() => {
       text-align: center;
       line-height: 32rpx;
       margin-left: 8rpx;
-      
+
       text {
         font-size: 20rpx;
       }
@@ -443,7 +446,7 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   padding-top: 300rpx;
-  
+
   .empty-icon {
     width: 200rpx;
     height: 200rpx;
@@ -451,30 +454,30 @@ onMounted(() => {
     align-items: center;
     justify-content: center;
     margin-bottom: 32rpx;
-    
+
     .empty-text {
       font-size: 120rpx;
     }
   }
-  
+
   .empty-title {
     font-size: 36rpx;
     color: $text-main;
     font-weight: 500;
     margin-bottom: 16rpx;
   }
-  
+
   .empty-desc {
     font-size: 26rpx;
     color: $text-weak;
     margin-bottom: 64rpx;
   }
-  
+
   .empty-btn {
     padding: 24rpx 80rpx;
     background: linear-gradient(135deg, $color-primary 0%, $color-primary-danger 100%);
     border-radius: 48rpx;
-    
+
     text {
       font-size: 30rpx;
       color: #FFFFFF;
@@ -493,45 +496,63 @@ onMounted(() => {
   margin-bottom: 24rpx;
   overflow: hidden;
   box-shadow: $category-shadow-sm;
+
+  &:active {
+    opacity: 0.95;
+  }
 }
 
 .order-header-info {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding: 24rpx;
   border-bottom: 1rpx solid $bg-page-light;
-  
+
+  .order-header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 8rpx;
+    flex: 1;
+    min-width: 0;
+  }
+
   .order-sn {
     font-size: 26rpx;
     color: $text-sub;
     font-family: monospace;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  
+
+  .order-time {
+    font-size: 24rpx;
+    color: $text-weak;
+  }
+
   .order-status {
     font-size: 28rpx;
     font-weight: 500;
-    
+    flex-shrink: 0;
+    margin-left: 16rpx;
+
     &.status-wait-pay {
       color: $color-primary-danger;
     }
-    
+
     &.status-wait-accept {
       color: $color-primary;
     }
-    
-    &.status-accepted {
-      color: $color-warning;
-    }
-    
+
     &.status-in-progress {
       color: $color-success;
     }
-    
+
     &.status-completed {
       color: $text-weak;
     }
-    
+
     &.status-cancelled, &.status-closed {
       color: $text-weak;
       text-decoration: line-through;
@@ -540,66 +561,52 @@ onMounted(() => {
 }
 
 .order-goods {
-  padding: 16rpx 24rpx;
-}
+  padding: 24rpx;
 
-.goods-row {
-  display: flex;
-  padding: 16rpx 0;
-  border-bottom: 1rpx solid $bg-page-light;
-  
-  &:last-child {
-    border-bottom: none;
+  .goods-thumbnails {
+    display: flex;
+    gap: 16rpx;
   }
-  
-  .goods-image {
+
+  .thumbnail-item {
+    position: relative;
     width: 160rpx;
     height: 160rpx;
-    border-radius: 16rpx;
-    margin-right: 20rpx;
-    background: $bg-page-light;
-  }
-  
-  .goods-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    
-    .goods-name {
-      font-size: 26rpx;
-      color: $text-main;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    flex-shrink: 0;
+
+    .thumbnail-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 16rpx;
+      background: $bg-page-light;
     }
-    
-    .goods-sku {
-      font-size: 22rpx;
-      color: $text-weak;
-      margin-top: 8rpx;
-    }
-    
-    .goods-bottom {
+
+    .thumbnail-more {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 16rpx;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      margin-top: 16rpx;
-      
-      .goods-price {
-        font-size: 28rpx;
-        color: $color-primary-danger;
+      justify-content: center;
+
+      text {
+        color: #FFFFFF;
+        font-size: 32rpx;
         font-weight: 600;
       }
-      
-      .goods-count {
-        font-size: 24rpx;
-        color: $text-sub;
-      }
+    }
+  }
+
+  .goods-summary {
+    margin-top: 20rpx;
+
+    .summary-text {
+      font-size: 26rpx;
+      color: $text-sub;
     }
   }
 }
@@ -610,42 +617,41 @@ onMounted(() => {
   justify-content: space-between;
   padding: 20rpx 24rpx;
   background: $bg-page-light;
-  
+
   .order-total {
     display: flex;
     align-items: baseline;
-    gap: 16rpx;
-    
+
     .total-label {
       font-size: 26rpx;
       color: $text-sub;
     }
-    
+
     .total-price {
       font-size: 32rpx;
       color: $color-primary-danger;
       font-weight: 600;
     }
   }
-  
+
   .order-actions {
     display: flex;
     gap: 16rpx;
-    
+
     .action-btn {
       padding: 12rpx 28rpx;
       border: 1rpx solid $gray-300;
       border-radius: 24rpx;
-      
+
       text {
         font-size: 26rpx;
         color: $text-main;
       }
-      
+
       &.primary-btn {
         background: $color-primary;
         border-color: $color-primary;
-        
+
         text {
           color: #FFFFFF;
         }
@@ -654,20 +660,10 @@ onMounted(() => {
   }
 }
 
-.order-detail-btn {
-  padding: 20rpx 24rpx;
-  text-align: center;
-  
-  text {
-    font-size: 26rpx;
-    color: $text-weak;
-  }
-}
-
 .loading-more, .no-more {
   padding: 32rpx;
   text-align: center;
-  
+
   .loading-text, .no-more-text {
     font-size: 26rpx;
     color: $text-weak;

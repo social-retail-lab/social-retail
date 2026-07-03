@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { 
-  getAddressListApi, 
-  getDefaultAddressApi, 
-  addAddressApi, 
-  editAddressApi, 
-  deleteAddressApi, 
+import {
+  getAddressListApi,
+  getDefaultAddressApi,
+  getAddressDetailApi,
+  addAddressApi,
+  editAddressApi,
+  deleteAddressApi,
   setDefaultAddressApi,
   normalizeAddressData,
   normalizeAddressList
@@ -29,6 +30,14 @@ export const useAddressStore = defineStore('address', () => {
     if (res.code === 0 && res.data) {
       defaultAddress.value = normalizeAddressData(res.data)
       return defaultAddress.value
+    }
+    return null
+  }
+
+  const fetchAddressDetail = async (addressId) => {
+    const res = await getAddressDetailApi(addressId)
+    if (res.code === 0 && res.data) {
+      return normalizeAddressData(res.data)
     }
     return null
   }
@@ -70,6 +79,7 @@ export const useAddressStore = defineStore('address', () => {
     defaultAddress,
     fetchAddressList,
     fetchDefaultAddress,
+    fetchAddressDetail,
     fetchAddAddress,
     fetchEditAddress,
     fetchDeleteAddress,

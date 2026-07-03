@@ -71,16 +71,16 @@
                   <view class="goods-bottom">
                     <text class="goods-price">¥{{ item.price.toFixed(2) }}</text>
                     <view class="stepper">
-                      <view 
-                        class="stepper-btn stepper-minus" 
+                      <view
+                        class="stepper-btn stepper-minus"
                         :class="{ 'stepper-disabled': item.quantity <= 1 }"
                         @click="handleMinus(item)"
                       >
                         <text>-</text>
                       </view>
-                      <text class="stepper-value">{{ item.quantity }}</text>
-                      <view 
-                        class="stepper-btn stepper-plus" 
+                      <text class="stepper-value" @click="handleEditQuantity(item)">{{ item.quantity }}</text>
+                      <view
+                        class="stepper-btn stepper-plus"
                         :class="{ 'stepper-disabled': item.quantity >= item.stock }"
                         @click="handlePlus(item)"
                       >
@@ -250,6 +250,30 @@ const handleMinus = (item) => {
     return
   }
   loadUpdateQuantity(item.cartItemId, item.quantity - 1)
+}
+
+const handleEditQuantity = (item) => {
+  uni.showModal({
+    title: '修改数量',
+    editable: true,
+    placeholderText: `请输入购买数量(1-${item.stock})`,
+    content: String(item.quantity),
+    success: (res) => {
+      if (res.confirm) {
+        const num = parseInt(res.content)
+        if (isNaN(num) || num < 1) {
+          uni.showToast({ title: '数量不能小于1', icon: 'none' })
+          return
+        }
+        if (num > item.stock) {
+          uni.showToast({ title: `数量不能超过库存${item.stock}`, icon: 'none' })
+          return
+        }
+        if (num === item.quantity) return
+        loadUpdateQuantity(item.cartItemId, num)
+      }
+    }
+  })
 }
 
 const handleDelete = (cartItemId) => {
@@ -571,6 +595,14 @@ onShow(() => {
     justify-content: center;
     font-size: 28rpx;
     color: $text-main;
+    border-left: 2rpx solid #E5E5E5;
+    border-right: 2rpx solid #E5E5E5;
+    padding: 0 16rpx;
+    transition: background 0.2s;
+
+    &:active {
+      background: rgba(255, 106, 0, 0.08);
+    }
     font-weight: 500;
   }
 }

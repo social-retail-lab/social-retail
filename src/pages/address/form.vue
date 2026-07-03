@@ -6,97 +6,146 @@
       </view>
       <view class="navbar-title">{{ isEdit ? '编辑地址' : '新增地址' }}</view>
       <view class="navbar-right" @click="handleSave">
-        <text class="save-text">保存</text>
+        <text class="save-text" :class="{ disabled: saving }">保存</text>
       </view>
     </view>
 
     <scroll-view class="content" scroll-y>
-      <view class="form-card">
-        <view class="form-item">
-          <view class="form-label">收货人</view>
-          <input 
-            class="form-input" 
-            v-model="form.receiverName" 
-            placeholder="请输入收货人姓名"
-            maxlength="20"
-          />
+      <view v-if="loading && isEdit" class="loading-state">
+        <text class="loading-text">加载中...</text>
+      </view>
+
+      <template v-else>
+        <view class="form-card">
+          <view class="form-item">
+            <view class="form-label">
+              <text class="label-text">收货人</text>
+              <text class="required">*</text>
+            </view>
+            <input
+              class="form-input"
+              v-model="form.receiverName"
+              placeholder="请输入收货人姓名"
+              placeholder-class="input-placeholder"
+              maxlength="20"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">
+              <text class="label-text">手机号</text>
+              <text class="required">*</text>
+            </view>
+            <input
+              class="form-input"
+              v-model="form.receiverPhone"
+              type="text"
+              inputmode="numeric"
+              placeholder="请输入11位手机号"
+              placeholder-class="input-placeholder"
+              maxlength="11"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">
+              <text class="label-text">省份</text>
+              <text class="required">*</text>
+            </view>
+            <input
+              class="form-input"
+              v-model="form.province"
+              placeholder="请输入省份（如：广东省）"
+              placeholder-class="input-placeholder"
+              maxlength="20"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">
+              <text class="label-text">城市</text>
+              <text class="required">*</text>
+            </view>
+            <input
+              class="form-input"
+              v-model="form.city"
+              placeholder="请输入城市（如：深圳市）"
+              placeholder-class="input-placeholder"
+              maxlength="20"
+            />
+          </view>
+
+          <view class="form-item">
+            <view class="form-label">
+              <text class="label-text">区县</text>
+              <text class="required">*</text>
+            </view>
+            <input
+              class="form-input"
+              v-model="form.district"
+              placeholder="请输入区县（如：南山区）"
+              placeholder-class="input-placeholder"
+              maxlength="20"
+            />
+          </view>
+
+          <view class="form-item textarea-item">
+            <view class="form-label">
+              <text class="label-text">详细地址</text>
+              <text class="required">*</text>
+            </view>
+            <textarea
+              class="form-textarea"
+              v-model="form.detailAddress"
+              placeholder="请输入街道、楼牌号等详细地址"
+              placeholder-class="input-placeholder"
+              maxlength="200"
+              :auto-height="true"
+            />
+          </view>
         </view>
 
-        <view class="form-item">
-          <view class="form-label">手机号</view>
-          <input 
-            class="form-input" 
-            v-model="form.receiverPhone" 
-            type="text"
-            placeholder="请输入11位手机号"
-            maxlength="11"
-          />
-        </view>
-
-        <view class="form-item">
-          <view class="form-label">省份</view>
-          <input 
-            class="form-input" 
-            v-model="form.province" 
-            placeholder="请输入省份"
-            maxlength="20"
-          />
-        </view>
-
-        <view class="form-item">
-          <view class="form-label">城市</view>
-          <input 
-            class="form-input" 
-            v-model="form.city" 
-            placeholder="请输入城市"
-            maxlength="20"
-          />
-        </view>
-
-        <view class="form-item">
-          <view class="form-label">区县</view>
-          <input 
-            class="form-input" 
-            v-model="form.district" 
-            placeholder="请输入区县"
-            maxlength="20"
-          />
-        </view>
-
-        <view class="form-item">
-          <view class="form-label">详细地址</view>
-          <textarea 
-            class="form-textarea" 
-            v-model="form.detailAddress" 
-            placeholder="请输入详细地址"
-            maxlength="200"
-          />
-        </view>
-
-        <view class="form-item">
-          <view class="form-label">设为默认地址</view>
-          <switch 
-            :checked="form.isDefault" 
+        <view class="default-card">
+          <view class="default-left">
+            <text class="default-title">设为默认地址</text>
+            <text class="default-desc">下单时优先使用该地址</text>
+          </view>
+          <switch
+            :checked="form.isDefault"
             color="#FF6A00"
             @change="handleDefaultChange"
           />
         </view>
-      </view>
 
-      <view class="tip-box">
-        <text class="tip-title">温馨提示</text>
-        <text class="tip-desc">请确保填写的收货信息准确无误，以便顺利收到商品。</text>
-      </view>
+        <view v-if="isEdit" class="delete-card">
+          <view class="delete-btn" @click="handleDelete">
+            <text>删除地址</text>
+          </view>
+        </view>
+
+        <view class="tip-box">
+          <text class="tip-icon">💡</text>
+          <view class="tip-content">
+            <text class="tip-title">温馨提示</text>
+            <text class="tip-desc">请确保填写的收货信息准确无误，以便顺利收到商品。设为默认地址后，下单时将自动选中该地址。</text>
+          </view>
+        </view>
+      </template>
     </scroll-view>
   </view>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from "vue"
-import { useAddress } from "@/hooks/useAddress"
+import { ref, reactive, computed } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
+import { useAddress } from '@/hooks/useAddress'
+import { useAddressStore } from '@/store/address'
 
 const addressHook = useAddress()
+const addressStore = useAddressStore()
 const addressId = ref('')
+const loading = ref(false)
+const saving = ref(false)
 
 const form = reactive({
   receiverName: '',
@@ -110,31 +159,34 @@ const form = reactive({
 
 const isEdit = computed(() => !!addressId.value)
 
-onMounted(() => {
-  const pages = getCurrentPages()
-  const currentPage = pages[pages.length - 1]
-  const options = currentPage.options || {}
-  
+onLoad((options) => {
   if (options.addressId) {
     addressId.value = options.addressId
-    loadAddressData()
+    fillAddressFromStore()
   }
 })
 
-const loadAddressData = () => {
-  addressHook.loadAddressList().then(data => {
-    const addressList = Array.isArray(data) ? data : []
-    const address = addressList.find(a => a.addressId === addressId.value)
-    if (address) {
-      form.receiverName = address.receiverName || ''
-      form.receiverPhone = address.receiverPhone || ''
-      form.province = address.province || ''
-      form.city = address.city || ''
-      form.district = address.district || ''
-      form.detailAddress = address.detailAddress || ''
-      form.isDefault = address.isDefault || false
-    }
-  })
+const fillAddressFromStore = async () => {
+  loading.value = true
+  let list = addressStore.addressList
+  if (list.length === 0) {
+    await addressHook.loadAddressList()
+    list = addressStore.addressList
+  }
+  const data = list.find(a => String(a.addressId) === String(addressId.value))
+  if (data) {
+    form.receiverName = data.receiverName || ''
+    form.receiverPhone = data.receiverPhone || ''
+    form.province = data.province || ''
+    form.city = data.city || ''
+    form.district = data.district || ''
+    form.detailAddress = data.detailAddress || ''
+    form.isDefault = data.isDefault || false
+  } else {
+    uni.showToast({ title: '获取地址信息失败', icon: 'none' })
+    setTimeout(() => uni.navigateBack(), 1500)
+  }
+  loading.value = false
 }
 
 const goBack = () => {
@@ -158,8 +210,18 @@ const validateForm = () => {
     return false
   }
 
-  if (!form.province.trim() || !form.city.trim() || !form.district.trim()) {
-    uni.showToast({ title: '请输入省市区', icon: 'none' })
+  if (!form.province.trim()) {
+    uni.showToast({ title: '请输入省份', icon: 'none' })
+    return false
+  }
+
+  if (!form.city.trim()) {
+    uni.showToast({ title: '请输入城市', icon: 'none' })
+    return false
+  }
+
+  if (!form.district.trim()) {
+    uni.showToast({ title: '请输入区县', icon: 'none' })
     return false
   }
 
@@ -171,28 +233,53 @@ const validateForm = () => {
   return true
 }
 
-const handleSave = () => {
+const handleSave = async () => {
+  if (saving.value) return
   if (!validateForm()) return
+
+  saving.value = true
 
   const params = {
     receiverName: form.receiverName.trim(),
     receiverPhone: String(form.receiverPhone).trim(),
-    province: form.province,
-    city: form.city,
-    district: form.district,
+    province: form.province.trim(),
+    city: form.city.trim(),
+    district: form.district.trim(),
     detailAddress: form.detailAddress.trim(),
     isDefault: form.isDefault
   }
 
-  const saveFn = isEdit.value 
-    ? () => addressHook.loadEditAddress(addressId.value, params)
-    : () => addressHook.loadAddAddress(params)
+  let result = null
+  if (isEdit.value) {
+    result = await addressHook.loadEditAddress(addressId.value, params)
+  } else {
+    result = await addressHook.loadAddAddress(params)
+  }
 
-  saveFn().then(res => {
-    if (res) {
-      setTimeout(() => {
-        uni.navigateBack()
-      }, 1500)
+  saving.value = false
+
+  if (result) {
+    setTimeout(() => {
+      uni.navigateBack()
+    }, 1500)
+  }
+}
+
+const handleDelete = () => {
+  uni.showModal({
+    title: '删除地址',
+    content: '确定删除该收货地址？删除后无法恢复',
+    confirmText: '删除',
+    confirmColor: '#FF4D4F',
+    success: async (res) => {
+      if (res.confirm) {
+        const success = await addressHook.loadDeleteAddress(addressId.value)
+        if (success) {
+          setTimeout(() => {
+            uni.navigateBack()
+          }, 1500)
+        }
+      }
     }
   })
 }
@@ -201,7 +288,9 @@ const handleSave = () => {
 <style lang="scss" scoped>
 .page-address-form {
   min-height: 100vh;
-  background-color: #F8F8F8;
+  background-color: #F5F5F5;
+  display: flex;
+  flex-direction: column;
 }
 
 .navbar {
@@ -214,15 +303,19 @@ const handleSave = () => {
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
 .navbar-left {
   width: 80rpx;
+  display: flex;
+  align-items: center;
 }
 
 .back-icon {
-  font-size: 48rpx;
+  font-size: 52rpx;
   color: #333333;
+  line-height: 1;
 }
 
 .navbar-title {
@@ -239,70 +332,174 @@ const handleSave = () => {
 .save-text {
   font-size: 30rpx;
   color: #FF6A00;
-  font-weight: 500;
+  font-weight: 600;
+
+  &.disabled {
+    color: #CCCCCC;
+  }
 }
 
 .content {
+  flex: 1;
   padding: 24rpx;
-  padding-bottom: 160rpx;
-  height: calc(100vh - 88rpx);
-  box-sizing: border-box;
+  padding-bottom: calc(48rpx + env(safe-area-inset-bottom));
+  height: 0;
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 300rpx;
+
+  .loading-text {
+    font-size: 28rpx;
+    color: #999999;
+  }
 }
 
 .form-card {
   background-color: #FFFFFF;
-  border-radius: 20rpx;
-  padding: 32rpx;
+  border-radius: 24rpx;
+  padding: 8rpx 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
 }
 
 .form-item {
   display: flex;
   flex-direction: column;
-  padding: 24rpx 0;
-  
+  padding: 28rpx 0;
+
   &:not(:last-child) {
     border-bottom: 1rpx solid #F5F5F5;
   }
 }
 
+.textarea-item {
+  &:not(:last-child) {
+    border-bottom: none;
+  }
+}
+
 .form-label {
-  font-size: 28rpx;
-  color: #999999;
+  display: flex;
+  align-items: center;
   margin-bottom: 16rpx;
+
+  .label-text {
+    font-size: 28rpx;
+    color: #333333;
+    font-weight: 500;
+  }
+
+  .required {
+    font-size: 28rpx;
+    color: #FF4D4F;
+    margin-left: 4rpx;
+  }
 }
 
 .form-input {
-  font-size: 32rpx;
+  font-size: 30rpx;
   color: #333333;
   line-height: 1.5;
-}
-
-.form-textarea {
-  font-size: 32rpx;
-  color: #333333;
-  line-height: 1.6;
-  min-height: 160rpx;
   padding: 0;
 }
 
-.tip-box {
-  margin-top: 32rpx;
-  background-color: rgba(255, 106, 0, 0.05);
-  border-radius: 12rpx;
-  padding: 24rpx;
+.input-placeholder {
+  color: #CCCCCC;
+  font-size: 30rpx;
 }
 
-.tip-title {
-  font-size: 28rpx;
-  color: #FF6A00;
-  font-weight: 500;
-  display: block;
-  margin-bottom: 12rpx;
-}
-
-.tip-desc {
-  font-size: 24rpx;
-  color: #999999;
+.form-textarea {
+  font-size: 30rpx;
+  color: #333333;
   line-height: 1.6;
+  min-height: 120rpx;
+  padding: 0;
+  width: 100%;
+}
+
+.default-card {
+  background-color: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+
+  .default-left {
+    flex: 1;
+
+    .default-title {
+      font-size: 30rpx;
+      color: #333333;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 8rpx;
+    }
+
+    .default-desc {
+      font-size: 24rpx;
+      color: #999999;
+    }
+  }
+}
+
+.delete-card {
+  margin-bottom: 24rpx;
+
+  .delete-btn {
+    background-color: #FFFFFF;
+    border-radius: 24rpx;
+    padding: 32rpx;
+    text-align: center;
+    box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.04);
+
+    &:active {
+      background-color: #FFF5F5;
+    }
+
+    text {
+      font-size: 30rpx;
+      color: #FF4D4F;
+      font-weight: 500;
+    }
+  }
+}
+
+.tip-box {
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(255, 106, 0, 0.05);
+  border-radius: 16rpx;
+  padding: 24rpx;
+
+  .tip-icon {
+    font-size: 32rpx;
+    margin-right: 16rpx;
+    flex-shrink: 0;
+  }
+
+  .tip-content {
+    flex: 1;
+
+    .tip-title {
+      font-size: 26rpx;
+      color: #FF6A00;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 8rpx;
+    }
+
+    .tip-desc {
+      font-size: 24rpx;
+      color: #999999;
+      line-height: 1.6;
+    }
+  }
 }
 </style>

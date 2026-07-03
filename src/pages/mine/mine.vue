@@ -91,11 +91,21 @@
           <view v-else class="user-info">
             <view class="user-left" @click="handleEditProfile">
               <view class="user-avatar">
-                <image :src="userData.avatar || '/static/images/default-avatar.png'" mode="aspectFill" />
+                <image
+                  v-if="userData.avatar"
+                  :src="userData.avatar"
+                  mode="aspectFill"
+                />
+                <text v-else class="avatar-placeholder">👤</text>
               </view>
               <view class="user-detail">
-                <text class="user-name">{{ userData.nickname }}</text>
-                <text class="user-id">ID：{{ userData.userId }}</text>
+                <view class="user-name-row">
+                  <text class="user-name">{{ userData.nickname || '用户' }}</text>
+                  <view v-if="userStore.isMember" class="user-tag member">
+                    <text>{{ memberData.levelName || '会员' }}</text>
+                  </view>
+                </view>
+                <text class="user-id">ID：{{ userData.userId || '--' }}</text>
               </view>
             </view>
             <view class="user-right">
@@ -113,27 +123,28 @@
         </view>
 
         <view class="content-area">
-          <view class="member-card card-animate">
+          <view class="member-card card-animate" @click="handleMemberCenter" :style="{ background: memberCardGradient }">
             <view class="member-left">
               <view class="member-icon">
                 <text>{{ userStore.isMember ? '👑' : '👤' }}</text>
               </view>
               <view class="member-info">
-                <text class="member-level">{{ memberData.levelName || '普通用户' }}</text>
-                <text class="member-growth">成长值：{{ userStore.isLogin ? (Number(memberData.totalGrowth) || 0) : '--' }} / {{ userStore.isLogin ? (Number(memberData.nextLevelGrowth) || 0) : '--' }}</text>
+                <view class="member-level-row">
+                  <text class="member-level">{{ memberLevelName }}</text>
+                  <view v-if="userStore.isLogin" class="member-level-badge">
+                    <text>Lv.{{ memberLevelNum }}</text>
+                  </view>
+                </view>
+                <text class="member-growth">成长值：{{ userStore.isLogin ? memberStore.growthValue : '--' }} / {{ userStore.isLogin ? (memberStore.nextLevelGrowth || '已封顶') : '--' }}</text>
                 <view class="growth-bar">
                   <view class="growth-progress" :style="{ width: growthProgress + '%' }"></view>
                 </view>
-                <text class="growth-tip">{{ userStore.isLogin && memberData.nextLevelGrowth ? `距离升级还差 ${Number(memberData.nextLevelGrowth) - Number(memberData.totalGrowth)} 成长值` : '' }}</text>
+                <text class="growth-tip">{{ userStore.isLogin && memberStore.nextLevelInfo ? `距离升级还差 ${memberStore.nextLevelInfo.needGrowth} 成长值` : (userStore.isLogin ? '已达最高等级' : '') }}</text>
               </view>
             </view>
-            <view class="member-buttons">
-              <view class="member-btn" @click="handleMemberActivity">
-                <text>会员专属活动</text>
-              </view>
-              <view class="member-btn" @click="handleBirthdayGift">
-                <text>生日礼包</text>
-              </view>
+            <view class="member-right-arrow">
+              <text class="arrow-text">会员中心</text>
+              <text class="arrow-icon">›</text>
             </view>
           </view>
 
@@ -154,9 +165,9 @@
                 <text>💰</text>
               </view>
               <view class="asset-info">
-                <text class="asset-num">{{ userStore.isLogin ? assetStats.points : '--' }}</text>
+                <text class="asset-num">{{ userStore.isLogin ? pointsBalance : '--' }}</text>
                 <text class="asset-title">我的积分</text>
-                <text v-if="userStore.isLogin" class="asset-subtitle points-link">积分商城 ></text>
+                <text v-if="userStore.isLogin" class="asset-subtitle">查看明细 ></text>
               </view>
             </view>
             <view class="asset-divider"></view>
@@ -165,7 +176,7 @@
                 <text>📈</text>
               </view>
               <view class="asset-info">
-                <text class="asset-num">{{ userStore.isLogin ? assetStats.growth : '--' }}</text>
+                <text class="asset-num">{{ userStore.isLogin ? memberStore.growthValue : '--' }}</text>
                 <text class="asset-title">成长值</text>
                 <text v-if="userStore.isLogin" class="asset-subtitle">查看明细 ></text>
               </view>
@@ -207,7 +218,7 @@
                     <text>{{ orderStats.pendingReceipt }}</text>
                   </view>
                 </view>
-                <text class="order-name">待收货/自提</text>
+                <text class="order-name">待收货</text>
                 <text v-if="userStore.isLogin" class="order-desc"></text>
               </view>
               <view class="order-item" @click="handleOrder('pendingReview')">
@@ -342,11 +353,14 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useMine } from '@/hooks/useMine'
 import { useUserStore } from '@/store/user'
+import { useMemberStore } from '@/store/member'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
 
 const userStore = useUserStore()
+const memberStore = useMemberStore()
 
 const {
   loading,
@@ -360,6 +374,23 @@ const {
   growthProgress,
   handleRefresh
 } = useMine()
+
+const pointsBalance = computed(() => memberStore.pointsBalance || 0)
+
+const memberLevelName = computed(() => {
+  return memberStore.currentLevelInfo?.name || '普通用户'
+})
+
+const memberLevelNum = computed(() => {
+  return memberStore.currentLevel || 0
+})
+
+// 会员卡片渐变背景
+const memberCardGradient = computed(() => {
+  const levelName = memberLevelName.value
+  const theme = memberStore.getLevelTheme(levelName)
+  return theme.gradient
+})
 
 const formatTime = (minutes) => {
   if (minutes === 0) return '已完成'
@@ -388,14 +419,9 @@ const handleMessage = () => {
   uni.showToast({ title: '消息中心', icon: 'none' })
 }
 
-const handleMemberActivity = () => {
+const handleMemberCenter = () => {
   if (!userStore.isLogin) return handleLogin()
-  uni.showToast({ title: '会员专属活动', icon: 'none' })
-}
-
-const handleBirthdayGift = () => {
-  if (!userStore.isLogin) return handleLogin()
-  uni.showToast({ title: '生日礼包', icon: 'none' })
+  uni.navigateTo({ url: '/pagesSub/member/memberHome' })
 }
 
 const handleCoupon = () => {
@@ -405,12 +431,12 @@ const handleCoupon = () => {
 
 const handlePoints = () => {
   if (!userStore.isLogin) return handleLogin()
-  uni.showToast({ title: '积分商城', icon: 'none' })
+  uni.navigateTo({ url: '/pagesSub/member/point/pointMall' })
 }
 
 const handleGrowth = () => {
   if (!userStore.isLogin) return handleLogin()
-  uni.showToast({ title: '成长值明细', icon: 'none' })
+  uni.navigateTo({ url: '/pagesSub/member/growth/growthDetail' })
 }
 
 const handleAllOrders = () => {
@@ -422,12 +448,20 @@ const handleOrder = (type) => {
   if (!userStore.isLogin) return handleLogin()
   const statusMap = {
     pendingPayment: 'WAIT_PAY',
-    pendingShipment: 'WAIT_SHIP',
-    pendingReceipt: 'WAIT_RECEIVE',
-    pendingReview: 'COMPLETED',
-    afterSale: 'AFTER_SALE'
+    pendingShipment: 'WAIT_ACCEPT',
+    pendingReceipt: 'IN_PROGRESS',
+    pendingReview: 'pendingReview',
+    afterSale: 'afterSale'
   }
-  uni.navigateTo({ url: `/pagesSub/order/orderList?status=${statusMap[type] || ''}` })
+  const status = statusMap[type] || ''
+  
+  if (status === 'pendingReview') {
+    uni.navigateTo({ url: '/pagesSub/order/reviewList' })
+  } else if (status === 'afterSale') {
+    uni.navigateTo({ url: '/pagesSub/order/afterSaleList' })
+  } else {
+    uni.navigateTo({ url: `/pagesSub/order/orderList?status=${status}` })
+  }
 }
 
 const handleDistribution = () => {
@@ -746,21 +780,26 @@ const handleService = () => {
       align-items: center;
       
       .user-avatar {
-        width: 80rpx;
-        height: 80rpx;
+        width: 96rpx;
+        height: 96rpx;
         border-radius: 50%;
         overflow: hidden;
         margin-right: 24rpx;
         border: 2rpx solid rgba(255,122,0,0.2);
-        position: relative;
-        
+        background: #F5F5F5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
         image {
           width: 100%;
           height: 100%;
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
+        }
+
+        .avatar-placeholder {
+          font-size: 48rpx;
+          color: #CCCCCC;
         }
       }
       
@@ -855,97 +894,115 @@ const handleService = () => {
   }
   
   .member-card {
-    background: #FFFFFF;
     border-radius: 24rpx;
     padding: 32rpx;
     margin-bottom: 20rpx;
-    box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.05);
-    
+    box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.12);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+
+    &:active {
+      transform: scale(0.98);
+    }
+
     .member-left {
       display: flex;
-      
+      flex: 1;
+      align-items: center;
+
       .member-icon {
         width: 72rpx;
         height: 72rpx;
         border-radius: 50%;
-        background: linear-gradient(135deg, #FF7A00, #FFA040);
+        background: rgba(255, 255, 255, 0.25);
+        border: 2rpx solid rgba(255, 255, 255, 0.4);
         display: flex;
         align-items: center;
         justify-content: center;
         margin-right: 24rpx;
-        
+        flex-shrink: 0;
+
         text {
           font-size: 36rpx;
         }
       }
-      
+
       .member-info {
         flex: 1;
-        
-        .member-level {
-          font-size: 32rpx;
-          font-weight: 600;
-          color: #333;
-          display: block;
+
+        .member-level-row {
+          display: flex;
+          align-items: center;
           margin-bottom: 8rpx;
+
+          .member-level {
+            font-size: 32rpx;
+            font-weight: 600;
+            color: #FFFFFF;
+            margin-right: 12rpx;
+          }
+
+          .member-level-badge {
+            padding: 2rpx 12rpx;
+            border-radius: 20rpx;
+            background: rgba(255, 255, 255, 0.3);
+
+            text {
+              font-size: 20rpx;
+              color: #FFFFFF;
+              font-weight: 500;
+            }
+          }
         }
-        
+
         .member-growth {
           font-size: 24rpx;
-          color: #666;
+          color: rgba(255, 255, 255, 0.85);
           display: block;
           margin-bottom: 16rpx;
         }
-        
+
         .growth-bar {
           width: 100%;
           height: 12rpx;
-          background: #F0F0F0;
+          background: rgba(255, 255, 255, 0.25);
           border-radius: 6rpx;
           overflow: hidden;
           margin-bottom: 8rpx;
-          
+
           .growth-progress {
             height: 100%;
-            background: linear-gradient(90deg, #FF7A00, #FFA040);
+            background: linear-gradient(90deg, #FFFFFF, #FFE0B2);
             border-radius: 6rpx;
             transition: width 0.5s ease;
           }
         }
-        
+
         .growth-tip {
           font-size: 22rpx;
-          color: #FF7A00;
+          color: rgba(255, 255, 255, 0.9);
         }
       }
     }
-    
-    .member-buttons {
+
+    .member-right-arrow {
       display: flex;
-      margin-top: 24rpx;
-      
-      .member-btn {
-        flex: 1;
-        height: 72rpx;
-        border: 1rpx solid #FF7A00;
-        border-radius: 36rpx;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-right: 16rpx;
-        
-        &:last-child {
-          margin-right: 0;
-        }
-        
-        &:active {
-          transform: scale(0.96);
-        }
-        
-        text {
-          font-size: 26rpx;
-          color: #FF7A00;
-        }
+      align-items: center;
+      flex-shrink: 0;
+      margin-left: 16rpx;
+
+      .arrow-text {
+        font-size: 24rpx;
+        color: #FFFFFF;
+        font-weight: 500;
+      }
+
+      .arrow-icon {
+        font-size: 36rpx;
+        color: #FFFFFF;
+        margin-left: 4rpx;
       }
     }
   }
@@ -1063,6 +1120,14 @@ const handleService = () => {
         display: flex;
         flex-direction: column;
         align-items: center;
+        padding: 16rpx 0;
+        border-radius: 16rpx;
+        transition: all 0.2s ease;
+        
+        &:active {
+          background: rgba(255, 122, 0, 0.08);
+          transform: scale(0.96);
+        }
         
         .order-icon-wrap {
           width: 72rpx;

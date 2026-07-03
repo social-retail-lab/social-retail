@@ -218,6 +218,20 @@
           }
         },
         {
+          "path": "reviewList",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的评价"
+          }
+        },
+        {
+          "path": "afterSaleList",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "退款/售后"
+          }
+        },
+        {
           "path": "pay/payOrder",
           "style": {
             "navigationStyle": "custom",
@@ -355,7 +369,8 @@
           "path": "point/pointDetail",
           "style": {
             "navigationStyle": "custom",
-            "navigationBarTitleText": "积分明细"
+            "navigationBarTitleText": "积分明细",
+            "enablePullDownRefresh": true
           }
         },
         {
@@ -369,7 +384,8 @@
           "path": "growth/growthDetail",
           "style": {
             "navigationStyle": "custom",
-            "navigationBarTitleText": "成长值明细"
+            "navigationBarTitleText": "成长值明细",
+            "enablePullDownRefresh": true
           }
         }
       ]

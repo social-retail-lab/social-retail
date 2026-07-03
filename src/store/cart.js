@@ -10,6 +10,7 @@ export const useCartStore = defineStore('cart', () => {
   const checkedAmount = ref(0)
   const isAllSelected = ref(false)
   const isManageMode = ref(false)
+  const checkoutPreviewData = ref(null)
 
   const validCartList = computed(() => {
     return cartList.value.filter(item => item.valid)
@@ -119,6 +120,10 @@ export const useCartStore = defineStore('cart', () => {
     updateAllSelectedStatus()
   }
 
+  const setCheckoutPreviewData = (data) => {
+    checkoutPreviewData.value = data
+  }
+
   const fetchCartItems = async () => {
     const res = await getCartItemsApi()
     if (res.code === 0 && res.data) {
@@ -162,6 +167,7 @@ export const useCartStore = defineStore('cart', () => {
   const fetchCheckoutPreview = async (data) => {
     const res = await checkoutPreviewApi(data)
     if (res.code === 0 && res.data) {
+      checkoutPreviewData.value = res.data
       return res.data
     }
     return null
@@ -183,6 +189,7 @@ export const useCartStore = defineStore('cart', () => {
     checkedAmount,
     isAllSelected,
     isManageMode,
+    checkoutPreviewData,
     validCartList,
     groupedCartList,
     selectedItems,
@@ -194,6 +201,7 @@ export const useCartStore = defineStore('cart', () => {
     toggleManageMode,
     setCartData,
     setInvalidList,
+    setCheckoutPreviewData,
     removeItem,
     removeSelectedItems,
     fetchCartItems,

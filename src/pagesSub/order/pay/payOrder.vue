@@ -12,11 +12,11 @@
       <view class="order-info-card">
         <view class="order-info-top">
           <text class="order-label">订单编号</text>
-          <text class="order-sn">{{ orderSn }}</text>
+          <text class="order-sn">{{ orderSn || '-' }}</text>
         </view>
         <view class="order-info-bottom">
           <text class="order-label">下单时间</text>
-          <text class="order-time">{{ orderTime }}</text>
+          <text class="order-time">{{ createTime || '-' }}</text>
         </view>
       </view>
 
@@ -24,11 +24,12 @@
         <view class="amount-label">支付金额</view>
         <view class="amount-value-wrap">
           <text class="amount-symbol">¥</text>
-          <text class="amount-value">{{ payAmount.toFixed(2) }}</text>
+          <text class="amount-value">{{ displayPayAmount }}</text>
         </view>
         <view v-if="expireTime" class="expire-info">
           <text class="expire-icon">⏱</text>
-          <text class="expire-text">请在 <text class="expire-time">{{ expireTime }}</text> 前完成支付</text>
+          <text v-if="isExpired" class="expire-text">支付已过期</text>
+          <text v-else class="expire-text">剩余支付时间 <text class="expire-time">{{ countdownText }}</text></text>
         </view>
       </view>
 
@@ -37,8 +38,8 @@
           <text class="section-title">支付方式</text>
         </view>
         <view class="payment-options">
-          <view 
-            class="payment-option" 
+          <view
+            class="payment-option"
             :class="{ 'payment-active': paymentType === 'ALIPAY' }"
             @click="paymentType = 'ALIPAY'"
           >
@@ -50,8 +51,8 @@
               <view v-if="paymentType === 'ALIPAY'" class="check-dot"></view>
             </view>
           </view>
-          <view 
-            class="payment-option" 
+          <view
+            class="payment-option"
             :class="{ 'payment-active': paymentType === 'WECHAT' }"
             @click="paymentType = 'WECHAT'"
           >
@@ -71,13 +72,17 @@
           <text class="section-title">商品信息</text>
         </view>
         <view class="goods-list">
-          <view v-for="item in orderItems" :key="item.cartItemId" class="goods-item">
+          <view
+            v-for="item in orderItems"
+            :key="item.orderItemId || item.cartItemId"
+            class="goods-item"
+          >
             <image :src="getValidImageUrl(item.productImage)" class="goods-image" mode="aspectFill" />
             <view class="goods-info">
               <text class="goods-name">{{ item.productName }}</text>
               <text class="goods-sku">{{ item.skuSpecs }}</text>
               <view class="goods-bottom">
-                <text class="goods-price">¥{{ item.finalPrice }}</text>
+                <text class="goods-price">¥{{ formatItemPrice(item.finalPrice) }}</text>
                 <text class="goods-count">×{{ item.quantity }}</text>
               </view>
             </view>
@@ -89,134 +94,199 @@
     <view class="pay-footer">
       <view class="footer-left">
         <text class="footer-label">合计：</text>
-        <text class="footer-amount">¥{{ payAmount.toFixed(2) }}</text>
+        <text class="footer-amount">¥{{ displayPayAmount }}</text>
       </view>
-      <view 
-        class="pay-btn" 
-        :class="{ 'btn-disabled': isPaying }"
+      <view
+        class="pay-btn"
+        :class="{ 'btn-disabled': isPaying, 'btn-expired': isExpired }"
         @click="handlePay"
       >
-        <text>{{ isPaying ? '支付中...' : '立即支付' }}</text>
+        <text>{{ buttonText }}</text>
       </view>
     </view>
   </view>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { showToast, getValidImageUrl } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
+
+const orderHook = useOrder()
 
 const orderId = ref('')
 const orderSn = ref('')
 const payAmount = ref(0)
 const expireTime = ref('')
+const createTime = ref('')
+
 const paymentType = ref('ALIPAY')
 const isPaying = ref(false)
+const remainSeconds = ref(0)
 
 const orderItems = ref([])
-const orderTime = ref('')
 
-const { fetchOrderDetail, fetchOrderStatus } = useOrder()
 let pollTimer = null
+let countdownTimer = null
+
+const isExpired = computed(() => remainSeconds.value <= 0)
+
+const displayPayAmount = computed(() => (Number(payAmount.value) || 0).toFixed(2))
+
+const countdownText = computed(() => {
+  const total = remainSeconds.value
+  if (total <= 0) return '00:00'
+  const hours = Math.floor(total / 3600)
+  const minutes = Math.floor((total % 3600) / 60)
+  const seconds = total % 60
+  const pad = (n) => n.toString().padStart(2, '0')
+  if (hours > 0) return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`
+  return `${pad(minutes)}:${pad(seconds)}`
+})
+
+const buttonText = computed(() => {
+  if (isExpired.value) return '支付已过期'
+  if (isPaying.value) return '支付中...'
+  return '立即支付'
+})
+
+const formatItemPrice = (price) => (Number(price) || 0).toFixed(2)
+
+const parseExpireDate = (val) => {
+  if (!val) return null
+  if (/^\d+$/.test(String(val).trim())) {
+    return new Date(Number(val))
+  }
+  return new Date(val)
+}
 
 const handleBack = () => {
   uni.showModal({
-    title: '确认取消',
+    title: '确认离开',
     content: '支付未完成，确定要离开吗？',
+    confirmText: '离开',
+    cancelText: '继续支付',
     success: (res) => {
       if (res.confirm) {
-        uni.redirectTo({ url: '/pagesSub/order/orderList?status=WAIT_PAY' })
+        stopAllTimers()
+        uni.navigateBack()
       }
     }
   })
 }
 
-const fetchOrderDetailData = async () => {
-  if (!orderId.value) return
-  
-  const data = await fetchOrderDetail(orderId.value)
-  
-  if (data) {
-    orderItems.value = data.itemList || []
-    if (!orderSn.value) orderSn.value = data.orderSn || ''
-    if (!payAmount.value) payAmount.value = data.payAmount || 0
-    if (!expireTime.value) expireTime.value = data.payExpireTime || ''
+const startCountdown = () => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
   }
+  if (!expireTime.value) return
+  const expireDate = parseExpireDate(expireTime.value)
+  if (!expireDate || isNaN(expireDate.getTime())) return
+
+  const update = () => {
+    const remain = Math.floor((expireDate.getTime() - Date.now()) / 1000)
+    remainSeconds.value = remain > 0 ? remain : 0
+    if (remainSeconds.value <= 0 && countdownTimer) {
+      clearInterval(countdownTimer)
+      countdownTimer = null
+    }
+  }
+  update()
+  countdownTimer = setInterval(update, 1000)
+}
+
+const stopPolling = () => {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+}
+
+const stopAllTimers = () => {
+  stopPolling()
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+    countdownTimer = null
+  }
+}
+
+const startPolling = () => {
+  if (pollTimer) return
+  if (!orderId.value) return
+  pollTimer = setInterval(pollOrderStatus, 3000)
+}
+
+const redirectToDetail = () => {
+  uni.navigateTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
 }
 
 const pollOrderStatus = async () => {
-  const statusData = await fetchOrderStatus(orderId.value)
-  
-  if (statusData && statusData.status !== 'WAIT_PAY') {
-    if (pollTimer) {
-      clearInterval(pollTimer)
-      pollTimer = null
+  if (!orderId.value) return
+  const statusData = await orderHook.loadOrderStatus(orderId.value)
+  if (!statusData) return
+  if (statusData.status && statusData.status !== 'WAIT_PAY') {
+    stopAllTimers()
+    const successStatuses = ['WAIT_SHIP', 'WAIT_RECEIVE', 'IN_PROGRESS', 'COMPLETED']
+    if (successStatuses.includes(statusData.status)) {
+      showToast('支付成功', 'success')
+    } else {
+      showToast(statusData.statusText || '订单状态已变更')
     }
-    
-    if (statusData.status === 'WAIT_SHIP' || statusData.status === 'WAIT_RECEIVE') {
-      showToast('支付成功')
-      setTimeout(() => {
-        uni.redirectTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
-      }, 1500)
-    }
+    setTimeout(redirectToDetail, 1500)
   }
 }
 
-const handlePay = async () => {
-  isPaying.value = true
-  try {
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    showToast('支付处理中')
-    
-    pollTimer = setInterval(pollOrderStatus, 3000)
-    
-    setTimeout(() => {
-      if (pollTimer) {
-        clearInterval(pollTimer)
-        pollTimer = null
-        showToast('支付成功')
-        uni.redirectTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
-      }
-    }, 10000)
-  } catch (error) {
-    console.error('支付失败:', error)
-    showToast('支付失败，请重试')
-  } finally {
-    isPaying.value = false
+const fetchOrderDetailData = async () => {
+  if (!orderId.value) return false
+  const data = await orderHook.loadOrderDetail(orderId.value)
+  if (!data) return true
+
+  orderItems.value = data.itemList || []
+  if (data.orderSn) orderSn.value = data.orderSn
+  if (data.payAmount !== undefined) payAmount.value = Number(data.payAmount) || 0
+  if (data.payExpireTime) expireTime.value = data.payExpireTime
+  createTime.value = data.createTime || ''
+
+  // 订单已脱离待支付状态，直接跳转详情页
+  if (data.status && data.status !== 'WAIT_PAY') {
+    stopAllTimers()
+    redirectToDetail()
+    return false
   }
+  return true
+}
+
+const handlePay = () => {
+  if (isPaying.value || isExpired.value) return
+  isPaying.value = true
+  uni.showLoading({ title: '正在跳转支付...', mask: true })
+  // 实际项目中这里应该调用后端支付下单接口获取支付参数
+  uni.hideLoading()
+  showToast('支付功能对接中，请稍后')
+  // 继续轮询订单状态，轮询到状态变化后自动跳转订单详情
+  startPolling()
 }
 
 onMounted(async () => {
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const options = currentPage.$page?.options || currentPage.options || {}
-  
+
   if (options.orderId) orderId.value = options.orderId
   if (options.orderSn) orderSn.value = options.orderSn
-  if (options.payAmount) payAmount.value = parseFloat(options.payAmount) || 150.00
-  if (options.expireTime) expireTime.value = options.expireTime
-  
-  if (!orderSn.value) {
-    orderSn.value = 'ORD' + Date.now().toString().slice(-10)
-  }
-  
-  if (!expireTime.value) {
-    const expire = new Date(Date.now() + 30 * 60 * 1000)
-    expireTime.value = `${expire.getHours().toString().padStart(2, '0')}:${expire.getMinutes().toString().padStart(2, '0')}:${expire.getSeconds().toString().padStart(2, '0')}`
-  }
-  
-  const now = new Date()
-  orderTime.value = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
-  
-  await fetchOrderDetailData()
+  if (options.payAmount) payAmount.value = Number(options.payAmount) || 0
+  if (options.expireTime) expireTime.value = decodeURIComponent(options.expireTime)
+
+  const stay = await fetchOrderDetailData()
+  if (stay === false) return
+
+  startCountdown()
+  startPolling()
 })
 
 onUnmounted(() => {
-  if (pollTimer) {
-    clearInterval(pollTimer)
-    pollTimer = null
-  }
+  stopAllTimers()
 })
 </script>
 
@@ -569,6 +639,11 @@ onUnmounted(() => {
     
     &.btn-disabled {
       opacity: 0.6;
+    }
+    
+    &.btn-expired {
+      background: #CCCCCC;
+      opacity: 0.7;
     }
   }
 }

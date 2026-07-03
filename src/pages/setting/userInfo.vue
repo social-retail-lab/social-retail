@@ -51,9 +51,10 @@
 
 <script setup>
 import { ref, onMounted } from "vue"
-import { useUserProfile } from "@/hooks/useUserProfile"
+import { useUserStore } from '@/store/user'
+import { showToast } from '@/utils/common'
 
-const userProfileHook = useUserProfile()
+const userStore = useUserStore()
 
 const nickname = ref('')
 const avatar = ref('')
@@ -61,9 +62,8 @@ const avatar = ref('')
 const defaultAvatar = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=simple%20user%20avatar%20icon%20neutral%20background&image_size=square'
 
 onMounted(() => {
-  const userInfo = userProfileHook.getUserInfo()
-  nickname.value = userInfo.nickname || ''
-  avatar.value = userInfo.avatar || ''
+  nickname.value = userStore.userInfo.nickname || ''
+  avatar.value = userStore.userInfo.avatar || ''
 })
 
 const goBack = () => {
@@ -86,11 +86,26 @@ const chooseAvatar = () => {
   })
 }
 
-const handleSave = () => {
-  userProfileHook.loadUpdateUserInfo({ 
-    nickname: nickname.value, 
-    avatar: avatar.value 
-  })
+const handleSave = async () => {
+  try {
+    const res = await userStore.fetchUpdateUserInfo({ 
+      nickname: nickname.value, 
+      avatar: avatar.value 
+    })
+    if (res) {
+      userStore.updateUserInfo(res)
+      await userStore.fetchUserInfo()
+      showToast('修改成功')
+      setTimeout(() => {
+        uni.navigateBack()
+      }, 1000)
+    } else {
+      showToast('修改失败')
+    }
+  } catch (error) {
+    console.error('修改用户信息失败:', error)
+    showToast('修改失败')
+  }
 }
 </script>
 

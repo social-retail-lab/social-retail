@@ -65,6 +65,16 @@ export const editAddressApi = (addressId, data) => {
   })
 }
 
+export const getAddressDetailApi = (addressId) => {
+  if (!addressId) {
+    throw new Error('地址ID不能为空')
+  }
+  return request({
+    url: `/api/addresses/${addressId}`,
+    method: "get"
+  })
+}
+
 export const deleteAddressApi = (addressId) => {
   if (!addressId) {
     throw new Error('地址ID不能为空')

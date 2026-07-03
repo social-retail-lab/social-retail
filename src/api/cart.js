@@ -237,15 +237,7 @@ const validateCheckoutPreviewParams = (data) => {
   }
   
   return {
-    cartItemIds,
-    couponUserId: data?.couponUserId || null,
-    usePoints: !!data?.usePoints,
-    activityContext: {
-      seckillId: data?.activityContext?.seckillId || null,
-      bargainId: data?.activityContext?.bargainId || null,
-      groupId: data?.activityContext?.groupId || null,
-      promotionIds: Array.isArray(data?.activityContext?.promotionIds) ? data.activityContext.promotionIds : []
-    }
+    cartItemIds
   }
 }
 
@@ -259,38 +251,105 @@ const normalizeCheckoutPreviewData = (data) => {
       productId: item.productId || null,
       productName: item.productName || '',
       productImage: item.productImage || '',
-      skuSpec: item.skuSpec || '',
-      originalPrice: Number(item.originalPrice) || 0,
-      salePrice: Number(item.salePrice) || 0,
+      skuSpecs: item.skuSpecs || '',
+      originPrice: Number(item.originPrice) || 0,
+      finalPrice: Number(item.finalPrice) || 0,
       quantity: Number(item.quantity) || 0,
       stock: Number(item.stock) || 0,
-      itemOriginalAmount: Number(item.itemOriginalAmount) || 0,
-      itemPayableAmount: Number(item.itemPayableAmount) || 0,
-      activityType: item.activityType || null,
+      itemOriginAmount: Number(item.itemOriginAmount) || 0,
+      itemFinalAmount: Number(item.itemFinalAmount) || 0,
+      promotionType: item.promotionType || null,
       activityDiscount: Number(item.activityDiscount) || 0,
       isValid: item.isValid !== false,
       invalidReason: item.invalidReason || null
     })) : [],
     priceDetail: data.priceDetail ? {
-      originalAmount: Number(data.priceDetail.originalAmount) || 0,
+      totalAmount: Number(data.priceDetail.totalAmount) || 0,
       seckillDiscount: Number(data.priceDetail.seckillDiscount) || 0,
       bargainDiscount: Number(data.priceDetail.bargainDiscount) || 0,
       promotionDiscount: Number(data.priceDetail.promotionDiscount) || 0,
-      couponDiscount: Number(data.priceDetail.couponDiscount) || 0,
+      merchantCouponDiscount: Number(data.priceDetail.merchantCouponDiscount) || 0,
+      platformCouponDiscount: Number(data.priceDetail.platformCouponDiscount) || 0,
+      couponDiscount: (Number(data.priceDetail.platformCouponDiscount) || 0) + (Number(data.priceDetail.merchantCouponDiscount) || 0),
       pointsDeduction: Number(data.priceDetail.pointsDeduction) || 0,
       deliveryFee: Number(data.priceDetail.deliveryFee) || 0,
-      payableAmount: Number(data.priceDetail.payableAmount) || 0
+      payAmount: Number(data.priceDetail.payAmount) || 0,
+      fullReductionDiscount: Number(data.priceDetail.promotionDiscount) || 0
     } : null,
-    promotionDetail: Array.isArray(data.promotionDetail) ? data.promotionDetail : [],
-    couponInfo: data.couponInfo || null,
+    couponInfo: data.couponInfo ? {
+      platformCoupon: data.couponInfo.platformCoupon ? {
+        couponUserId: data.couponInfo.platformCoupon.couponUserId || null,
+        couponId: data.couponInfo.platformCoupon.couponId || null,
+        title: data.couponInfo.platformCoupon.title || '',
+        source: data.couponInfo.platformCoupon.source || '',
+        sourceText: data.couponInfo.platformCoupon.sourceText || '',
+        minConsume: Number(data.couponInfo.platformCoupon.minConsume) || 0,
+        discountAmount: Number(data.couponInfo.platformCoupon.discountAmount) || 0,
+        selected: data.couponInfo.platformCoupon.selected !== false,
+        autoSelected: data.couponInfo.platformCoupon.autoSelected !== false
+      } : null,
+      merchantCoupon: data.couponInfo.merchantCoupon ? {
+        couponUserId: data.couponInfo.merchantCoupon.couponUserId || null,
+        couponId: data.couponInfo.merchantCoupon.couponId || null,
+        merchantId: data.couponInfo.merchantCoupon.merchantId || null,
+        merchantName: data.couponInfo.merchantCoupon.merchantName || '',
+        title: data.couponInfo.merchantCoupon.title || '',
+        source: data.couponInfo.merchantCoupon.source || '',
+        sourceText: data.couponInfo.merchantCoupon.sourceText || '',
+        minConsume: Number(data.couponInfo.merchantCoupon.minConsume) || 0,
+        discountAmount: Number(data.couponInfo.merchantCoupon.discountAmount) || 0,
+        selected: data.couponInfo.merchantCoupon.selected !== false,
+        autoSelected: data.couponInfo.merchantCoupon.autoSelected !== false
+      } : null
+    } : null,
+    pointsInfo: data.pointsInfo ? {
+      pointsBalance: Number(data.pointsInfo.pointsBalance) || 0,
+      canUsePoints: data.pointsInfo.canUsePoints !== false,
+      maxUsablePoints: Number(data.pointsInfo.maxUsablePoints) || 0,
+      usedPoints: Number(data.pointsInfo.usedPoints) || 0,
+      deductionAmount: Number(data.pointsInfo.deductionAmount) || 0,
+      deductionRule: data.pointsInfo.deductionRule || '',
+      maxDeductionAmount: Number(data.pointsInfo.maxDeductionAmount) || 0
+    } : null,
+    promotionDetail: Array.isArray(data.promotionDetail) ? data.promotionDetail.map(item => ({
+      type: item.type || '',
+      title: item.title || '',
+      discount: Number(item.discount) || 0,
+      usedPoints: Number(item.usedPoints) || 0
+    })) : [],
     activityInfo: data.activityInfo ? {
-      seckillActivityId: data.activityInfo.seckillActivityId || null,
-      bargainActivityId: data.activityInfo.bargainActivityId || null,
-      groupActivityId: data.activityInfo.groupActivityId || null,
+      seckillProductId: data.activityInfo.seckillProductId || null,
+      bargainRecordId: data.activityInfo.bargainRecordId || null,
+      groupId: data.activityInfo.groupId || null,
       promotionIds: Array.isArray(data.activityInfo.promotionIds) ? data.activityInfo.promotionIds : []
     } : {},
     availablePromotions: Array.isArray(data.availablePromotions) ? data.availablePromotions : [],
-    availableCoupons: Array.isArray(data.availableCoupons) ? data.availableCoupons : [],
+    availableCoupons: data.availableCoupons ? {
+      platformCoupons: Array.isArray(data.availableCoupons.platformCoupons) ? data.availableCoupons.platformCoupons.map(coupon => ({
+        couponUserId: coupon.couponUserId || null,
+        couponId: coupon.couponId || null,
+        title: coupon.title || '',
+        source: coupon.source || '',
+        sourceText: coupon.sourceText || '',
+        minConsume: Number(coupon.minConsume) || 0,
+        discountAmount: Number(coupon.discountAmount) || 0,
+        selected: coupon.selected !== false,
+        autoSelected: coupon.autoSelected !== false
+      })) : [],
+      merchantCoupons: Array.isArray(data.availableCoupons.merchantCoupons) ? data.availableCoupons.merchantCoupons.map(coupon => ({
+        couponUserId: coupon.couponUserId || null,
+        couponId: coupon.couponId || null,
+        merchantId: coupon.merchantId || null,
+        merchantName: coupon.merchantName || '',
+        title: coupon.title || '',
+        source: coupon.source || '',
+        sourceText: coupon.sourceText || '',
+        minConsume: Number(coupon.minConsume) || 0,
+        discountAmount: Number(coupon.discountAmount) || 0,
+        selected: coupon.selected !== false,
+        autoSelected: coupon.autoSelected !== false
+      })) : []
+    } : {},
     totalQuantity: Number(data.totalQuantity) || 0
   }
 }

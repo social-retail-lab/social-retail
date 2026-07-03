@@ -225,11 +225,11 @@ const loadCategoryGoods = async (categoryId) => {
     }
     
     if (sortType.value === 'sales') {
-      params.sortBy = 'soldCount'
-      params.sortDirection = 'desc'
+      params.sortField = 'soldCount'
+      params.sortOrder = 'desc'
     } else {
-      params.sortBy = 'price'
-      params.sortDirection = priceSortDirection.value
+      params.sortField = 'price'
+      params.sortOrder = priceSortDirection.value
     }
     
     const result = await loadCategoryProducts(categoryId, params)

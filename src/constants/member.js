@@ -32,9 +32,44 @@ export const MEMBER_LEVEL_THRESHOLD = {
   [MEMBER_LEVEL.NORMAL]: 0,
   [MEMBER_LEVEL.SILVER]: 1000,
   [MEMBER_LEVEL.GOLD]: 5000,
-  [MEMBER_LEVEL.PLATINUM]: 20000,
-  [MEMBER_LEVEL.DIAMOND]: 50000,
-  [MEMBER_LEVEL.SUPREME]: 100000
+  [MEMBER_LEVEL.DIAMOND]: 10000
+}
+
+// 会员等级列表（按顺序）
+export const MEMBER_LEVEL_LIST = [
+  { level: MEMBER_LEVEL.NORMAL, name: '普通会员', threshold: 0 },
+  { level: MEMBER_LEVEL.SILVER, name: '银卡会员', threshold: 1000 },
+  { level: MEMBER_LEVEL.GOLD, name: '金卡会员', threshold: 5000 },
+  { level: MEMBER_LEVEL.DIAMOND, name: '钻石会员', threshold: 10000 }
+]
+
+// 根据成长值获取当前等级
+export const getLevelByGrowth = (growthValue) => {
+  const growth = Number(growthValue) || 0
+  let currentLevel = MEMBER_LEVEL.NORMAL
+  for (const item of MEMBER_LEVEL_LIST) {
+    if (growth >= item.threshold) {
+      currentLevel = item.level
+    }
+  }
+  return currentLevel
+}
+
+// 获取下一级信息
+export const getNextLevelInfo = (growthValue) => {
+  const growth = Number(growthValue) || 0
+  const currentLevel = getLevelByGrowth(growth)
+  const currentIndex = MEMBER_LEVEL_LIST.findIndex(item => item.level === currentLevel)
+  if (currentIndex < MEMBER_LEVEL_LIST.length - 1) {
+    const nextLevel = MEMBER_LEVEL_LIST[currentIndex + 1]
+    return {
+      level: nextLevel.level,
+      name: nextLevel.name,
+      threshold: nextLevel.threshold,
+      needGrowth: Math.max(0, nextLevel.threshold - growth)
+    }
+  }
+  return null
 }
 
 // 会员权益

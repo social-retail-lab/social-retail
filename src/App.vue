@@ -20,10 +20,14 @@ const initUserLogin = () => {
   const userStore = useUserStore()
   const token = uni.getStorageSync('token')
   const userInfo = uni.getStorageSync('userInfo')
+  const memberInfo = uni.getStorageSync('memberInfo')
   
   if (token && userInfo) {
     userStore.token = token
     userStore.userInfo = JSON.parse(userInfo)
+    if (memberInfo) {
+      userStore.memberInfo = JSON.parse(memberInfo)
+    }
     userStore.isLogin = true
   }
 }
