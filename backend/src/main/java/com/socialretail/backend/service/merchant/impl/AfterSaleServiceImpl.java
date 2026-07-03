@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.entity.order.*;
+import com.socialretail.backend.entity.system.Notification;
 import com.socialretail.backend.entity.user.User;
 import com.socialretail.backend.mapper.order.*;
+import com.socialretail.backend.mapper.system.NotificationMapper;
 import com.socialretail.backend.mapper.user.UserMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +47,9 @@ public class AfterSaleServiceImpl {
 
     @Resource
     private MerchantEarningsMapper merchantEarningsMapper;
+
+    @Resource
+    private NotificationMapper notificationMapper;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -232,6 +237,17 @@ public class AfterSaleServiceImpl {
         }
 
         afterSaleMapper.updateById(afterSale);
+
+        // 通知运营平台
+        Notification n = new Notification();
+        n.setUserId(0L);
+        n.setType("AFTERSALE_RESULT");
+        n.setTitle("售后处理通知");
+        n.setContent("商家「" + merchantId + "」已处理售后 #" + afterSaleId + "：" + (action == 1 ? "通过" : "拒绝"));
+        n.setIsRead(0);
+        n.setRelatedId(afterSaleId);
+        n.setCreateTime(LocalDateTime.now());
+        notificationMapper.insert(n);
 
         result.put("auditTime", formatDateTime(afterSale.getAuditTime()));
         return result;

@@ -1,7 +1,6 @@
 package com.socialretail.backend.service.promotion;
 
 import com.socialretail.backend.entity.promotion.Coupon;
-
 import java.util.List;
 
 public interface CouponService {
@@ -16,4 +15,7 @@ public interface CouponService {
     void deleteCoupon(Long id);
 
     void disableCoupon(Long id);
+
+    // 补充远程新增的启用优惠券方法
+    void enableCoupon(Long id);
 }

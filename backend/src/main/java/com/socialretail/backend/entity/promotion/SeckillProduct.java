@@ -14,7 +14,7 @@ public class SeckillProduct {
     private Long id;
     private Long seckillActivityId;
     private Long productId;
-    private Long skuId;
+    private String skuId;
     private BigDecimal seckillPrice;
     private Integer seckillStock;
     private Integer soldCount;

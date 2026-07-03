@@ -104,4 +104,17 @@ public class CouponServiceImpl implements CouponService {
         }
         return coupon;
     }
+    @Override
+    @Transactional
+    public void enableCoupon(Long id) {
+        requireCoupon(id);
+        Coupon update = new Coupon();
+        update.setId(id);
+        update.setStatus(1);
+        update.setUpdateTime(LocalDateTime.now());
+        if (couponMapper.updateById(update) != 1) {
+            throw new IllegalStateException("优惠券启用失败");
+        }
+    }
 }
+

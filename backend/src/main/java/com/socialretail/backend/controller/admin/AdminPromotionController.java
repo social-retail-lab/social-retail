@@ -1,14 +1,20 @@
 package com.socialretail.backend.controller.admin;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.socialretail.backend.common.result.Result;
 import com.socialretail.backend.entity.promotion.PlatformPromotion;
-import com.socialretail.backend.service.promotion.PromotionService;
+import com.socialretail.backend.entity.promotion.PlatformPromotionTier;
+import com.socialretail.backend.mapper.promotion.PlatformPromotionMapper;
+import com.socialretail.backend.mapper.promotion.PlatformPromotionTierMapper;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,78 +22,169 @@ import java.util.Map;
 @RequestMapping("/api/admin/promotions")
 public class AdminPromotionController {
 
-    private final PromotionService promotionService;
+    @Resource
+    private PlatformPromotionMapper promotionMapper;
 
-    public AdminPromotionController(PromotionService promotionService) {
-        this.promotionService = promotionService;
-    }
+    @Resource
+    private PlatformPromotionTierMapper tierMapper;
 
-    // 活动列表（status: 0=草稿, 1=已发布, 2=已关闭）
     @GetMapping
     public Result list(@RequestParam(required = false) Integer status) {
-        return Result.success(promotionService.listPromotions(status));
+        LambdaQueryWrapper<PlatformPromotion> wrapper = new LambdaQueryWrapper<>();
+        if (status != null) {
+            wrapper.eq(PlatformPromotion::getStatus, status);
+        }
+        wrapper.orderByDesc(PlatformPromotion::getCreateTime);
+        List<PlatformPromotion> list = promotionMapper.selectList(wrapper);
+        for (PlatformPromotion p : list) {
+            List<PlatformPromotionTier> tiers = tierMapper.selectList(
+                    new LambdaQueryWrapper<PlatformPromotionTier>()
+                            .eq(PlatformPromotionTier::getPromotionId, p.getId())
+                            .orderByAsc(PlatformPromotionTier::getSortOrder));
+            p.setTiers(tiers);
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("total", list.size());
+        result.put("list", list);
+        return Result.success(result);
     }
 
-    // 创建活动（保存为草稿）
     @PostMapping
     public Result create(@RequestBody Map<String, Object> body) {
         Map<String, Object> promotionMap = (Map<String, Object>) body.get("promotion");
-        PlatformPromotion p = new PlatformPromotion();
-        p.setTitle((String) promotionMap.get("title"));
-        p.setStartTime(parseDateTime((String) promotionMap.get("startTime")));
-        p.setEndTime(parseDateTime((String) promotionMap.get("endTime")));
-        List<Map<String, BigDecimal>> tiers = parseTiers(body.get("tiers"));
-        return Result.success(promotionService.createPromotion(p, tiers));
+        String timeErr = validatePromotionTime(promotionMap);
+        if (timeErr != null) return Result.fail(timeErr);
+
+        PlatformPromotion p = buildPromotion(body);
+        p.setStatus(0);
+        p.setCreateTime(LocalDateTime.now());
+        p.setUpdateTime(LocalDateTime.now());
+        promotionMapper.insert(p);
+
+        List<PlatformPromotionTier> tiers = buildTiers(body, p.getId());
+        if (!tiers.isEmpty()) {
+            for (PlatformPromotionTier tier : tiers) {
+                tierMapper.insert(tier);
+            }
+        }
+        p.setTiers(tiers);
+        return Result.success(p);
     }
 
-    // 编辑活动（仅草稿可编辑）
     @PutMapping("/{id}")
     public Result update(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        PlatformPromotion existing = promotionMapper.selectById(id);
+        if (existing == null) {
+            return Result.fail("活动不存在");
+        }
+        if (existing.getStatus() != 0) {
+            return Result.fail("仅草稿状态的活动可编辑");
+        }
+
         Map<String, Object> promotionMap = (Map<String, Object>) body.get("promotion");
-        PlatformPromotion p = new PlatformPromotion();
-        p.setTitle((String) promotionMap.get("title"));
-        p.setStartTime(parseDateTime((String) promotionMap.get("startTime")));
-        p.setEndTime(parseDateTime((String) promotionMap.get("endTime")));
-        List<Map<String, BigDecimal>> tiers = parseTiers(body.get("tiers"));
-        return Result.success(promotionService.updatePromotion(id, p, tiers));
+        String timeErr = validatePromotionTime(promotionMap);
+        if (timeErr != null) return Result.fail(timeErr);
+
+        PlatformPromotion p = buildPromotion(body);
+        p.setId(id);
+        p.setUpdateTime(LocalDateTime.now());
+        promotionMapper.updateById(p);
+
+        tierMapper.delete(new LambdaQueryWrapper<PlatformPromotionTier>()
+                .eq(PlatformPromotionTier::getPromotionId, id));
+        List<PlatformPromotionTier> tiers = buildTiers(body, id);
+        if (!tiers.isEmpty()) {
+            for (PlatformPromotionTier tier : tiers) {
+                tierMapper.insert(tier);
+            }
+        }
+        p.setTiers(tiers);
+        return Result.success(p);
     }
 
-    // 发布活动（草稿→已发布，发布后不可编辑）
     @PostMapping("/{id}/publish")
     public Result publish(@PathVariable Long id) {
-        promotionService.publishPromotion(id);
+        PlatformPromotion existing = promotionMapper.selectById(id);
+        if (existing == null) {
+            return Result.fail("活动不存在");
+        }
+        if (existing.getStatus() != 0) {
+            return Result.fail("仅草稿状态的活动可发布");
+        }
+        if (existing.getStartTime() == null || existing.getStartTime().isBefore(LocalDateTime.now())) {
+            return Result.fail("活动开始时间必须晚于当前时间");
+        }
+
+        PlatformPromotion p = new PlatformPromotion();
+        p.setId(id);
+        p.setStatus(1);
+        p.setUpdateTime(LocalDateTime.now());
+        promotionMapper.updateById(p);
         return Result.success(null);
     }
 
-    // 关闭活动（已发布→已关闭）
     @PostMapping("/{id}/close")
     public Result close(@PathVariable Long id) {
-        promotionService.closePromotion(id);
+        PlatformPromotion existing = promotionMapper.selectById(id);
+        if (existing == null) {
+            return Result.fail("活动不存在");
+        }
+        if (existing.getStatus() != 1) {
+            return Result.fail("仅已发布状态的活动可关闭");
+        }
+
+        PlatformPromotion p = new PlatformPromotion();
+        p.setId(id);
+        p.setStatus(2);
+        p.setUpdateTime(LocalDateTime.now());
+        promotionMapper.updateById(p);
         return Result.success(null);
     }
 
-    // 删除活动（仅已关闭可删除）
     @DeleteMapping("/{id}")
     public Result delete(@PathVariable Long id) {
-        promotionService.deletePromotion(id);
+        PlatformPromotion existing = promotionMapper.selectById(id);
+        if (existing == null) {
+            return Result.fail("活动不存在");
+        }
+        if (existing.getStatus() != 2) {
+            return Result.fail("仅已关闭状态的活动可删除");
+        }
+
+        tierMapper.delete(new LambdaQueryWrapper<PlatformPromotionTier>()
+                .eq(PlatformPromotionTier::getPromotionId, id));
+        promotionMapper.deleteById(id);
         return Result.success(null);
     }
 
-    // ===== 辅助方法 =====
-    private List<Map<String, BigDecimal>> parseTiers(Object tiersObj) {
-        List<Map<String, BigDecimal>> result = new ArrayList<>();
-        if (tiersObj == null) return result;
+    private PlatformPromotion buildPromotion(Map<String, Object> body) {
+        Map<String, Object> promotionMap = (Map<String, Object>) body.get("promotion");
+        PlatformPromotion p = new PlatformPromotion();
+        if (promotionMap != null) {
+            p.setTitle((String) promotionMap.get("title"));
+            p.setStartTime(parseDateTime((String) promotionMap.get("startTime")));
+            p.setEndTime(parseDateTime((String) promotionMap.get("endTime")));
+        }
+        return p;
+    }
+
+    private List<PlatformPromotionTier> buildTiers(Map<String, Object> body, Long promotionId) {
+        List<PlatformPromotionTier> result = new ArrayList<>();
+        Object tiersObj = body.get("tiers");
         if (tiersObj instanceof List) {
             List<?> list = (List<?>) tiersObj;
+            int order = 0;
             for (Object item : list) {
                 if (item instanceof Map) {
                     Map<?, ?> m = (Map<?, ?>) item;
-                    Map<String, BigDecimal> tier = new java.util.HashMap<>();
+                    PlatformPromotionTier tier = new PlatformPromotionTier();
+                    tier.setPromotionId(promotionId);
+                    tier.setSortOrder(order++);
                     if (m.get("minAmount") != null) {
-                        tier.put("minAmount", new BigDecimal(String.valueOf(m.get("minAmount"))));
+                        tier.setMinAmount(new BigDecimal(String.valueOf(m.get("minAmount"))));
                     }
                     if (m.get("discountAmount") != null) {
-                        tier.put("discountAmount", new BigDecimal(String.valueOf(m.get("discountAmount"))));
+                        tier.setDiscountAmount(new BigDecimal(String.valueOf(m.get("discountAmount"))));
                     }
                     result.add(tier);
                 }
@@ -97,7 +194,9 @@ public class AdminPromotionController {
     }
 
     private LocalDateTime parseDateTime(String str) {
-        if (str == null || str.isEmpty()) return null;
+        if (str == null || str.isEmpty()) {
+            return null;
+        }
         try {
             if (str.length() == 10) {
                 return LocalDateTime.parse(str + "T00:00:00");
@@ -109,5 +208,17 @@ public class AdminPromotionController {
         } catch (DateTimeParseException e) {
             return LocalDateTime.parse(str.replace(" ", "T"));
         }
+    }
+
+    private String validatePromotionTime(Map<String, Object> map) {
+        if (map == null) return null;
+        Object startObj = map.get("startTime");
+        Object endObj = map.get("endTime");
+        if (startObj == null || endObj == null) return null;
+        if (!(startObj instanceof String) || !(endObj instanceof String)) return null;
+        String s1 = (String) startObj, s2 = (String) endObj;
+        if (s1.isEmpty() || s2.isEmpty()) return null;
+        if (s1.compareTo(s2) >= 0) return "结束时间必须晚于开始时间";
+        return null;
     }
 }
