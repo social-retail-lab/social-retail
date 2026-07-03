@@ -73,7 +73,7 @@ public class MerchantSeckillController {
         SeckillProduct sp = new SeckillProduct();
         sp.setSeckillActivityId(activityId);
         sp.setProductId(toLong(params.get("productId")));
-        sp.setSkuId(toLong(params.get("skuId")));
+        sp.setSkuId(params.get("skuId") != null ? params.get("skuId").toString() : null);
         Object price = params.get("seckillPrice");
         if (price != null) sp.setSeckillPrice(toBigDecimal(price));
         Object stock = params.get("seckillStock");
