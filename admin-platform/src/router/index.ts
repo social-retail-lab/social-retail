@@ -61,6 +61,16 @@ const routes = [
         path: '/distribution',
         name: '分销管理',
         component: () => import('@/admin/marketing/distribution.vue')
+      },
+      {
+        path: '/after-sale-appeal',
+        name: '售后处理',
+        component: () => import('@/admin/audit/after-sale.vue')
+      },
+      {
+        path: '/distributor-audit',
+        name: '分销员审核',
+        component: () => import('@/admin/audit/distributor.vue')
       }
     ]
   }
@@ -88,7 +98,7 @@ router.beforeEach((to, from, next) => {
     return next('/dashboard')
   }
 
-  if ((to.path.startsWith('/dashboard') || to.path.startsWith('/merchant-audit') || to.path.startsWith('/product-audit') || to.path.startsWith('/info-change') || to.path.startsWith('/orders') || to.path.startsWith('/seckill') || to.path.startsWith('/coupon') || to.path.startsWith('/distribution')) && adminType === 'SYSTEM') {
+  if ((to.path.startsWith('/dashboard') || to.path.startsWith('/merchant-audit') || to.path.startsWith('/product-audit') || to.path.startsWith('/info-change') || to.path.startsWith('/orders') || to.path.startsWith('/seckill') || to.path.startsWith('/coupon') || to.path.startsWith('/distribution') || to.path.startsWith('/after-sale-appeal') || to.path.startsWith('/distributor-audit')) && adminType === 'SYSTEM') {
     alert('无权限，系统管理员不可访问业务运营功能')
     return next('/users')
   }

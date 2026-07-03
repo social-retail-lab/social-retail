@@ -10,8 +10,9 @@
             :class="['nav-item', { active: currentPath === menu.path }]"
             @click="$router.push(menu.path)"
           >
-            <span class="nav-icon">{{ menu.icon }}</span>
             <span class="nav-label">{{ menu.label }}</span>
+            <span v-if="badge[menu.badge]" class="nav-badge">{{ badge[menu.badge] }}</span>
+            <span v-if="!badge[menu.badge] && menu.dot && hasDot(menu.dot)" class="nav-dot"></span>
           </div>
         </div>
       </nav>
@@ -38,6 +39,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -48,33 +50,72 @@ const merchantInfo = ref({
   name: localStorage.getItem('merchantName') || '我的店铺'
 })
 
-const currentTime = ref('')
+const badge = ref<Record<string, number>>({})
+const dot = ref<Record<string, boolean>>({})
 
+const currentTime = ref('')
 const updateTime = () => {
   const now = new Date()
   currentTime.value = now.toLocaleString('zh-CN')
 }
 
+const fetchBadges = async () => {
+  try {
+    const res = await axios.get('/api/merchant/notifications/badges')
+    if (res.data?.code === 0) {
+      const d = res.data.data
+      if (d.pendingAccept > 0) badge.value['order'] = d.pendingAccept
+      else badge.value['order'] = 0
+      if (d.pendingAfterSale > 0) badge.value['afterSale'] = d.pendingAfterSale
+      else badge.value['afterSale'] = 0
+      dot.value['auditRequest'] = d.unreadNotifications > 0
+    }
+  } catch { /* silently fail */ }
+}
+
+const hasDot = (key: string) => dot.value[key] === true
+
+// mark notifications as read when visiting audit-requests page
+const markRead = async () => {
+  if (currentPath.value === '/audit-requests') {
+    try {
+      await axios.post('/api/merchant/notifications/mark-read', { type: 'AUDIT_RESULT' })
+      dot.value['auditRequest'] = false
+    } catch { /* silently fail */ }
+  }
+}
+
+let badgeTimer: number
+let dotTimer: number
 let timer: number
 
 onMounted(() => {
+  fetchBadges()
   updateTime()
+  badgeTimer = window.setInterval(fetchBadges, 30000)
+  dotTimer = window.setInterval(markRead, 2000)
   timer = window.setInterval(updateTime, 1000)
 })
 
 onUnmounted(() => {
+  clearInterval(badgeTimer)
+  clearInterval(dotTimer)
   clearInterval(timer)
 })
 
 const menus = [
-  { path: '/store-info', label: '商家信息', icon: '🏪' },
-  { path: '/audit-requests', label: '审核请求', icon: '📝' },
-  { path: '/goods', label: '商品管理', icon: '🛒' },
-  { path: '/orders', label: '订单管理', icon: '📋' },
-  { path: '/pickup/verify', label: '门店核销', icon: '✅' },
-  { path: '/pickup/manage', label: '自提点管理', icon: '📍' },
-  { path: '/after-sale', label: '售后管理', icon: '🔧' },
-  { path: '/earnings', label: '我的收益', icon: '💰' }
+  { path: '/dashboard', label: '店铺看板' },
+  { path: '/store-info', label: '商家信息' },
+  { path: '/audit-requests', label: '审核请求', dot: 'auditRequest' },
+  { path: '/goods', label: '商品管理' },
+  { path: '/orders', label: '订单管理', badge: 'order' },
+  { path: '/pickup/verify', label: '门店核销' },
+  { path: '/pickup/manage', label: '自提点管理' },
+  { path: '/after-sale', label: '售后管理', badge: 'afterSale' },
+  { path: '/distribution', label: '分销设置' },
+  { path: '/promotion', label: '店铺促销' },
+  { path: '/seckill', label: '秒杀活动' },
+  { path: '/earnings', label: '我的收益' }
 ]
 
 const logout = () => {
@@ -120,7 +161,6 @@ const logout = () => {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
   padding: 14px 20px;
   cursor: pointer;
   transition: background 0.2s;
@@ -134,12 +174,74 @@ const logout = () => {
   background: #3182CE;
 }
 
-.nav-icon {
-  font-size: 18px;
-}
-
 .nav-label {
   font-size: 14px;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: #FF4D4F;
+  color: #fff;
+  font-size: 11px;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 9px;
+  padding: 0 5px;
+}
+
+.nav-dot {
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  background: #FF4D4F;
+  border-radius: 50%;
+}
+
+/* 滚动条美化 */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.content-area::-webkit-scrollbar {
+  width: 4px;
+}
+.content-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.content-area::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.content-area:hover::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.12);
+}
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.25);
+}
+.content-area {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
 .sidebar-footer {

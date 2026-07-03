@@ -2,427 +2,184 @@
   <div class="dashboard-page">
     <div class="page-header">
       <h1>运营看板</h1>
-      <div class="header-date">{{ currentDate }}</div>
+      <el-button type="primary" :loading="refreshing" @click="refresh">刷新数据</el-button>
     </div>
 
+    <!-- 大盘指标 -->
     <div class="stats-grid">
+      <div class="stat-card"><div class="stat-val">¥{{ fmt(overview.totalSales) }}</div><div class="stat-label">总销售额</div></div>
+      <div class="stat-card"><div class="stat-val">{{ overview.totalOrders }}</div><div class="stat-label">总订单数</div></div>
+      <div class="stat-card"><div class="stat-val">{{ overview.totalUsers }}</div><div class="stat-label">总用户数</div></div>
       <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.totalOrders }}</div>
-          <div class="stat-label">总订单数</div>
-        </div>
-        <div class="stat-trend up">↑ 12.5%</div>
+        <div class="stat-val">{{ overview.totalMerchants }}</div>
+        <div class="stat-label">总商家数</div>
+        <div class="stat-sub">个体: {{ overview.individualMerchants }} / 企业: {{ overview.enterpriseMerchants }}</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon">💰</div>
-        <div class="stat-info">
-          <div class="stat-value">¥{{ stats.totalGMV.toFixed(2) }}</div>
-          <div class="stat-label">总GMV</div>
-        </div>
-        <div class="stat-trend up">↑ 8.3%</div>
+      <div class="stat-card"><div class="stat-val">¥{{ fmt(overview.avgOrderValue) }}</div><div class="stat-label">客单价</div></div>
+    </div>
+
+    <div class="two-col">
+      <!-- 商家销售额排行 -->
+      <div class="chart-box">
+        <h3>商家销售额排行 Top10</h3>
+        <el-table :data="merchantRank" size="small" max-height="420">
+          <el-table-column type="index" label="排名" width="60" />
+          <el-table-column prop="merchantName" label="商家" />
+          <el-table-column prop="totalSales" label="销售额">
+            <template #default="{ row }">¥{{ fmt(row.totalSales) }}</template>
+          </el-table-column>
+        </el-table>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon">👥</div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.totalUsers }}</div>
-          <div class="stat-label">总用户数</div>
-        </div>
-        <div class="stat-trend up">↑ 5.2%</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon">🏪</div>
-        <div class="stat-info">
-          <div class="stat-value">{{ stats.activeMerchants }}</div>
-          <div class="stat-label">活跃商家</div>
-        </div>
-        <div class="stat-trend down">↓ 2.1%</div>
+
+      <!-- 商家入驻趋势 -->
+      <div class="chart-box">
+        <h3>商家入驻趋势</h3>
+        <div class="line-chart" ref="trendChartRef"></div>
       </div>
     </div>
 
-    <div class="content-grid">
-      <div class="chart-card">
-        <div class="card-header">
-          <h3>订单趋势</h3>
-          <select v-model="timeRange" class="range-select">
-            <option value="7">近7天</option>
-            <option value="30">近30天</option>
-          </select>
-        </div>
-        <div class="chart-content">
-          <div class="bar-chart">
-            <div v-for="(item, index) in orderTrend" :key="index" class="bar-item">
-              <div class="bar-wrapper">
-                <div class="bar" :style="{ height: (item.count / maxOrderCount * 100) + '%' }"></div>
-              </div>
-              <div class="bar-label">{{ item.date }}</div>
-            </div>
-          </div>
-        </div>
+    <div class="two-col">
+      <!-- 商家分层 -->
+      <div class="chart-box">
+        <h3>商家分层统计</h3>
+        <div class="pie-chart" ref="tiersChartRef"></div>
       </div>
 
-      <div class="chart-card">
-        <div class="card-header">
-          <h3>商品分类销售</h3>
-        </div>
-        <div class="chart-content">
-          <div class="pie-chart">
-            <div v-for="(item, index) in categorySales" :key="index" class="pie-item">
-              <div class="pie-dot" :style="{ background: item.color }"></div>
-              <div class="pie-info">
-                <span class="pie-name">{{ item.name }}</span>
-                <span class="pie-value">{{ item.value }}%</span>
-              </div>
-            </div>
-          </div>
+      <!-- 平台抽成收入 -->
+      <div class="chart-box">
+        <h3>平台抽成收入</h3>
+        <div class="commission-cards">
+          <div class="comm-card income"><div class="comm-val">¥{{ fmt(commission.commission) }}</div><div class="comm-label">佣金收入</div></div>
+          <div class="comm-card subsidy"><div class="comm-val">¥{{ fmt(commission.subsidy) }}</div><div class="comm-label">平台补贴</div></div>
+          <div class="comm-card net"><div class="comm-val">¥{{ fmt(commission.netIncome) }}</div><div class="comm-label">净收入</div></div>
         </div>
       </div>
     </div>
 
-    <div class="content-grid">
-      <div class="table-card">
-        <div class="card-header">
-          <h3>今日订单</h3>
-        </div>
-        <div class="table-content">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>订单号</th>
-                <th>用户</th>
-                <th>商家</th>
-                <th>金额</th>
-                <th>状态</th>
-                <th>时间</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="order in todayOrders" :key="order.orderId">
-                <td>{{ order.orderSn }}</td>
-                <td>{{ order.userName }}</td>
-                <td>{{ order.merchantName }}</td>
-                <td>¥{{ order.amount.toFixed(2) }}</td>
-                <td><span :class="['status-tag', order.status]">{{ getStatusText(order.status) }}</span></td>
-                <td>{{ order.createTime }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="table-card">
-        <div class="card-header">
-          <h3>待审核商家</h3>
-        </div>
-        <div class="table-content">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>商家名称</th>
-                <th>联系人</th>
-                <th>手机号</th>
-                <th>申请时间</th>
-                <th>状态</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="merchant in pendingMerchants" :key="merchant.id">
-                <td>{{ merchant.name }}</td>
-                <td>{{ merchant.contact }}</td>
-                <td>{{ merchant.phone }}</td>
-                <td>{{ merchant.applyTime }}</td>
-                <td><span class="status-tag WAIT_AUDIT">待审核</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <!-- 类目占比 -->
+    <div class="chart-box">
+      <h3>类目销售额占比</h3>
+      <div class="pie-chart" ref="catChartRef"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { getDashboardData } from '@/api/dashboard'
+import { ref, reactive, onMounted, nextTick } from 'vue'
+import * as echarts from 'echarts'
+import axios from 'axios'
 
-const currentDate = ref(new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }))
-const timeRange = ref('7')
+const refreshing = ref(false)
+const overview = reactive({ totalSales: '0', totalOrders: 0, totalUsers: 0, individualMerchants: 0, enterpriseMerchants: 0, totalMerchants: 0, avgOrderValue: '0' })
+const merchantRank = ref<any[]>([])
+const merchantTrend = ref<any[]>([])
+const merchantTiers = reactive({ head: 0, waist: 0, tail: 0 })
+const commission = reactive({ commission: '0', subsidy: '0', netIncome: '0' })
+const categoryProportion = ref<any[]>([])
 
-const stats = ref({
-  totalOrders: 0,
-  totalGMV: 0,
-  totalUsers: 0,
-  activeMerchants: 0
-})
+const trendChartRef = ref<HTMLElement | null>(null)
+const tiersChartRef = ref<HTMLElement | null>(null)
+const catChartRef = ref<HTMLElement | null>(null)
+let trendChart: echarts.ECharts | null = null
+let tiersChart: echarts.ECharts | null = null
+let catChart: echarts.ECharts | null = null
 
-const orderTrend = ref<any[]>([])
+const fmt = (v: any) => (Number(v) || 0).toFixed(2)
 
-const maxOrderCount = computed(() => {
-  if (orderTrend.value.length === 0) return 1
-  return Math.max(...orderTrend.value.map(o => o.count))
-})
-
-const categorySales = ref<any[]>([])
-
-const todayOrders = ref<any[]>([])
-
-const pendingMerchants = ref<any[]>([])
-
-const getStatusText = (status: string) => {
-  const map: Record<string, string> = {
-    WAIT_PAY: '待支付',
-    WAIT_SHIP: '待发货',
-    SHIPPING: '配送中',
-    WAIT_PICKUP: '待自提',
-    COMPLETED: '已完成'
-  }
-  return map[status] || status
+const fetchAll = async () => {
+  refreshing.value = true
+  try {
+    const [ov, mr, mt, tr, cm, cp] = await Promise.all([
+      axios.get('/api/admin/dashboard/overview'),
+      axios.get('/api/admin/dashboard/merchant-rank'),
+      axios.get('/api/admin/dashboard/merchant-trend'),
+      axios.get('/api/admin/dashboard/merchant-tiers'),
+      axios.get('/api/admin/dashboard/commission'),
+      axios.get('/api/admin/dashboard/category-proportion')
+    ])
+    if (ov.data?.code === 0) Object.assign(overview, ov.data.data)
+    if (mr.data?.code === 0) merchantRank.value = mr.data.data || []
+    if (mt.data?.code === 0) merchantTrend.value = mt.data.data || []
+    if (tr.data?.code === 0) Object.assign(merchantTiers, tr.data.data)
+    if (cm.data?.code === 0) Object.assign(commission, cm.data.data)
+    if (cp.data?.code === 0) categoryProportion.value = cp.data.data || []
+  } catch { /* */ }
+  refreshing.value = false
+  await nextTick()
+  renderCharts()
 }
 
-const loadDashboard = async () => {
-  const res = await getDashboardData()
-  if (res.code === 0) {
-    const data = res.data
-    stats.value = data.stats || stats.value
-    orderTrend.value = data.orderTrend || orderTrend.value
-    categorySales.value = data.categorySales || categorySales.value
-    todayOrders.value = data.todayOrders || todayOrders.value
-    pendingMerchants.value = data.pendingMerchants || pendingMerchants.value
+const renderCharts = () => {
+  // 入驻趋势折线图
+  if (trendChartRef.value && merchantTrend.value.length > 0) {
+    if (!trendChart) trendChart = echarts.init(trendChartRef.value)
+    trendChart.setOption({
+      tooltip: { trigger: 'axis' },
+      grid: { left: 40, right: 10, top: 10, bottom: 50 },
+      xAxis: { type: 'category', data: merchantTrend.value.map(d => d.month), axisLabel: { rotate: 45, fontSize: 10 } },
+      yAxis: { type: 'value', name: '商家数', minInterval: 1 },
+      series: [{ type: 'line', data: merchantTrend.value.map(d => d.count), color: '#409EFF', smooth: true, areaStyle: { opacity: 0.15 } }]
+    }, true)
+  }
+  // 商家分层饼图
+  if (tiersChartRef.value) {
+    if (!tiersChart) tiersChart = echarts.init(tiersChartRef.value)
+    tiersChart.setOption({
+      tooltip: { trigger: 'item' },
+      legend: { bottom: 0 },
+      series: [{
+        type: 'pie', radius: ['35%', '60%'], center: ['50%', '45%'],
+        data: [
+          { name: '头部商家(>1万)', value: merchantTiers.head },
+          { name: '腰部商家(1千~1万)', value: merchantTiers.waist },
+          { name: '尾部商家(<1千)', value: merchantTiers.tail }
+        ],
+        itemStyle: { borderColor: '#fff', borderWidth: 2 },
+        label: { formatter: '{b}\n{d}%' }
+      }]
+    }, true)
+  }
+  // 类目饼图
+  if (catChartRef.value && categoryProportion.value.length > 0) {
+    if (!catChart) catChart = echarts.init(catChartRef.value)
+    catChart.setOption({
+      tooltip: { trigger: 'item', formatter: '{b}: ¥{c} ({d}%)' },
+      legend: { type: 'scroll', bottom: 0 },
+      series: [{
+        type: 'pie', radius: ['35%', '60%'], center: ['50%', '45%'],
+        data: categoryProportion.value.map(c => ({ name: c.name, value: Number(c.amount) })),
+        label: { formatter: '{b}\n{d}%' }
+      }]
+    }, true)
   }
 }
+
+const refresh = () => fetchAll()
 
 onMounted(() => {
-  loadDashboard()
+  fetchAll()
+  window.addEventListener('resize', () => { trendChart?.resize(); tiersChart?.resize(); catChart?.resize() })
 })
 </script>
 
 <style scoped>
-.dashboard-page {
-  padding: 20px;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.page-header h1 {
-  font-size: 22px;
-  color: #1D2129;
-}
-
-.header-date {
-  font-size: 14px;
-  color: #86909C;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.stat-icon {
-  font-size: 32px;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #F2F3F5;
-  border-radius: 8px;
-}
-
-.stat-info {
-  flex: 1;
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #1D2129;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #86909C;
-  margin-top: 4px;
-}
-
-.stat-trend {
-  font-size: 12px;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.stat-trend.up {
-  background: #F6FFED;
-  color: #52C41A;
-}
-
-.stat-trend.down {
-  background: #FFF2F0;
-  color: #FF4D4F;
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.chart-card, .table-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.card-header h3 {
-  font-size: 16px;
-  color: #1D2129;
-  margin: 0;
-}
-
-.range-select {
-  padding: 4px 8px;
-  border: 1px solid #dcdcdc;
-  border-radius: 4px;
-  font-size: 12px;
-}
-
-.chart-content {
-  padding-top: 10px;
-}
-
-.bar-chart {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  height: 200px;
-  padding-bottom: 10px;
-}
-
-.bar-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-}
-
-.bar-wrapper {
-  width: 30px;
-  height: 180px;
-  background: #F2F3F5;
-  border-radius: 4px;
-  display: flex;
-  align-items: flex-end;
-}
-
-.bar {
-  width: 100%;
-  background: #165DFF;
-  border-radius: 4px;
-  transition: height 0.3s ease;
-}
-
-.bar-label {
-  font-size: 11px;
-  color: #86909C;
-  margin-top: 8px;
-}
-
-.pie-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.pie-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.pie-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-.pie-info {
-  flex: 1;
-  display: flex;
-  justify-content: space-between;
-}
-
-.pie-name {
-  font-size: 14px;
-  color: #1D2129;
-}
-
-.pie-value {
-  font-size: 14px;
-  color: #86909C;
-}
-
-.table-content {
-  overflow-x: auto;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th, .data-table td {
-  padding: 10px 12px;
-  text-align: left;
-  border-bottom: 1px solid #f0f0f0;
-  font-size: 13px;
-}
-
-.data-table th {
-  background: #F2F3F5;
-  color: #4E5969;
-  font-weight: 600;
-}
-
-.data-table td {
-  color: #1D2129;
-}
-
-.status-tag {
-  font-size: 11px;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.status-tag.WAIT_PAY { background: #FFF7E6; color: #E67E22; }
-.status-tag.WAIT_SHIP { background: #E6F7FF; color: #1890FF; }
-.status-tag.SHIPPING { background: #E6F7FF; color: #1890FF; }
-.status-tag.WAIT_PICKUP { background: #FFF7E6; color: #E67E22; }
-.status-tag.COMPLETED { background: #F6FFED; color: #52C41A; }
-.status-tag.WAIT_AUDIT { background: #FFF7E6; color: #E67E22; }
+.dashboard-page { padding: 20px; }
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.page-header h1 { margin: 0; font-size: 20px; }
+.stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 24px; }
+.stat-card { background: #fff; border-radius: 8px; padding: 16px 20px; text-align: center; border-top: 3px solid #409EFF; }
+.stat-val { font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+.stat-label { color: #909399; font-size: 13px; }
+.stat-sub { font-size: 11px; color: #b0b3bb; margin-top: 2px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.chart-box { background: #fff; border-radius: 8px; padding: 18px; min-height: 300px; }
+.chart-box h3 { margin: 0 0 12px; font-size: 15px; }
+.line-chart, .pie-chart { width: 100%; height: 300px; }
+.commission-cards { display: flex; gap: 12px; justify-content: center; margin-top: 40px; }
+.comm-card { flex: 1; text-align: center; padding: 24px 12px; border-radius: 8px; color: #fff; }
+.comm-card.income { background: linear-gradient(135deg, #409EFF, #337ECC); }
+.comm-card.subsidy { background: linear-gradient(135deg, #E6A23C, #CC8A2C); }
+.comm-card.net { background: linear-gradient(135deg, #67C23A, #529B2E); }
+.comm-val { font-size: 22px; font-weight: 700; }
+.comm-label { font-size: 13px; margin-top: 4px; opacity: 0.9; }
 </style>

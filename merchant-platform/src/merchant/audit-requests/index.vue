@@ -9,13 +9,13 @@
         <el-table-column prop="createTime" label="申请时间" min-width="160" />
         <el-table-column label="请求类型" min-width="140">
           <template #default="{ row }">
-            {{ requestTypeMap[row.requestType] || row.requestType || '-' }}
+            {{ row.requestTypeText || requestTypeMap[row.requestType] || row.requestType || '-' }}
           </template>
         </el-table-column>
         <el-table-column label="审核状态" min-width="100">
           <template #default="{ row }">
             <el-tag :type="auditStatusTag(row.auditStatus)" size="small">
-              {{ auditStatusMap[row.auditStatus] || '未知' }}
+              {{ auditStatusMap[row.auditStatus] || row.auditStatusText || '未知' }}
             </el-tag>
           </template>
         </el-table-column>
@@ -70,12 +70,12 @@
           </div>
           <div class="meta-item">
             <span class="meta-label">请求类型：</span>
-            <span>{{ requestTypeMap[detail.requestType] || '-' }}</span>
+            <span>{{ detail.requestTypeText || requestTypeMap[detail.requestType] || '-' }}</span>
           </div>
           <div class="meta-item">
             <span class="meta-label">审核状态：</span>
             <el-tag :type="auditStatusTag(detail.auditStatus)" size="small">
-              {{ auditStatusMap[detail.auditStatus] || '未知' }}
+              {{ detail.auditStatusText || auditStatusMap[detail.auditStatus] || '未知' }}
             </el-tag>
           </div>
           <div v-if="detail.auditStatus !== 0 && detail.auditRemark" class="meta-item">
@@ -109,9 +109,8 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { getAuditRequests, getAuditRequestDetail, withdrawAuditRequest } from '@/api/order'
 
 const requestTypeMap: Record<string, string> = {
-  'GOODS_PUBLISH': '商品发布',
-  'GOODS_EDIT': '商品编辑',
-  'MERCHANT_INFO': '商家信息更改',
+  'PRODUCT_PUBLISH': '商品发布',
+  'INFO_CHANGE': '商家信息更改',
   'QUALIFICATION_UPGRADE': '企业资质升级'
 }
 

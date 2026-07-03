@@ -13,23 +13,17 @@ export const getSeckillDetail = (activityId: number) => {
 }
 
 export const createSeckill = (data: {
-  activityName: string
+  title: string
   startTime: string
   endTime: string
-  productId: number
-  skuId: number
-  seckillPrice: number
-  seckillStock: number
 }) => {
   return request.post('/admin/seckill-activities', data)
 }
 
 export const updateSeckill = (activityId: number, data: {
-  activityName?: string
+  title?: string
   startTime?: string
   endTime?: string
-  seckillPrice?: number
-  seckillStock?: number
 }) => {
   return request.put(`/admin/seckill-activities/${activityId}`, data)
 }
@@ -55,28 +49,31 @@ export const getCouponDetail = (couponId: number) => {
 }
 
 export const createCoupon = (data: {
-  couponName: string
-  couponType: string
+  title: string
+  type: string
   discountAmount?: number
-  discountRate?: number
   minConsume?: number
-  totalQuantity: number
-  perLimit: number
-  startTime: string
-  endTime: string
+  totalCount: number
+  perUserLimit: number
+  exchangePoints?: number
+  memberLevelRequired?: number
+  validStart: string
+  validEnd: string
 }) => {
   return request.post('/admin/coupons', data)
 }
 
 export const updateCoupon = (couponId: number, data: {
-  couponName?: string
+  title?: string
+  type?: string
   discountAmount?: number
-  discountRate?: number
   minConsume?: number
-  totalQuantity?: number
-  perLimit?: number
-  startTime?: string
-  endTime?: string
+  totalCount?: number
+  perUserLimit?: number
+  exchangePoints?: number
+  memberLevelRequired?: number
+  validStart?: string
+  validEnd?: string
 }) => {
   return request.put(`/admin/coupons/${couponId}`, data)
 }
@@ -85,9 +82,8 @@ export const deleteCoupon = (couponId: number) => {
   return request.delete(`/admin/coupons/${couponId}`)
 }
 
-export const updateCouponStatus = (couponId: number, data: { status: string }) => {
-  return request.patch(`/admin/coupons/${couponId}/status`, data)
-}
+export const disableCoupon = (couponId: number) => request.post(`/admin/coupons/${couponId}/disable`)
+export const enableCoupon = (couponId: number) => request.post(`/admin/coupons/${couponId}/enable`)
 
 export const getDistributionConfig = () => {
   return request.get('/admin/distribution/config')
@@ -101,3 +97,14 @@ export const updateDistributionConfig = (data: {
 }) => {
   return request.put('/admin/distribution/config', data)
 }
+
+// ========== 促销活动 ==========
+export const getPromotionList = (params?: any) => request.get('/admin/promotions', { params })
+export const createPromotion = (data: { promotion: { title: string; startTime: string; endTime: string }; tiers: { minAmount: number; discountAmount: number }[] }) => request.post('/admin/promotions', data)
+export const updatePromotion = (id: number, data: { promotion: { title: string; startTime: string; endTime: string }; tiers: { minAmount: number; discountAmount: number }[] }) => request.put(`/admin/promotions/${id}`, data)
+export const publishPromotion = (id: number) => request.post(`/admin/promotions/${id}/publish`)
+export const closePromotion = (id: number) => request.post(`/admin/promotions/${id}/close`)
+export const deletePromotion = (id: number) => request.delete(`/admin/promotions/${id}`)
+
+// ========== 分销列表 ==========
+export const getDistributionList = (params?: any) => request.get('/admin/distribution', { params })

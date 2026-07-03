@@ -15,8 +15,13 @@ const routes = [
     path: '/',
     name: '商家首页',
     component: () => import('@/components/Layout.vue'),
-    redirect: '/goods',
+    redirect: '/dashboard',
     children: [
+      {
+        path: '/dashboard',
+        name: '店铺看板',
+        component: () => import('@/merchant/dashboard/index.vue')
+      },
       {
         path: '/store-info',
         name: '商家信息',
@@ -61,6 +66,21 @@ const routes = [
         path: '/earnings',
         name: '我的收益',
         component: () => import('@/merchant/earnings/index.vue')
+      },
+      {
+        path: '/distribution',
+        name: '分销设置',
+        component: () => import('@/merchant/distribution/index.vue')
+      },
+      {
+        path: '/promotion',
+        name: '店铺促销',
+        component: () => import('@/merchant/promotion/index.vue')
+      },
+      {
+        path: '/seckill',
+        name: '秒杀活动',
+        component: () => import('@/merchant/promotion/seckill.vue')
       }
     ]
   }

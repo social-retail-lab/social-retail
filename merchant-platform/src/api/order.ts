@@ -103,9 +103,9 @@ export const pickupVerify = (pickupCode: string) => {
   return request.post('/merchant/pickup/verify', { pickupCode })
 }
 
-// 通过订单详情获取pickupCode后调用
-export const confirmPickup = (orderId: number) => {
-  return request.post(`/merchant/pickup/confirm/${orderId}`)
+// 订单管理内确认自提（传自提码，支持万能码111111）
+export const confirmPickupCode = (orderId: number, pickupCode: string) => {
+  return request.post(`/merchant/pickup/confirm/${orderId}`, { pickupCode })
 }
 
 // ========== 自提点管理 ==========
@@ -124,3 +124,25 @@ export const deletePickupPoint = (pointId: number) => {
 export const getWithdrawRecords = (params: { pageNum?: number; pageSize?: number }) => {
   return request.get('/merchant/earnings/withdraw-records', { params })
 }
+
+// ========== 促销 ==========
+export const getPlatformPromotions = () => request.get('/merchant/promotions/platform')
+export const joinPromotion = (promotionId: number) => request.post(`/merchant/promotions/platform/${promotionId}/join`)
+export const quitPromotion = (promotionId: number) => request.post(`/merchant/promotions/platform/${promotionId}/quit`)
+export const getMerchantCoupons = () => request.get('/merchant/promotions/coupons')
+export const createMerchantCoupon = (data: any) => request.post('/merchant/promotions/coupons', data)
+export const updateMerchantCoupon = (id: number, data: any) => request.put(`/merchant/promotions/coupons/${id}`, data)
+export const disableMerchantCoupon = (id: number) => request.post(`/merchant/promotions/coupons/${id}/disable`)
+export const enableMerchantCoupon = (id: number) => request.post(`/merchant/promotions/coupons/${id}/enable`)
+
+// ========== 秒杀 ==========
+// 秒杀活动列表（已发布）
+export const getSeckillActivities = () => request.get('/merchant/seckill/activities')
+// 活动下的我的商品
+export const getSeckillProducts = (activityId: number) => request.get(`/merchant/seckill/activities/${activityId}/products`)
+// 添加秒杀商品
+export const addSeckillProduct = (activityId: number, data: { productId: number; skuId: number; seckillPrice: number; seckillStock: number; limitQuantity?: number }) => request.post(`/merchant/seckill/activities/${activityId}/products`, data)
+// 更新秒杀商品
+export const updateSeckillProduct = (productId: number, data: { seckillPrice?: number; seckillStock?: number; limitQuantity?: number }) => request.put(`/merchant/seckill/products/${productId}`, data)
+// 删除秒杀商品
+export const deleteSeckillProduct = (productId: number) => request.delete(`/merchant/seckill/products/${productId}`)

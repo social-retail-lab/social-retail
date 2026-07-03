@@ -30,6 +30,9 @@
       >
         💸 立即提现
       </button>
+      <div class="commission-rule-link" @click="showCommissionModal = true">
+        平台阶梯式佣金收费细则？
+      </div>
     </div>
 
     <div class="tabs-section">
@@ -148,6 +151,66 @@
         </div>
       </div>
     </div>
+
+    <!-- 佣金收费细则弹窗 -->
+    <div v-if="showCommissionModal" class="modal-mask" @click.self="showCommissionModal = false">
+      <div class="commission-modal-content">
+        <div class="modal-header">
+          <h3>平台阶梯式佣金收费细则（V1.0）</h3>
+          <button class="close-btn" @click="showCommissionModal = false">×</button>
+        </div>
+        <div class="commission-modal-body">
+          <div class="rule-section">
+            <h4>一、收费构成说明</h4>
+            <p>平台收费由 <b>基础技术服务费 + 类目差异化费率</b> 两部分构成。最终佣金 = 商品实付金额（不含运费）× 类目佣金率。单笔订单佣金设有封顶值，超出部分不再收取。</p>
+          </div>
+          <div class="rule-section">
+            <h4>二、阶梯收费标准（按店铺月销售额）</h4>
+            <table class="commission-table">
+              <thead>
+                <tr><th>月销售额区间（元）</th><th>标准佣金率</th><th>单笔订单封顶（元）</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>0 ~ 10,000（试运营期）</td><td>1.0%</td><td>20</td></tr>
+                <tr><td>10,001 ~ 50,000（成长期）</td><td>2.5%</td><td>50</td></tr>
+                <tr><td>50,001 ~ 200,000（成熟期）</td><td>4.0%</td><td>80</td></tr>
+                <tr><td>200,001 以上（头部商家）</td><td>5.0%</td><td>100</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="rule-section">
+            <h4>三、类目差异化调整系数</h4>
+            <p>在阶梯费率基础上，乘以类目系数（四舍五入保留两位小数）：</p>
+            <table class="commission-table">
+              <thead>
+                <tr><th>类目</th><th>调整系数</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>家居百货日用品、厨具餐具厨房配件</td><td>1.0</td></tr>
+                <tr><td>食品饮料滋补</td><td>0.7</td></tr>
+                <tr><td>个护美妆清洁、母婴孕童用品</td><td>1.2</td></tr>
+                <tr><td>生鲜果蔬肉禽</td><td>0.4</td></tr>
+              </tbody>
+            </table>
+            <p class="formula">计算公式：实际佣金率 = 阶梯基准费率 × 类目调整系数</p>
+          </div>
+          <div class="rule-section">
+            <h4>四、特殊场景规则</h4>
+            <p><b>支付通道费：</b>所有订单另收 0.6% 支付手续费（由第三方支付机构收取，平台代扣，不计入平台收入）。</p>
+            <p><b>促销订单：</b>使用平台官方大促券（如"满200减30"）产生的订单，佣金按优惠后实付金额计算，且该部分订单的佣金率按原档位的8折执行；使用店铺券的订单，佣金按券后实付金额计算（即原价 - 店铺券面额），佣金率按原档位正常执行，不打折。</p>
+            <p><b>支付优先级：</b>订单结算时先计算店铺优惠卷，再计算平台优惠卷。大促满减卷与固定金额卷可同时使用（先满减、后固定金额）。订单使用优惠卷后最低需支付0.01元。</p>
+            <p><b>平台固定金额卷贴补：</b>用户使用平台固定金额卷支付时，卷成本由平台承担。商家佣金按优惠后实付金额计算，订单直接收入为优惠后实付金额，平台额外贴补该卷金额。若一张卷支付多个商家商品，则按各商家商品金额比例分配贴补。</p>
+            <p><b>退款订单：</b>全额退款退还已收佣金；部分退款按剩余实付金额重新计算佣金，差额退回。</p>
+            <p><b>月销售额达标回溯：</b>当月实际销售额达到更高阶梯时，当月所有订单按新阶梯统一补差结算（而非仅增量部分）。</p>
+          </div>
+          <div class="rule-section">
+            <h4>五、违规与争议处理</h4>
+            <p>商家若存在刷单、虚假交易等行为，当月佣金率直接按最高档（5%）封顶执行，且不予退还。</p>
+            <p>佣金争议申诉期为账单生成后 7个工作日，超时视为认可。</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -157,6 +220,7 @@ import { getEarningsInfo, getEarningsList, applyWithdraw, getWithdrawRecords } f
 
 const activeTab = ref('earnings')
 const showWithdrawModal = ref(false)
+const showCommissionModal = ref(false)
 
 const totalAvailable = ref(0)
 const totalFrozen = ref(0)
@@ -564,5 +628,85 @@ onMounted(() => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+/* 佣金收费细则 */
+.commission-rule-link {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 13px;
+  color: #165DFF;
+  cursor: pointer;
+  user-select: none;
+}
+.commission-rule-link:hover {
+  text-decoration: underline;
+}
+
+.commission-modal-content {
+  width: 640px;
+  max-height: 80vh;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.commission-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  font-size: 13px;
+  color: #333;
+  line-height: 1.8;
+}
+
+.rule-section {
+  margin-bottom: 16px;
+}
+
+.rule-section h4 {
+  font-size: 14px;
+  color: #1D2129;
+  margin: 0 0 8px 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.rule-section p {
+  margin: 4px 0;
+}
+
+.rule-section .formula {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #F7F8FA;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #165DFF;
+}
+
+.commission-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 12px;
+}
+
+.commission-table th,
+.commission-table td {
+  padding: 8px 10px;
+  border: 1px solid #E2E8F0;
+  text-align: left;
+}
+
+.commission-table th {
+  background: #F7F8FA;
+  font-weight: 600;
+  color: #4E5969;
+}
+
+.commission-table td {
+  color: #1D2129;
 }
 </style>

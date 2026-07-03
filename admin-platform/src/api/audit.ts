@@ -43,3 +43,21 @@ export const getPendingPickupPoints = (params: { pageNum?: number; pageSize?: nu
 export const auditPickupPoint = (pointId: number, data: { auditStatus: number; auditRemark?: string }) => {
   return request.post(`/admin/operation/pickup-points/${pointId}/audit`, data)
 }
+
+// ========== 售后申诉处理 ==========
+export const getAppealedAfterSales = (params: { keyword?: string; pageNum?: number; pageSize?: number }) => {
+  return request.get('/admin/after-sales/appealed', { params })
+}
+
+export const interveneAfterSale = (afterSaleId: number, data: { action: number; remark?: string }) => {
+  return request.post(`/admin/after-sales/${afterSaleId}/intervene`, data)
+}
+
+// ========== 分销员审核 ==========
+export const getDistributorApplications = (params: { keyword?: string; auditStatus?: number; pageNum?: number; pageSize?: number }) => {
+  return request.get('/admin/operation/distributors/applications', { params })
+}
+
+export const auditDistributor = (applyId: number, data: { auditStatus: number; auditRemark?: string }) => {
+  return request.post(`/admin/operation/distributors/${applyId}/audit`, data)
+}

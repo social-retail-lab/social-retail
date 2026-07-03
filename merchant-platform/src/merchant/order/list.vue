@@ -75,8 +75,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getOrderList, getOrderDetail, acceptOrder, prepareOrder, cancelOrder as cancelOrderApi } from '@/api/order'
-import { verifyPickup } from '@/api/pickup'
+import { getOrderList, getOrderDetail, acceptOrder, prepareOrder, cancelOrder as cancelOrderApi, confirmPickupCode } from '@/api/order'
 
 interface OrderItem {
   id: number
@@ -212,13 +211,13 @@ const viewDetail = async (order: Order) => {
 }
 
 const handleConfirmPickup = async (order: Order) => {
-  const pickupCode = prompt(`请输入订单 ${order.orderSn} 的自提码（6位数字）：`)
+  const pickupCode = prompt(`请输入订单 ${order.orderSn} 的自提码（6位数字，万能测试码：111111）：`)
   if (!pickupCode) return
   if (!/^\d{6}$/.test(pickupCode)) {
     alert('请输入6位数字自提码')
     return
   }
-  const res = await verifyPickup({ pickupCode })
+  const res = await confirmPickupCode(order.orderId, pickupCode)
   if (res.code === 0) {
     alert(`订单 ${order.orderSn} 已完成自提`)
     loadData()

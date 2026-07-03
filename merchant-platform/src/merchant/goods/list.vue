@@ -6,7 +6,7 @@
     </div>
 
     <div class="filter-bar">
-      <input v-model="keyword" placeholder="商品名称搜索" class="search-input" @keyup.enter="searchGoods" />
+      <input v-model="keyword" placeholder="商品名称 / SKU编码搜索" class="search-input" @keyup.enter="searchGoods" />
       <select v-model="categoryId1" class="filter-select" @change="onFilterLevel1Change">
         <option value="">一级分类</option>
         <option v-for="cat in level1Categories" :key="cat.categoryId" :value="cat.categoryId">{{ cat.categoryName }}</option>
@@ -31,6 +31,7 @@
 
     <div class="goods-list">
       <div v-for="goods in goodsList" :key="goods.productId" class="goods-card">
+        <div class="goods-id">ID: {{ goods.productId }}</div>
         <div class="goods-image">
           <img :src="goods.mainImage" :alt="goods.title" />
         </div>
@@ -532,6 +533,12 @@ onMounted(() => {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.goods-id {
+  padding: 6px 12px 0;
+  font-size: 11px;
+  color: #C9CDD4;
 }
 
 .goods-image {

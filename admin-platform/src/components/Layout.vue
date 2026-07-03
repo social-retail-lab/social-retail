@@ -8,10 +8,11 @@
         <div v-for="menu in menus" :key="menu.path">
           <div 
             :class="['nav-item', { active: currentPath === menu.path }]"
-            @click="$router.push(menu.path)"
+            @click="menu.children && menu.children.length ? '' : $router.push(menu.path)"
           >
-            <span class="nav-icon">{{ menu.icon }}</span>
             <span class="nav-label">{{ menu.label }}</span>
+            <span v-if="menu.badge && badge[menu.badge]" class="nav-badge">{{ badge[menu.badge] }}</span>
+            <span v-if="menu.dot && hasDot(menu.dot)" class="nav-dot"></span>
           </div>
           <div v-if="menu.children" class="sub-menu">
             <div 
@@ -21,6 +22,7 @@
               @click="$router.push(child.path)"
             >
               <span class="sub-label">{{ child.label }}</span>
+              <span v-if="child.badge && badge[child.badge]" class="sub-badge">{{ badge[child.badge] }}</span>
             </div>
           </div>
         </div>
@@ -49,6 +51,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -61,28 +64,61 @@ const adminInfo = ref({
 })
 
 const currentTime = ref('')
+const badge = ref<Record<string, number>>({})
+const dot = ref<Record<string, boolean>>({})
 
 const updateTime = () => {
   const now = new Date()
   currentTime.value = now.toLocaleString('zh-CN')
 }
 
+const fetchBadges = async () => {
+  try {
+    const res = await axios.get('/api/admin/notifications/badges')
+    if (res.data?.code === 0) {
+      const d = res.data.data
+      const auditTotal = (d.pendingProductAudit || 0)
+      if (auditTotal > 0) badge.value['audit'] = auditTotal
+      else badge.value['audit'] = 0
+      dot.value['audit'] = d.unreadNotifications > 0
+    }
+  } catch { /* silently fail */ }
+}
+
+const hasDot = (key: string) => dot.value[key] === true
+
+const markRead = async () => {
+  if (currentPath.value === '/merchant-audit' || currentPath.value === '/product-audit' ||
+      currentPath.value === '/info-change' || currentPath.value === '/after-sale-appeal') {
+    try {
+      await axios.post('/api/admin/notifications/mark-read', {})
+      dot.value['audit'] = false
+    } catch { /* silently fail */ }
+  }
+}
+
+let badgeTimer: number
+let dotTimer: number
 let timer: number
 
 onMounted(() => {
+  fetchBadges()
   updateTime()
+  badgeTimer = window.setInterval(fetchBadges, 30000)
+  dotTimer = window.setInterval(markRead, 2000)
   timer = window.setInterval(updateTime, 1000)
 })
 
 onUnmounted(() => {
+  clearInterval(badgeTimer)
+  clearInterval(dotTimer)
   clearInterval(timer)
 })
 
 const systemMenus = [
   { 
     path: '/users', 
-    label: '系统管理', 
-    icon: '⚙️',
+    label: '系统管理',
     children: [
       { path: '/users', label: '用户管理' },
       { path: '/roles', label: '角色管理' }
@@ -91,26 +127,26 @@ const systemMenus = [
 ]
 
 const operationMenus = [
-  { path: '/dashboard', label: '运营看板', icon: '📊' },
+  { path: '/dashboard', label: '运营看板' },
   { 
     path: '/merchant-audit', 
-    label: '审核管理', 
-    icon: '✅',
+    label: '审核管理',
+    dot: 'audit',
     children: [
       { path: '/merchant-audit', label: '商家入驻审核' },
-      { path: '/product-audit', label: '商品审核' },
-      { path: '/info-change', label: '信息审核' }
+      { path: '/product-audit', label: '商品审核', badge: 'audit' },
+      { path: '/info-change', label: '信息审核' },
+      { path: '/after-sale-appeal', label: '售后处理' },
+      { path: '/distributor-audit', label: '分销员审核' }
     ]
   },
   { 
     path: '/orders', 
-    label: '订单管理', 
-    icon: '📋'
+    label: '订单管理'
   },
   { 
     path: '/seckill', 
-    label: '营销管理', 
-    icon: '🎯',
+    label: '营销管理',
     children: [
       { path: '/seckill', label: '秒杀活动' },
       { path: '/coupon', label: '优惠券管理' },
@@ -166,7 +202,6 @@ const logout = () => {
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 10px;
   padding: 12px 20px;
   cursor: pointer;
   transition: background 0.2s;
@@ -180,12 +215,53 @@ const logout = () => {
   background: #165DFF;
 }
 
-.nav-icon {
-  font-size: 16px;
-}
-
 .nav-label {
   font-size: 14px;
+}
+
+/* 滚动条美化 */
+.sidebar-nav::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.sidebar-nav:hover::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.15);
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255,255,255,0.3);
+}
+.sidebar-nav {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.content-area::-webkit-scrollbar {
+  width: 4px;
+}
+.content-area::-webkit-scrollbar-track {
+  background: transparent;
+}
+.content-area::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 2px;
+  transition: background 0.3s;
+}
+.content-area:hover::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.12);
+}
+.content-area::-webkit-scrollbar-thumb:hover {
+  background: rgba(0,0,0,0.25);
+}
+.content-area {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
 }
 
 .sub-menu {
@@ -214,6 +290,40 @@ const logout = () => {
 
 .sub-item.active .sub-label {
   color: #69B1FF;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: #FF4D4F;
+  color: #fff;
+  font-size: 11px;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 9px;
+  padding: 0 5px;
+}
+
+.nav-dot {
+  margin-left: auto;
+  width: 8px;
+  height: 8px;
+  background: #FF4D4F;
+  border-radius: 50%;
+}
+
+.sub-badge {
+  margin-left: auto;
+  background: #FF4D4F;
+  color: #fff;
+  font-size: 11px;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  border-radius: 9px;
+  padding: 0 5px;
 }
 
 .sidebar-footer {
