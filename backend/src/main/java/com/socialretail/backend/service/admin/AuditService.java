@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.socialretail.backend.common.PageResult;
+import com.socialretail.backend.common.exception.BusinessException;
+import org.springframework.http.HttpStatus;
 import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.member.MerchantApply;
 import com.socialretail.backend.entity.member.MerchantInfoChange;
@@ -141,10 +143,10 @@ public class AuditService {
     public AuditVO auditMerchantApplication(Long applyId, Integer auditStatus, String auditRemark) {
         MerchantApply application = merchantApplyMapper.selectById(applyId);
         if (application == null) {
-            throw new RuntimeException("申请不存在");
+            throw new BusinessException(40001, HttpStatus.BAD_REQUEST, "申请不存在");
         }
         if (application.getAuditStatus() != null && application.getAuditStatus() != 0) {
-            throw new RuntimeException("该申请已审核过");
+            throw new BusinessException(40002, HttpStatus.BAD_REQUEST, "该申请已审核过，无法重复审核");
         }
 
         application.setAuditStatus(auditStatus);
@@ -237,10 +239,10 @@ public class AuditService {
     public AuditVO auditProduct(Long productId, Integer auditStatus, String auditRemark) {
         Product product = productMapper.selectById(productId);
         if (product == null) {
-            throw new RuntimeException("商品不存在");
+            throw new BusinessException(40003, HttpStatus.BAD_REQUEST, "商品不存在");
         }
         if (product.getAuditStatus() != null && product.getAuditStatus() != 0) {
-            throw new RuntimeException("该商品已审核过");
+            throw new BusinessException(40004, HttpStatus.BAD_REQUEST, "该商品已审核过，无法重复审核");
         }
 
         product.setAuditStatus(auditStatus);
@@ -599,9 +601,9 @@ public class AuditService {
     @Transactional
     public Map<String, Object> auditInfoChange(Long changeId, Integer auditStatus, String remark) {
         MerchantInfoChange change = merchantInfoChangeMapper.selectById(changeId);
-        if (change == null) throw new RuntimeException("信息变更请求不存在");
+        if (change == null) throw new BusinessException(40005, HttpStatus.BAD_REQUEST, "信息变更请求不存在");
         if (change.getAuditStatus() != null && change.getAuditStatus() != 0) {
-            throw new RuntimeException("该请求已审核");
+            throw new BusinessException(40006, HttpStatus.BAD_REQUEST, "该请求已审核过，无法重复审核");
         }
 
         change.setAuditStatus(auditStatus);
