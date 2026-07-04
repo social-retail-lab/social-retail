@@ -80,7 +80,7 @@
         </div>
 
         <!-- 审批操作 -->
-        <div class="action-section" v-if="detail.status === 0">
+        <div class="action-section" v-if="detail.status === 1">
           <div class="form-row">
             <label>处理备注：</label>
             <textarea v-model="auditRemark" rows="3" placeholder="请输入处理备注（拒绝时必填）"></textarea>
@@ -101,7 +101,7 @@
             <button class="btn-reject" @click="handleReturnConfirm(2)">收货异常</button>
           </div>
         </div>
-        <div class="action-section" v-if="detail.status !== 0 && !(detail.type === 2 && detail.status === 3)">
+        <div class="action-section" v-if="detail.status !== 1 && !(detail.type === 2 && detail.status === 3)">
           <div class="detail-row" v-if="detail.auditRemark"><span class="d-label">处理备注：</span>{{ detail.auditRemark }}</div>
           <div class="detail-row" v-if="detail.auditTime"><span class="d-label">处理时间：</span>{{ detail.auditTime }}</div>
         </div>
@@ -149,9 +149,9 @@ const list = ref<AfterSaleItem[]>([])
 
 const tabs = [
   { label: '全部', value: 'ALL', status: undefined },
-  { label: '待处理', value: 'WAIT', status: 0 },
-  { label: '已通过', value: 'APPROVED', status: 1 },
-  { label: '已拒绝', value: 'REJECTED', status: 2 }
+  { label: '待处理', value: 'WAIT', status: 1 },
+  { label: '已通过', value: 'APPROVED', status: 4 },
+  { label: '已拒绝', value: 'REJECTED', status: 5 }
 ]
 
 const showDetail = ref(false)
@@ -176,16 +176,19 @@ const previewImage = (url: string) => {
 }
 
 const getStatusClass = (status: number) => {
-  if (status === 0) return 'WAIT'
-  if (status === 1) return 'APPROVED'
-  if (status === 2) return 'REJECTED'
+  if (status === 1) return 'WAIT'
+  if (status === 2 || status === 3) return 'WAIT'
+  if (status === 4) return 'APPROVED'
+  if (status === 5) return 'REJECTED'
   return ''
 }
 
 const getStatusText = (status: number) => {
-  if (status === 0) return '待处理'
-  if (status === 1) return '已通过'
-  if (status === 2) return '已拒绝'
+  if (status === 1) return '待处理'
+  if (status === 2) return '待退货'
+  if (status === 3) return '已寄回'
+  if (status === 4) return '已完成'
+  if (status === 5) return '已拒绝'
   return '未知'
 }
 

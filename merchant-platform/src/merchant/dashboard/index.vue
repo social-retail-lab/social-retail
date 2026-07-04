@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import axios from 'axios'
+import request from '@/utils/request'
 
 const refreshing = ref(false)
 const metrics = reactive({ todaySales: '0.00', todayOrders: 0, activeProducts: 0 })
@@ -64,15 +64,15 @@ const fetchAll = async () => {
   refreshing.value = true
   try {
     const [m, r, t] = await Promise.all([
-      axios.get('/api/merchant/dashboard/metrics'),
-      axios.get('/api/merchant/dashboard/product-rank'),
-      axios.get('/api/merchant/dashboard/sales-trend')
+      request.get('/merchant/dashboard/metrics'),
+      request.get('/merchant/dashboard/product-rank'),
+      request.get('/merchant/dashboard/sales-trend')
     ])
-    if (m.data?.code === 0) Object.assign(metrics, m.data.data)
-    if (r.data?.code === 0) productRank.value = r.data.data || []
-    if (t.data?.code === 0) {
-      salesTrend.daily = t.data.data.daily || []
-      salesTrend.weekly = t.data.data.weekly || []
+    if (m.code === 0) Object.assign(metrics, m.data)
+    if (r.code === 0) productRank.value = r.data || []
+    if (t.code === 0) {
+      salesTrend.daily = t.data.daily || []
+      salesTrend.weekly = t.data.weekly || []
     }
   } catch { /* */ }
   refreshing.value = false

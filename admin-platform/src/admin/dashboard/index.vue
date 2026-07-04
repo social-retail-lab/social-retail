@@ -67,7 +67,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import axios from 'axios'
+import request from '@/utils/request'
 
 const refreshing = ref(false)
 const overview = reactive({ totalSales: '0', totalOrders: 0, totalUsers: 0, individualMerchants: 0, enterpriseMerchants: 0, totalMerchants: 0, avgOrderValue: '0' })
@@ -90,19 +90,19 @@ const fetchAll = async () => {
   refreshing.value = true
   try {
     const [ov, mr, mt, tr, cm, cp] = await Promise.all([
-      axios.get('/api/admin/dashboard/overview'),
-      axios.get('/api/admin/dashboard/merchant-rank'),
-      axios.get('/api/admin/dashboard/merchant-trend'),
-      axios.get('/api/admin/dashboard/merchant-tiers'),
-      axios.get('/api/admin/dashboard/commission'),
-      axios.get('/api/admin/dashboard/category-proportion')
+      request.get('/admin/dashboard/overview'),
+      request.get('/admin/dashboard/merchant-rank'),
+      request.get('/admin/dashboard/merchant-trend'),
+      request.get('/admin/dashboard/merchant-tiers'),
+      request.get('/admin/dashboard/commission'),
+      request.get('/admin/dashboard/category-proportion')
     ])
-    if (ov.data?.code === 0) Object.assign(overview, ov.data.data)
-    if (mr.data?.code === 0) merchantRank.value = mr.data.data || []
-    if (mt.data?.code === 0) merchantTrend.value = mt.data.data || []
-    if (tr.data?.code === 0) Object.assign(merchantTiers, tr.data.data)
-    if (cm.data?.code === 0) Object.assign(commission, cm.data.data)
-    if (cp.data?.code === 0) categoryProportion.value = cp.data.data || []
+    if (ov.code === 0) Object.assign(overview, ov.data)
+    if (mr.code === 0) merchantRank.value = mr.data || []
+    if (mt.code === 0) merchantTrend.value = mt.data || []
+    if (tr.code === 0) Object.assign(merchantTiers, tr.data)
+    if (cm.code === 0) Object.assign(commission, cm.data)
+    if (cp.code === 0) categoryProportion.value = cp.data || []
   } catch { /* */ }
   refreshing.value = false
   await nextTick()
