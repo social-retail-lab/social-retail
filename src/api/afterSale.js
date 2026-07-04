@@ -63,38 +63,44 @@ export const submitAfterSaleApi = (data) => {
 }
 
 const validateSubmitAfterSaleParams = (data) => {
+  // orderId 必填(接口文档 3.4.1 要求)
+  if (!data?.orderId) {
+    throw new Error('订单ID不能为空')
+  }
+
   if (!data?.orderItemId) {
     throw new Error('订单商品ID不能为空')
   }
-  
+
   if (!data?.type || !['REFUND_ONLY', 'RETURN_REFUND'].includes(data.type)) {
     throw new Error('请选择售后类型')
   }
-  
+
   const refundAmount = Number(data?.refundAmount)
   if (!refundAmount || refundAmount <= 0) {
     throw new Error('退款金额必须大于0')
   }
-  
+
   if (!data?.reason) {
     throw new Error('请选择售后原因')
   }
-  
+
   const params = {
+    orderId: data.orderId,
     orderItemId: data.orderItemId,
     type: data.type,
     refundAmount,
     reason: data.reason
   }
-  
+
   if (data?.reasonDesc) {
     params.reasonDesc = data.reasonDesc
   }
-  
+
   if (Array.isArray(data?.evidenceImages) && data.evidenceImages.length > 0) {
     params.evidenceImages = data.evidenceImages
   }
-  
+
   return params
 }
 

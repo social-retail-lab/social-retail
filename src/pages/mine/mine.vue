@@ -426,7 +426,11 @@ const handleMemberCenter = () => {
 
 const handleCoupon = () => {
   if (!userStore.isLogin) return handleLogin()
-  uni.showToast({ title: '我的优惠券', icon: 'none' })
+  uni.navigateTo({
+    url: '/pagesSub/promotion/coupon/myCoupon?status=0',
+    animationType: 'slide-in-right',
+    animationDuration: 200
+  })
 }
 
 const handlePoints = () => {

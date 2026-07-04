@@ -97,11 +97,11 @@
     </scroll-view>
 
     <!-- 5. 底部动态操作按钮 -->
-    <view v-if="detail && detail.status === 'APPLYING'" class="bottom-bar">
-      <view class="action-btn primary" @click="handleSupplyEvidence">
+    <view v-if="detail && (canCancel || canSupplyEvidence)" class="bottom-bar">
+      <view v-if="canSupplyEvidence" class="action-btn primary" @click="handleSupplyEvidence">
         <text>补充凭证</text>
       </view>
-      <view class="action-btn" @click="handleCancel">
+      <view v-if="canCancel" class="action-btn" @click="handleCancel">
         <text>取消售后</text>
       </view>
     </view>
@@ -109,37 +109,46 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { showToast, getValidImageUrl, formatPrice } from '@/utils/common'
+import { useAfterSale } from '@/hooks/useAfterSale'
+import { uploadFileApi } from '@/api/afterSale'
+import { getValidImageUrl, formatPrice } from '@/utils/common'
 import {
-  getAfterSaleDetailApi,
-  cancelAfterSaleApi,
-  uploadAfterSaleImagesApi,
-  uploadFileApi
-} from '@/api/afterSale'
+  AFTER_SALE_STATUS,
+  getAfterSaleStatusClass,
+  isAfterSaleCancellable
+} from '@/constants/afterSale'
+
+const {
+  afterSaleStore,
+  loading,
+  refreshing,
+  uploading,
+  loadAfterSaleDetail,
+  confirmCancelAfterSale,
+  supplementEvidence
+} = useAfterSale()
 
 const afterSaleId = ref('')
-const detail = ref(null)
-const loading = ref(false)
-const refreshing = ref(false)
-const uploading = ref(false)
 
-// 状态对应样式类
-const getStatusClass = (status) => {
-  const map = {
-    APPLYING: 'status-applying',
-    CANCELLED: 'status-cancelled',
-    REFUNDED: 'status-refunded'
-  }
-  return map[status] || ''
-}
+// 详情数据(从 store 获取)
+const detail = computed(() => afterSaleStore.afterSaleDetail)
+
+// 是否可取消售后
+const canCancel = computed(() => detail.value && isAfterSaleCancellable(detail.value.status))
+
+// 是否可补充凭证(申请中状态)
+const canSupplyEvidence = computed(() => detail.value && detail.value.status === AFTER_SALE_STATUS.APPLYING)
 
 const handleBack = () => {
   uni.navigateBack()
 }
 
-// 拉取售后详情
+// 状态对应样式类(使用常量)
+const getStatusClass = (status) => getAfterSaleStatusClass(status)
+
+// 拉取售后详情(通过 Hook)
 const fetchDetailData = async () => {
   if (!afterSaleId.value) {
     const pages = getCurrentPages()
@@ -148,37 +157,11 @@ const fetchDetailData = async () => {
   }
 
   if (!afterSaleId.value) {
-    showToast('售后ID不能为空')
     return
   }
 
-  loading.value = true
-  try {
-    const res = await getAfterSaleDetailApi(afterSaleId.value)
-    if (res.code === 0) {
-      detail.value = res.data
-    } else {
-      showToast(res.message || '获取售后详情失败')
-    }
-  } catch (error) {
-    if (error?.code === 40431) {
-      // 售后不存在，弹窗提示并返回列表页
-      uni.showModal({
-        title: '提示',
-        content: '售后单不存在或已删除',
-        showCancel: false,
-        confirmText: '返回列表',
-        success: () => {
-          uni.redirectTo({ url: '/pagesSub/order/afterSaleList' })
-        }
-      })
-    } else {
-      showToast(error?.message || '获取售后详情失败')
-    }
-  } finally {
-    loading.value = false
-    refreshing.value = false
-  }
+  await loadAfterSaleDetail(afterSaleId.value)
+  refreshing.value = false
 }
 
 // 下拉刷新
@@ -196,7 +179,7 @@ const previewImage = (index) => {
   })
 }
 
-// 补充凭证：选图 -> 上传 -> 追加 -> 刷新
+// 补充凭证：选图 -> 上传 -> 调用 Hook 上传 -> 刷新
 const handleSupplyEvidence = () => {
   if (uploading.value) return
   uni.chooseImage({
@@ -207,63 +190,32 @@ const handleSupplyEvidence = () => {
       const filePaths = chooseRes.tempFilePaths || []
       if (!filePaths.length) return
 
-      uploading.value = true
-      uni.showLoading({ title: '上传中...', mask: true })
       try {
+        // 1. 先上传图片文件
         const uploadedUrls = []
         for (const filePath of filePaths) {
           const url = await uploadFileApi(filePath)
           uploadedUrls.push(url)
         }
-        await uploadAfterSaleImagesApi(afterSaleId.value, uploadedUrls)
-        showToast('凭证上传成功', 'success')
-        fetchDetailData()
+        // 2. 调用 Hook 保存凭证关联关系
+        const success = await supplementEvidence(afterSaleId.value, uploadedUrls)
+        if (success) {
+          // 3. 刷新详情
+          fetchDetailData()
+        }
       } catch (error) {
-        showToast(error?.message || '上传凭证失败')
-      } finally {
-        uploading.value = false
-        uni.hideLoading()
+        // 错误已在 Hook 中处理
       }
     }
   })
 }
 
-// 取消售后：弹窗输入原因 -> 调用接口 -> 刷新
-const handleCancel = () => {
-  uni.showModal({
-    title: '取消售后',
-    editable: true,
-    placeholderText: '请输入取消原因',
-    confirmText: '确认取消',
-    cancelText: '再想想',
-    success: async (res) => {
-      if (!res.confirm) return
-      const cancelReason = (res.content || '').trim()
-      if (!cancelReason) {
-        showToast('请填写取消原因')
-        return
-      }
-      try {
-        const result = await cancelAfterSaleApi(afterSaleId.value, { cancelReason })
-        if (result.code === 0) {
-          showToast('已取消售后', 'success')
-          fetchDetailData()
-        } else {
-          showToast(result.message || '取消失败')
-        }
-      } catch (error) {
-        if (error?.code === 40932) {
-          uni.showModal({
-            title: '提示',
-            content: '当前状态不允许取消',
-            showCancel: false
-          })
-        } else {
-          showToast(error?.message || '取消失败')
-        }
-      }
-    }
-  })
+// 取消售后(通过 Hook 弹窗确认)
+const handleCancel = async () => {
+  const success = await confirmCancelAfterSale(afterSaleId.value)
+  if (success) {
+    fetchDetailData()
+  }
 }
 
 onShow(() => {

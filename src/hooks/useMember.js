@@ -157,18 +157,31 @@ export const useMember = () => {
     }
   }
 
+  // 是否已加载过（首次加载完成后置为 true，避免后续 onShow 闪现）
+  const loaded = ref(false)
+
   // 刷新全部会员数据（onShow / 下拉刷新调用）
   const refreshAllMemberData = async () => {
-    await Promise.all([
-      loadMemberInfo(),
-      loadSignInStatus(),
-      loadExchangeCoupons()
-    ])
+    // 仅首次加载时显示 loading（已加载过则保留旧数据，避免闪现）
+    if (!loaded.value) {
+      loading.value = true
+    }
+    try {
+      await Promise.all([
+        loadMemberInfo(),
+        loadSignInStatus(),
+        loadExchangeCoupons()
+      ])
+      loaded.value = true
+    } finally {
+      loading.value = false
+    }
   }
 
   return {
     memberStore,
     loading,
+    loaded,
     signInLoading,
     exchangeLoading,
     loadMemberInfo,

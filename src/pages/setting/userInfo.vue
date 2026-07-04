@@ -16,9 +16,9 @@
           <text class="form-label">头像</text>
           <view class="form-right">
             <view class="avatar-wrapper" @click="chooseAvatar">
-              <image 
-                class="avatar" 
-                :src="avatar || userProfileHook.getUserInfo().avatar || defaultAvatar" 
+              <image
+                class="avatar"
+                :src="avatar || userStore.userInfo.avatar || defaultAvatar"
                 mode="aspectFill"
               />
               <view class="avatar-upload">

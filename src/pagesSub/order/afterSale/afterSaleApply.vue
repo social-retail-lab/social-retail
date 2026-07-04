@@ -170,8 +170,20 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { submitAfterSaleApi, uploadFileApi } from '@/api/afterSale'
+import { useAfterSale } from '@/hooks/useAfterSale'
+import { uploadFileApi } from '@/api/afterSale'
 import { showToast, getValidImageUrl, formatPrice } from '@/utils/common'
+import {
+  AFTER_SALE_TYPE,
+  AFTER_SALE_TYPE_TEXT,
+  AFTER_SALE_TYPE_DESC,
+  AFTER_SALE_REASONS
+} from '@/constants/afterSale'
+
+const {
+  submitting,
+  submitAfterSaleApply
+} = useAfterSale()
 
 // 路由参数
 const orderId = ref('')
@@ -188,18 +200,17 @@ const selectedReason = ref('')
 const reasonDesc = ref('')
 const evidenceImages = ref([])
 
-// 弹窗与状态
+// 弹窗
 const showReasonPicker = ref(false)
-const submitting = ref(false)
 
-// 售后类型选项
+// 售后类型选项(来自常量)
 const typeOptions = [
-  { value: 'REFUND_ONLY', label: '仅退款', desc: '未发货/收货破损无需寄回商品' },
-  { value: 'RETURN_REFUND', label: '退货退款', desc: '需寄回商品等待商家收货退款' }
+  { value: AFTER_SALE_TYPE.REFUND_ONLY, label: AFTER_SALE_TYPE_TEXT.REFUND_ONLY, desc: AFTER_SALE_TYPE_DESC.REFUND_ONLY },
+  { value: AFTER_SALE_TYPE.RETURN_REFUND, label: AFTER_SALE_TYPE_TEXT.RETURN_REFUND, desc: AFTER_SALE_TYPE_DESC.RETURN_REFUND }
 ]
 
-// 售后原因选项
-const reasonOptions = ['商品破损', '质量问题', '发错货', '不想要了', '其他']
+// 售后原因选项(来自常量)
+const reasonOptions = AFTER_SALE_REASONS
 
 const isOtherReason = computed(() => selectedReason.value === '其他')
 
@@ -235,7 +246,6 @@ const handleAmountBlur = () => {
 // 选择售后原因
 const handleSelectReason = (reason) => {
   selectedReason.value = reason
-  // 切换非“其他”时清空补充说明
   if (reason !== '其他') {
     reasonDesc.value = ''
   }
@@ -305,35 +315,27 @@ const validateForm = () => {
   return true
 }
 
-// 提交售后申请
+// 提交售后申请(通过 Hook)
 const handleSubmit = async () => {
   if (submitting.value) return
   if (!validateForm()) return
 
-  submitting.value = true
-  uni.showLoading({ title: '提交中...', mask: true })
+  const data = {
+    orderId: orderId.value,
+    orderItemId: orderItemId.value,
+    type: selectedType.value,
+    refundAmount: Number(refundAmount.value),
+    reason: selectedReason.value,
+    reasonDesc: selectedReason.value === '其他' ? reasonDesc.value.trim() : '',
+    evidenceImages: evidenceImages.value
+  }
 
-  try {
-    const data = {
-      orderItemId: orderItemId.value,
-      type: selectedType.value,
-      refundAmount: Number(refundAmount.value),
-      reason: selectedReason.value,
-      reasonDesc: selectedReason.value === '其他' ? reasonDesc.value.trim() : '',
-      evidenceImages: evidenceImages.value
-    }
-    await submitAfterSaleApi(data)
-    showToast('售后申请提交成功', 'success')
+  const result = await submitAfterSaleApply(data)
+  if (result) {
+    // 提交成功,跳转售后列表
     setTimeout(() => {
       uni.redirectTo({ url: '/pagesSub/order/afterSaleList' })
     }, 1500)
-  } catch (error) {
-    if (error?.code === 40931) {
-      showToast('当前订单状态不允许申请售后')
-    }
-  } finally {
-    submitting.value = false
-    uni.hideLoading()
   }
 }
 </script>

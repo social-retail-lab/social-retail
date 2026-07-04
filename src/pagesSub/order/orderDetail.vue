@@ -83,6 +83,12 @@
                 <text class="subtotal-label">小计</text>
                 <text class="subtotal-value">¥{{ formatPrice(item.itemAmount) }}</text>
               </view>
+              <!-- 申请售后按钮(仅已支付/已完成订单显示) -->
+              <view v-if="canApplyAfterSale" class="goods-actions">
+                <view class="after-sale-btn" @click="handleApplyAfterSale(item)">
+                  <text>申请售后</text>
+                </view>
+              </view>
             </view>
           </view>
         </view>
@@ -377,6 +383,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { onShow, onHide } from '@dcloudio/uni-app'
 import { showToast, getValidImageUrl } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
+import { useAfterSale } from '@/hooks/useAfterSale'
 
 const orderId = ref('')
 const countdownText = ref('')
@@ -389,6 +396,26 @@ let countdownTimer = null
 let statusPollingTimer = null
 
 const { loadOrderDetail, loadOrderStatus, cancelOrder, confirmOrder, deleteOrder } = useOrder()
+const { goAfterSaleApply } = useAfterSale()
+
+// 是否允许申请售后(已支付或已完成订单)
+// 允许状态: WAIT_ACCEPT(待接单)、ACCEPTED(已接单)、IN_PROGRESS(配送中)、COMPLETED(已完成)
+const canApplyAfterSale = computed(() => {
+  const status = orderDetail.value?.status
+  return ['WAIT_ACCEPT', 'ACCEPTED', 'IN_PROGRESS', 'COMPLETED'].includes(status)
+})
+
+// 申请售后
+const handleApplyAfterSale = (item) => {
+  goAfterSaleApply({
+    orderId: orderDetail.value?.orderId || orderId.value,
+    orderItemId: item.orderItemId,
+    productName: item.productName,
+    productImage: item.productImage,
+    skuSpecs: item.skuSpecs,
+    originPrice: item.finalPrice || item.originPrice
+  })
+}
 
 // 取消订单预设原因（5个 + 自定义）
 const cancelReasons = [
@@ -1054,6 +1081,33 @@ onUnmounted(() => {
         font-size: 28rpx;
         color: $text-main;
         font-weight: 600;
+      }
+    }
+
+    // 申请售后按钮
+    .goods-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16rpx;
+      padding-top: 16rpx;
+      border-top: 1rpx dashed $bg-page-light;
+
+      .after-sale-btn {
+        padding: 10rpx 24rpx;
+        border: 1rpx solid $color-primary;
+        border-radius: 28rpx;
+        background: rgba($color-primary, 0.04);
+        transition: all 0.2s ease;
+
+        text {
+          font-size: 24rpx;
+          color: $color-primary;
+        }
+
+        &:active {
+          transform: scale(0.96);
+          background: rgba($color-primary, 0.1);
+        }
       }
     }
   }

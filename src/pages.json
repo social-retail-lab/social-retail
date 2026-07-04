@@ -320,6 +320,13 @@
           }
         },
         {
+          "path": "coupon/selectCoupon",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "选择优惠券"
+          }
+        },
+        {
           "path": "seckillSettle",
           "style": {
             "navigationStyle": "custom",
@@ -412,6 +419,19 @@
           "style": {
             "navigationStyle": "custom",
             "navigationBarTitleText": "成长值明细",
+            "enablePullDownRefresh": true
+          }
+        }
+      ]
+    },
+    {
+      "root": "pagesSub/shop",
+      "pages": [
+        {
+          "path": "shopHome",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "商家主页",
             "enablePullDownRefresh": true
           }
         }

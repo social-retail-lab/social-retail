@@ -202,10 +202,13 @@ export function useAuth() {
   }
 
   const loadLogout = async () => {
+    // 后端可能未实现 logout 接口(无状态 token),失败也无所谓
+    // 仍然尝试调用以通知后端清理会话(若后端支持),失败静默处理
     try {
       await userStore.fetchUserLogout()
     } catch (error) {
-      console.error("退出登录失败:", error)
+      // 静默处理:404/网络错误都不影响前端退出流程
+      console.warn("退出登录接口调用失败(不影响本地退出):", error?.status || error?.message || 'unknown')
     }
     // 清除本地登录状态（token、userInfo、memberInfo 等）
     userStore.logout()

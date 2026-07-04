@@ -316,7 +316,16 @@ const goHome = () => {
 }
 
 const goMerchant = () => {
-  console.log('跳转店铺页面')
+  const merchantId = productDetail.value?.merchantId
+  if (!merchantId) {
+    uni.showToast({ title: '商家信息不存在', icon: 'none' })
+    return
+  }
+  uni.navigateTo({
+    url: `/pagesSub/shop/shopHome?merchantId=${merchantId}`,
+    animationType: 'slide-in-right',
+    animationDuration: 200
+  })
 }
 
 const goCart = () => {
@@ -467,6 +476,7 @@ const loadProductData = async (productId) => {
     if (detailData) {
       productDetail.value = {
         ...detailData,
+        merchantId: detailData.merchantInfo?.merchantId || detailData.merchantId || null,
         merchantName: detailData.merchantInfo?.merchantName || '',
         merchantLogo: detailData.merchantInfo?.merchantLogo || ''
       }

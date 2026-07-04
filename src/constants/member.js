@@ -20,11 +20,9 @@ export const MEMBER_LEVEL = {
 // 会员等级映射
 export const MEMBER_LEVEL_MAP = {
   [MEMBER_LEVEL.NORMAL]: { label: '普通用户', color: '#999999', icon: '' },
-  [MEMBER_LEVEL.SILVER]: { label: '白银会员', color: '#C0C0C0', icon: '' },
-  [MEMBER_LEVEL.GOLD]: { label: '黄金会员', color: '#FFD700', icon: '' },
-  [MEMBER_LEVEL.PLATINUM]: { label: '铂金会员', color: '#E5E4E2', icon: '' },
+  [MEMBER_LEVEL.SILVER]: { label: '银卡会员', color: '#C0C0C0', icon: '' },
+  [MEMBER_LEVEL.GOLD]: { label: '金卡会员', color: '#FFD700', icon: '' },
   [MEMBER_LEVEL.DIAMOND]: { label: '钻石会员', color: '#B9F2FF', icon: '' },
-  [MEMBER_LEVEL.SUPREME]: { label: '至尊会员', color: '#FF69B4', icon: '' }
 }
 
 // 会员等级成长值门槛

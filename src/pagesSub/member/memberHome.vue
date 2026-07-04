@@ -13,146 +13,199 @@
     <view class="nav-placeholder" :style="{ height: (statusBarHeight + 44) + 'px' }"></view>
 
     <scroll-view scroll-y class="page-scroll" enhanced :bounces="true">
-      <!-- ============ 顶部渐变会员卡 ============ -->
-      <view class="member-card" :style="{ background: cardGradient }">
-        <!-- 等级头 -->
-        <view class="level-header">
-          <view class="level-badge">
-            <text class="level-icon">👑</text>
-          </view>
-          <view class="level-info">
-            <text class="level-name">{{ levelName }}</text>
-            <text class="level-sub">尊享会员专属权益</text>
-          </view>
-        </view>
-
-        <!-- 成长值进度 -->
-        <view class="growth-section">
-          <view class="growth-top">
-            <text class="growth-label">当前成长值</text>
-            <text class="growth-value">{{ growthValue }}</text>
-          </view>
-          <view v-if="nextLevel" class="growth-progress-wrap">
-            <view class="progress-bar">
-              <view class="progress-fill" :style="{ width: growthProgress + '%' }"></view>
+      <!-- ============ 骨架屏（首次加载时显示，避免闪现默认值） ============ -->
+      <view v-if="!loaded" class="skeleton-wrap">
+        <!-- 会员卡骨架 -->
+        <view class="sk-member-card">
+          <view class="sk-level-header">
+            <view class="sk-level-badge sk-shimmer"></view>
+            <view class="sk-level-info">
+              <view class="sk-line sk-line-lg sk-shimmer"></view>
+              <view class="sk-line sk-line-sm sk-shimmer"></view>
             </view>
-            <text class="progress-tip">还差 {{ growthGap }} 成长值升级 {{ nextLevel.levelName }} 会员</text>
           </view>
-          <view v-else class="max-level-tip">
-            <text class="max-level-text">🏆 已达最高会员等级，解锁全部权益</text>
+          <view class="sk-growth">
+            <view class="sk-line sk-line-md sk-shimmer"></view>
+            <view class="sk-progress sk-shimmer"></view>
+            <view class="sk-line sk-line-sm sk-shimmer"></view>
           </view>
-        </view>
-
-        <!-- 双资产行 -->
-        <view class="asset-row">
-          <view class="asset-item" @click="handlePointDetail">
-            <text class="asset-num">{{ pointsBalance }}</text>
-            <text class="asset-label">积分明细 ›</text>
-          </view>
-          <view class="asset-divider"></view>
-          <view class="asset-item" @click="handleGrowthDetail">
-            <text class="asset-num">{{ growthValue }}</text>
-            <text class="asset-label">成长明细 ›</text>
+          <view class="sk-asset-row">
+            <view class="sk-asset-item">
+              <view class="sk-line sk-line-md sk-shimmer"></view>
+              <view class="sk-line sk-line-sm sk-shimmer"></view>
+            </view>
+            <view class="sk-asset-item">
+              <view class="sk-line sk-line-md sk-shimmer"></view>
+              <view class="sk-line sk-line-sm sk-shimmer"></view>
+            </view>
           </view>
         </view>
-
-        <!-- 当前权益 -->
-        <view v-if="benefits.length" class="benefits-section">
-          <view class="benefits-header">
-            <text class="benefits-title">当前权益</text>
-            <text class="benefits-count">{{ benefits.length }} 项权益</text>
+        <!-- 签到骨架 -->
+        <view class="sk-signin-card">
+          <view class="sk-signin-left">
+            <view class="sk-signin-icon sk-shimmer"></view>
+            <view class="sk-signin-info">
+              <view class="sk-line sk-line-md sk-shimmer"></view>
+              <view class="sk-line sk-line-sm sk-shimmer"></view>
+            </view>
           </view>
-          <view class="benefits-grid">
-            <view
-              v-for="(item, index) in benefits"
-              :key="item.benefitCode || index"
-              class="benefit-item"
-            >
-              <text class="benefit-icon">{{ getBenefitIcon(item.benefitCode) }}</text>
-              <view class="benefit-text">
-                <text class="benefit-name">{{ item.benefitName || item.name }}</text>
-                <text class="benefit-desc">{{ item.description }}</text>
+          <view class="sk-signin-btn sk-shimmer"></view>
+        </view>
+        <!-- 兑换区骨架 -->
+        <view class="sk-exchange">
+          <view class="sk-exchange-header">
+            <view class="sk-line sk-line-md sk-shimmer"></view>
+            <view class="sk-line sk-line-sm sk-shimmer"></view>
+          </view>
+          <view class="sk-coupon-grid">
+            <view v-for="n in 2" :key="n" class="sk-coupon-card sk-shimmer"></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- ============ 真实内容（数据加载完成后渲染） ============ -->
+      <template v-else>
+        <!-- ============ 顶部渐变会员卡 ============ -->
+        <view class="member-card" :style="{ background: cardGradient }">
+          <!-- 等级头 -->
+          <view class="level-header">
+            <view class="level-badge">
+              <text class="level-icon">👑</text>
+            </view>
+            <view class="level-info">
+              <text class="level-name">{{ levelName }}</text>
+              <text class="level-sub">尊享会员专属权益</text>
+            </view>
+          </view>
+
+          <!-- 成长值进度 -->
+          <view class="growth-section">
+            <view class="growth-top">
+              <text class="growth-label">当前成长值</text>
+              <text class="growth-value">{{ growthValue }}</text>
+            </view>
+            <view v-if="nextLevel" class="growth-progress-wrap">
+              <view class="progress-bar">
+                <view class="progress-fill" :style="{ width: growthProgress + '%' }"></view>
+              </view>
+              <text class="progress-tip">还差 {{ growthGap }} 成长值升级 {{ nextLevel.levelName }} 会员</text>
+            </view>
+            <view v-else class="max-level-tip">
+              <text class="max-level-text">🏆 已达最高会员等级，解锁全部权益</text>
+            </view>
+          </view>
+
+          <!-- 双资产行 -->
+          <view class="asset-row">
+            <view class="asset-item" @click="handlePointDetail">
+              <text class="asset-num">{{ pointsBalance }}</text>
+              <text class="asset-label">积分明细 ›</text>
+            </view>
+            <view class="asset-divider"></view>
+            <view class="asset-item" @click="handleGrowthDetail">
+              <text class="asset-num">{{ growthValue }}</text>
+              <text class="asset-label">成长明细 ›</text>
+            </view>
+          </view>
+
+          <!-- 当前权益 -->
+          <view v-if="benefits.length" class="benefits-section">
+            <view class="benefits-header">
+              <text class="benefits-title">当前权益</text>
+              <text class="benefits-count">{{ benefits.length }} 项权益</text>
+            </view>
+            <view class="benefits-grid">
+              <view
+                v-for="(item, index) in benefits"
+                :key="item.benefitCode || index"
+                class="benefit-item"
+              >
+                <text class="benefit-icon">{{ getBenefitIcon(item.benefitCode) }}</text>
+                <view class="benefit-text">
+                  <text class="benefit-name">{{ item.benefitName || item.name }}</text>
+                  <text class="benefit-desc">{{ item.description }}</text>
+                </view>
               </view>
             </view>
           </view>
         </view>
-      </view>
 
-      <!-- ============ 每日签到 ============ -->
-      <view class="signin-card">
-        <view class="signin-left">
-          <view class="signin-icon-wrap">
-            <text class="signin-icon">📅</text>
+        <!-- ============ 每日签到 ============ -->
+        <view class="signin-card">
+          <view class="signin-left">
+            <view class="signin-icon-wrap">
+              <text class="signin-icon">📅</text>
+            </view>
+            <view class="signin-info">
+              <text class="signin-title">每日签到</text>
+              <text class="signin-desc">{{ signedIn ? '今日已签到，明天再来吧' : `签到可获得 ${signInRewardPoints} 积分` }}</text>
+            </view>
           </view>
-          <view class="signin-info">
-            <text class="signin-title">每日签到</text>
-            <text class="signin-desc">{{ signedIn ? '今日已签到，明天再来吧' : `签到可获得 ${signInRewardPoints} 积分` }}</text>
-          </view>
-        </view>
-        <view
-          class="signin-btn"
-          :class="{ 'signin-btn-done': signedIn }"
-          @click="handleSignIn"
-        >
-          <text class="signin-btn-text">{{ signedIn ? '今日已签到' : '立即签到' }}</text>
-        </view>
-      </view>
-
-      <!-- ============ 积分兑换优惠券 ============ -->
-      <view class="exchange-section">
-        <view class="section-header">
-          <view class="section-title-wrap">
-            <text class="section-title">积分兑换</text>
-            <text class="section-subtitle">用积分兑换专属优惠券</text>
-          </view>
-          <view class="section-points">
-            <text class="points-label">可用积分</text>
-            <text class="points-num">{{ pointsBalance }}</text>
-          </view>
-        </view>
-
-        <view v-if="exchangeCoupons.length" class="coupon-grid">
           <view
-            v-for="coupon in exchangeCoupons"
-            :key="coupon.id"
-            class="coupon-card"
-            :class="{ 'coupon-disabled': !coupon.canExchange }"
+            class="signin-btn"
+            :class="{ 'signin-btn-done': signedIn }"
+            @click="handleSignIn"
           >
-            <!-- 金额区 -->
-            <view class="coupon-amount-area">
-              <view class="amount-row">
-                <text class="amount-symbol">¥</text>
-                <text class="amount-value">{{ coupon.discountAmount }}</text>
-              </view>
-              <text class="amount-threshold">满{{ coupon.minConsume }}元可用</text>
-            </view>
-
-            <!-- 信息区 -->
-            <view class="coupon-info-area">
-              <text class="coupon-title">{{ coupon.title || coupon.couponTitle }}</text>
-              <text class="coupon-validity">有效期：{{ formatCouponValidity(coupon) }}</text>
-              <view class="coupon-cost">
-                <text class="cost-icon">💰</text>
-                <text class="cost-text">{{ coupon.exchangePoints }} 积分</text>
-              </view>
-            </view>
-
-            <!-- 兑换按钮 -->
-            <view
-              class="exchange-btn"
-              :class="{ 'exchange-btn-disabled': !coupon.canExchange }"
-              @click="handleExchange(coupon)"
-            >
-              <text class="exchange-btn-text">{{ coupon.exchangeStatusText }}</text>
-            </view>
+            <text class="signin-btn-text">{{ signedIn ? '今日已签到' : '立即签到' }}</text>
           </view>
         </view>
 
-        <view v-else class="empty-state">
-          <text class="empty-icon">🎫</text>
-          <text class="empty-text">暂无可兑换优惠券</text>
+        <!-- ============ 积分兑换优惠券 ============ -->
+        <view class="exchange-section">
+          <view class="section-header">
+            <view class="section-title-wrap">
+              <text class="section-title">积分兑换</text>
+              <text class="section-subtitle">用积分兑换专属优惠券</text>
+            </view>
+            <view class="section-points">
+              <text class="points-label">可用积分</text>
+              <text class="points-num">{{ pointsBalance }}</text>
+            </view>
+          </view>
+
+          <view v-if="exchangeCoupons.length" class="coupon-grid">
+            <view
+              v-for="coupon in exchangeCoupons"
+              :key="coupon.id"
+              class="coupon-card"
+              :class="{ 'coupon-disabled': !coupon.canExchange }"
+            >
+              <!-- 金额区 -->
+              <view class="coupon-amount-area">
+                <view class="amount-row">
+                  <text class="amount-symbol">¥</text>
+                  <text class="amount-value">{{ coupon.discountAmount }}</text>
+                </view>
+                <text class="amount-threshold">满{{ coupon.minConsume }}元可用</text>
+              </view>
+
+              <!-- 信息区 -->
+              <view class="coupon-info-area">
+                <text class="coupon-title">{{ coupon.title || coupon.couponTitle }}</text>
+                <text class="coupon-validity">有效期：{{ formatCouponValidity(coupon) }}</text>
+                <view class="coupon-cost">
+                  <text class="cost-icon">💰</text>
+                  <text class="cost-text">{{ coupon.exchangePoints }} 积分</text>
+                </view>
+              </view>
+
+              <!-- 兑换按钮 -->
+              <view
+                class="exchange-btn"
+                :class="{ 'exchange-btn-disabled': !coupon.canExchange }"
+                @click="handleExchange(coupon)"
+              >
+                <text class="exchange-btn-text">{{ coupon.exchangeStatusText }}</text>
+              </view>
+            </view>
+          </view>
+
+          <view v-else class="empty-state">
+            <text class="empty-icon">🎫</text>
+            <text class="empty-text">暂无可兑换优惠券</text>
+          </view>
         </view>
-      </view>
+      </template>
 
       <!-- 底部安全区 -->
       <view class="safe-bottom"></view>
@@ -167,6 +220,7 @@ import { onShow, onPullDownRefresh } from '@dcloudio/uni-app'
 
 const {
   memberStore,
+  loaded,
   doSignIn,
   doExchangeCoupon,
   refreshAllMemberData
@@ -889,5 +943,153 @@ onPullDownRefresh(async () => {
 .safe-bottom {
   height: calc(40rpx + env(safe-area-inset-bottom));
   width: 100%;
+}
+
+// ============ 骨架屏 ============
+.skeleton-wrap {
+  padding: 20rpx 24rpx 0;
+}
+
+// 骨架占位基础块
+.sk-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(228, 228, 232, 0.6) 25%,
+    rgba(238, 238, 242, 0.9) 37%,
+    rgba(228, 228, 232, 0.6) 63%
+  );
+  background-size: 400% 100%;
+  animation: sk-shimmer-anim 1.4s ease infinite;
+  border-radius: 8rpx;
+}
+
+@keyframes sk-shimmer-anim {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+// 骨架线条
+.sk-line {
+  height: 24rpx;
+  border-radius: 6rpx;
+
+  &.sk-line-lg { height: 44rpx; width: 60%; }
+  &.sk-line-md { height: 32rpx; width: 50%; }
+  &.sk-line-sm { height: 22rpx; width: 40%; margin-top: 12rpx; }
+}
+
+// 会员卡骨架
+.sk-member-card {
+  height: 480rpx;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #E8E8EC, #D8D8DC);
+  padding: 36rpx 32rpx 32rpx;
+  box-shadow: 0 12rpx 32rpx rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sk-level-header {
+  display: flex;
+  align-items: center;
+
+  .sk-level-badge {
+    width: 88rpx;
+    height: 88rpx;
+    border-radius: 50%;
+    margin-right: 24rpx;
+    flex-shrink: 0;
+  }
+
+  .sk-level-info {
+    flex: 1;
+  }
+}
+
+.sk-growth {
+  margin-top: 48rpx;
+
+  .sk-progress {
+    height: 16rpx;
+    border-radius: 8rpx;
+    width: 100%;
+    margin-top: 24rpx;
+  }
+}
+
+.sk-asset-row {
+  display: flex;
+  margin-top: 48rpx;
+  padding-top: 32rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, 0.2);
+
+  .sk-asset-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+// 签到骨架
+.sk-signin-card {
+  margin: 24rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.04);
+
+  .sk-signin-left {
+    display: flex;
+    align-items: center;
+    flex: 1;
+  }
+
+  .sk-signin-icon {
+    width: 72rpx;
+    height: 72rpx;
+    border-radius: 50%;
+    margin-right: 24rpx;
+    flex-shrink: 0;
+  }
+
+  .sk-signin-info {
+    flex: 1;
+  }
+
+  .sk-signin-btn {
+    width: 160rpx;
+    height: 64rpx;
+    border-radius: 32rpx;
+    flex-shrink: 0;
+  }
+}
+
+// 兑换区骨架
+.sk-exchange {
+  margin: 0 24rpx;
+
+  .sk-exchange-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32rpx 8rpx 24rpx;
+  }
+
+  .sk-coupon-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20rpx;
+  }
+
+  .sk-coupon-card {
+    height: 200rpx;
+    border-radius: 20rpx;
+    background: #FFFFFF;
+  }
 }
 </style>

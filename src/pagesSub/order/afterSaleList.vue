@@ -103,34 +103,38 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { showToast, getValidImageUrl, formatPrice } from '@/utils/common'
-import { getAfterSaleListApi, cancelAfterSaleApi } from '@/api/afterSale'
+import { useAfterSale } from '@/hooks/useAfterSale'
+import { getValidImageUrl, formatPrice } from '@/utils/common'
+import {
+  AFTER_SALE_TABS,
+  getAfterSaleStatusClass,
+  isAfterSaleCancellable
+} from '@/constants/afterSale'
+
+const {
+  afterSaleStore,
+  loading,
+  refreshing,
+  loadAfterSaleList,
+  confirmCancelAfterSale,
+  goAfterSaleDetail
+} = useAfterSale()
 
 const activeTab = ref('ALL')
-const afterSaleList = ref([])
-const loading = ref(false)
-const refreshing = ref(false)
 const page = ref(1)
 const pageSize = ref(10)
 const hasMore = ref(true)
 
-const statusTabs = ref([
-  { label: '全部', value: 'ALL' },
-  { label: '申请中', value: 'APPLYING' },
-  { label: '已取消', value: 'CANCELLED' },
-  { label: '已退款', value: 'REFUNDED' }
-])
+// 售后列表(从 store 获取)
+const afterSaleList = computed(() => afterSaleStore.afterSaleList)
 
-const getStatusClass = (status) => {
-  const classMap = {
-    APPLYING: 'status-applying',
-    CANCELLED: 'status-cancelled',
-    REFUNDED: 'status-refunded'
-  }
-  return classMap[status] || ''
-}
+// 状态 tab(来自常量)
+const statusTabs = AFTER_SALE_TABS
+
+// 状态样式类(使用常量函数)
+const getStatusClass = (status) => getAfterSaleStatusClass(status)
 
 const handleBack = () => {
   uni.navigateBack()
@@ -140,12 +144,9 @@ const goOrderList = () => {
   uni.navigateTo({ url: '/pagesSub/order/orderList' })
 }
 
+// 跳转详情(通过 Hook)
 const goToDetail = (afterSaleId) => {
-  if (!afterSaleId) {
-    showToast('售后ID缺失')
-    return
-  }
-  uni.navigateTo({ url: `/pagesSub/order/afterSale/afterSaleDetail?afterSaleId=${afterSaleId}` })
+  goAfterSaleDetail(afterSaleId)
 }
 
 const switchTab = (value) => {
@@ -153,53 +154,26 @@ const switchTab = (value) => {
   activeTab.value = value
   page.value = 1
   hasMore.value = true
-  afterSaleList.value = []
-  fetchAfterSales()
+  fetchAfterSales(true)
 }
 
+// 获取售后列表(通过 Hook)
 const fetchAfterSales = async (isRefresh = false) => {
   if (loading.value) return
 
-  loading.value = true
-
-  try {
-    const params = {
-      status: activeTab.value,
-      page: page.value,
-      pageSize: pageSize.value
-    }
-
-    const response = await getAfterSaleListApi(params)
-
-    if (response.code === 0) {
-      const data = response.data || {}
-      const list = Array.isArray(data.list) ? data.list : []
-
-      if (isRefresh || page.value === 1) {
-        afterSaleList.value = list
-      } else {
-        afterSaleList.value = [...afterSaleList.value, ...list]
-      }
-
-      const total = Number(data.total) || 0
-      hasMore.value = list.length > 0 && afterSaleList.value.length < total
-    } else {
-      if (isRefresh || page.value === 1) {
-        afterSaleList.value = []
-      }
-      hasMore.value = false
-      showToast(response.message || '获取售后列表失败')
-    }
-  } catch (error) {
-    if (isRefresh || page.value === 1) {
-      afterSaleList.value = []
-    }
-    hasMore.value = false
-    showToast(error?.message || '获取售后列表失败')
-  } finally {
-    loading.value = false
-    refreshing.value = false
+  const params = {
+    status: activeTab.value,
+    page: page.value,
+    pageSize: pageSize.value
   }
+
+  const result = await loadAfterSaleList(params, !isRefresh && page.value > 1)
+
+  // 计算是否还有更多
+  const total = Number(result.total) || 0
+  hasMore.value = afterSaleList.value.length < total
+
+  refreshing.value = false
 }
 
 const onRefresh = () => {
@@ -215,44 +189,15 @@ const onLoadMore = () => {
   fetchAfterSales()
 }
 
-const handleCancel = (item) => {
-  uni.showModal({
-    title: '取消售后',
-    editable: true,
-    placeholderText: '请输入取消原因',
-    confirmText: '确认取消',
-    cancelText: '再想想',
-    success: async (res) => {
-      if (!res.confirm) return
-
-      const cancelReason = (res.content || '').trim()
-      if (!cancelReason) {
-        showToast('请输入取消原因')
-        return
-      }
-
-      try {
-        const response = await cancelAfterSaleApi(item.afterSaleId, { cancelReason })
-        if (response.code === 0) {
-          showToast('已取消售后', 'success')
-          onRefresh()
-        } else {
-          showToast(response.message || '取消失败')
-        }
-      } catch (error) {
-        if (error?.code === 40932) {
-          uni.showModal({
-            title: '提示',
-            content: '当前状态不允许取消',
-            showCancel: false,
-            confirmText: '我知道了'
-          })
-        } else {
-          showToast(error?.message || '取消失败')
-        }
-      }
-    }
-  })
+// 取消售后(通过 Hook 弹窗确认)
+const handleCancel = async (item) => {
+  if (!isAfterSaleCancellable(item.status)) {
+    return
+  }
+  const success = await confirmCancelAfterSale(item.afterSaleId)
+  if (success) {
+    onRefresh()
+  }
 }
 
 let isFirstShow = true

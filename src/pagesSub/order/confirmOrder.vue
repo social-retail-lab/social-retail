@@ -106,7 +106,7 @@
       <!-- 模块3: 优惠选择 -->
       <view
         class="coupon-section"
-        @click="showPlatformCouponPopup = true"
+        @click="openPlatformCouponPopup"
       >
         <view class="coupon-left">
           <text class="coupon-icon">🎫</text>
@@ -128,7 +128,7 @@
 
       <view
         class="coupon-section"
-        @click="showMerchantCouponPopup = true"
+        @click="openMerchantCouponPopup"
       >
         <view class="coupon-left">
           <text class="coupon-icon">🎫</text>
@@ -284,37 +284,57 @@
           <text class="popup-close" @click="showPlatformCouponPopup = false">✕</text>
         </view>
         <scroll-view scroll-y class="coupon-list">
-          <view
-            class="coupon-item"
-            :class="{ 'coupon-selected': !usePlatformCoupon }"
-            @click="selectPlatformCoupon(null)"
-          >
-            <view class="coupon-check">
-              <view v-if="!usePlatformCoupon" class="check-dot"></view>
-            </view>
-            <view class="coupon-content">
-              <text class="coupon-name">不使用平台优惠券</text>
-            </view>
+          <!-- 加载中 -->
+          <view v-if="availableCouponsLoading" class="coupon-loading">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">加载中...</text>
           </view>
-          <view
-            v-for="coupon in previewData.availableCoupons?.platformCoupons"
-            :key="coupon.couponUserId"
-            class="coupon-item"
-            :class="{ 'coupon-selected': platformCouponUserId === coupon.couponUserId && usePlatformCoupon }"
-            @click="selectPlatformCoupon(coupon)"
-          >
-            <view class="coupon-check">
-              <view
-                v-if="platformCouponUserId === coupon.couponUserId && usePlatformCoupon"
-                class="check-dot"
-              ></view>
+          <template v-else>
+            <view
+              class="coupon-item"
+              :class="{ 'coupon-selected': !usePlatformCoupon }"
+              @click="selectPlatformCoupon(null)"
+            >
+              <view class="coupon-check">
+                <view v-if="!usePlatformCoupon" class="check-dot"></view>
+              </view>
+              <view class="coupon-content">
+                <text class="coupon-name">不使用平台优惠券</text>
+              </view>
             </view>
-            <view class="coupon-content">
-              <text class="coupon-name">{{ coupon.title }}</text>
-              <text class="coupon-desc">{{ coupon.minConsume ? `满${coupon.minConsume}可用` : '无门槛' }}</text>
+            <view
+              v-for="coupon in availablePlatformCoupons"
+              :key="coupon.couponUserId"
+              class="coupon-item"
+              :class="{
+                'coupon-selected': platformCouponUserId === coupon.couponUserId && usePlatformCoupon,
+                'coupon-item-disabled': !coupon.available
+              }"
+              @click="selectPlatformCoupon(coupon)"
+            >
+              <view class="coupon-check">
+                <view
+                  v-if="platformCouponUserId === coupon.couponUserId && usePlatformCoupon"
+                  class="check-dot"
+                ></view>
+              </view>
+              <view class="coupon-content">
+                <view class="coupon-name-row">
+                  <text class="coupon-name">{{ coupon.title }}</text>
+                  <text v-if="coupon.recommended" class="recommend-tag">推荐</text>
+                </view>
+                <text class="coupon-desc">{{ coupon.minConsume ? `满${coupon.minConsume}可用` : '无门槛' }}</text>
+                <text v-if="!coupon.available && coupon.unavailableReason" class="coupon-reason">
+                  {{ coupon.unavailableReason }}
+                </text>
+              </view>
+              <text class="coupon-discount">-¥{{ formatPrice(coupon.discountAmount) }}</text>
             </view>
-            <text class="coupon-discount">-¥{{ formatPrice(coupon.discountAmount) }}</text>
-          </view>
+            <!-- 空状态 -->
+            <view v-if="availablePlatformCoupons.length === 0" class="coupon-empty">
+              <text class="empty-text">暂无可用平台优惠券</text>
+            </view>
+          </template>
         </scroll-view>
       </view>
     </view>
@@ -331,37 +351,57 @@
           <text class="popup-close" @click="showMerchantCouponPopup = false">✕</text>
         </view>
         <scroll-view scroll-y class="coupon-list">
-          <view
-            class="coupon-item"
-            :class="{ 'coupon-selected': !useMerchantCoupon }"
-            @click="selectMerchantCoupon(null)"
-          >
-            <view class="coupon-check">
-              <view v-if="!useMerchantCoupon" class="check-dot"></view>
-            </view>
-            <view class="coupon-content">
-              <text class="coupon-name">不使用商家优惠券</text>
-            </view>
+          <!-- 加载中 -->
+          <view v-if="availableCouponsLoading" class="coupon-loading">
+            <view class="loading-spinner"></view>
+            <text class="loading-text">加载中...</text>
           </view>
-          <view
-            v-for="coupon in previewData.availableCoupons?.merchantCoupons"
-            :key="coupon.couponUserId"
-            class="coupon-item"
-            :class="{ 'coupon-selected': merchantCouponUserId === coupon.couponUserId && useMerchantCoupon }"
-            @click="selectMerchantCoupon(coupon)"
-          >
-            <view class="coupon-check">
-              <view
-                v-if="merchantCouponUserId === coupon.couponUserId && useMerchantCoupon"
-                class="check-dot"
-              ></view>
+          <template v-else>
+            <view
+              class="coupon-item"
+              :class="{ 'coupon-selected': !useMerchantCoupon }"
+              @click="selectMerchantCoupon(null)"
+            >
+              <view class="coupon-check">
+                <view v-if="!useMerchantCoupon" class="check-dot"></view>
+              </view>
+              <view class="coupon-content">
+                <text class="coupon-name">不使用商家优惠券</text>
+              </view>
             </view>
-            <view class="coupon-content">
-              <text class="coupon-name">{{ coupon.title }}</text>
-              <text class="coupon-desc">{{ coupon.minConsume ? `满${coupon.minConsume}可用` : '无门槛' }}</text>
+            <view
+              v-for="coupon in availableMerchantCoupons"
+              :key="coupon.couponUserId"
+              class="coupon-item"
+              :class="{
+                'coupon-selected': merchantCouponUserId === coupon.couponUserId && useMerchantCoupon,
+                'coupon-item-disabled': !coupon.available
+              }"
+              @click="selectMerchantCoupon(coupon)"
+            >
+              <view class="coupon-check">
+                <view
+                  v-if="merchantCouponUserId === coupon.couponUserId && useMerchantCoupon"
+                  class="check-dot"
+                ></view>
+              </view>
+              <view class="coupon-content">
+                <view class="coupon-name-row">
+                  <text class="coupon-name">{{ coupon.title }}</text>
+                  <text v-if="coupon.recommended" class="recommend-tag">推荐</text>
+                </view>
+                <text class="coupon-desc">{{ coupon.minConsume ? `满${coupon.minConsume}可用` : '无门槛' }}</text>
+                <text v-if="!coupon.available && coupon.unavailableReason" class="coupon-reason">
+                  {{ coupon.unavailableReason }}
+                </text>
+              </view>
+              <text class="coupon-discount">-¥{{ formatPrice(coupon.discountAmount) }}</text>
             </view>
-            <text class="coupon-discount">-¥{{ formatPrice(coupon.discountAmount) }}</text>
-          </view>
+            <!-- 空状态 -->
+            <view v-if="availableMerchantCoupons.length === 0" class="coupon-empty">
+              <text class="empty-text">暂无可用商家优惠券</text>
+            </view>
+          </template>
         </scroll-view>
       </view>
     </view>
@@ -375,6 +415,8 @@ import { useOrder } from '@/hooks/useOrder'
 import { useAddress } from '@/hooks/useAddress'
 import { useCart } from '@/hooks/useCart'
 import { useMember } from '@/hooks/useMember'
+import { useCoupon } from '@/hooks/useCoupon'
+import { isCouponAvailable } from '@/constants/coupon'
 
 // ==================== 基础状态 ====================
 const cartItemIds = ref([])
@@ -400,6 +442,13 @@ const activityContext = ref({})
 
 const showPlatformCouponPopup = ref(false)
 const showMerchantCouponPopup = ref(false)
+
+// 4.3.4 预览订单可用优惠券
+const couponHook = useCoupon()
+const availableCouponsLoading = ref(false)
+// 平台券/商家券列表(4.3.4 返回,含 available/unavailableReason/recommended 字段)
+const availablePlatformCoupons = ref([])
+const availableMerchantCoupons = ref([])
 
 // ==================== previewToken 全局管理 ====================
 const previewToken = ref('')
@@ -455,13 +504,20 @@ const addressInfo = ref(null)
 const pickupPointInfo = ref(null)
 
 // ==================== 计算属性 ====================
-const availablePlatformCouponCount = computed(
-  () => previewData.value.availableCoupons?.platformCoupons?.length || 0
-)
+// 可用优惠券数量:优先使用 4.3.4 返回的数据(过滤 available=true),否则用预览接口数据
+const availablePlatformCouponCount = computed(() => {
+  if (availablePlatformCoupons.value.length > 0) {
+    return availablePlatformCoupons.value.filter(c => c.available).length
+  }
+  return previewData.value.availableCoupons?.platformCoupons?.length || 0
+})
 
-const availableMerchantCouponCount = computed(
-  () => previewData.value.availableCoupons?.merchantCoupons?.length || 0
-)
+const availableMerchantCouponCount = computed(() => {
+  if (availableMerchantCoupons.value.length > 0) {
+    return availableMerchantCoupons.value.filter(c => c.available).length
+  }
+  return previewData.value.availableCoupons?.merchantCoupons?.length || 0
+})
 
 const hasActivity = computed(() => {
   const info = previewData.value.activityInfo || {}
@@ -570,7 +626,52 @@ const changeDeliveryType = (type) => {
 }
 
 // ==================== 优惠券选择 ====================
+
+/**
+ * 打开平台优惠券弹窗(4.3.4 接口获取可用列表)
+ */
+const openPlatformCouponPopup = async () => {
+  showPlatformCouponPopup.value = true
+  if (cartItemIds.value.length === 0) return
+  availableCouponsLoading.value = true
+  try {
+    const data = await couponHook.loadAvailableCoupons(cartItemIds.value)
+    if (data) {
+      availablePlatformCoupons.value = data.platformCoupons || []
+      availableMerchantCoupons.value = data.merchantCoupons || []
+    }
+  } finally {
+    availableCouponsLoading.value = false
+  }
+}
+
+/**
+ * 打开商家优惠券弹窗(4.3.4 接口获取可用列表)
+ */
+const openMerchantCouponPopup = async () => {
+  showMerchantCouponPopup.value = true
+  if (cartItemIds.value.length === 0) return
+  // 平台券和商家券一起返回,若已加载过则直接复用
+  if (availablePlatformCoupons.value.length === 0 && availableMerchantCoupons.value.length === 0) {
+    availableCouponsLoading.value = true
+    try {
+      const data = await couponHook.loadAvailableCoupons(cartItemIds.value)
+      if (data) {
+        availablePlatformCoupons.value = data.platformCoupons || []
+        availableMerchantCoupons.value = data.merchantCoupons || []
+      }
+    } finally {
+      availableCouponsLoading.value = false
+    }
+  }
+}
+
 const selectPlatformCoupon = (coupon) => {
+  // 不可用优惠券不允许选择
+  if (coupon && !isCouponAvailable(coupon)) {
+    showToast(coupon.unavailableReason || '该优惠券不可用')
+    return
+  }
   if (coupon) {
     usePlatformCoupon.value = true
     platformCouponUserId.value = coupon.couponUserId
@@ -585,6 +686,11 @@ const selectPlatformCoupon = (coupon) => {
 }
 
 const selectMerchantCoupon = (coupon) => {
+  // 不可用优惠券不允许选择
+  if (coupon && !isCouponAvailable(coupon)) {
+    showToast(coupon.unavailableReason || '该优惠券不可用')
+    return
+  }
   if (coupon) {
     useMerchantCoupon.value = true
     merchantCouponUserId.value = coupon.couponUserId
@@ -671,6 +777,10 @@ const applyPreviewData = (data) => {
     activityInfo: data.activityInfo || {},
     availableCoupons: data.availableCoupons || { platformCoupons: [], merchantCoupons: [] }
   }
+
+  // 清空 4.3.4 缓存:预览数据变更后,弹窗下次打开需重新加载可用优惠券
+  availablePlatformCoupons.value = []
+  availableMerchantCoupons.value = []
 
   // 同步地址信息：仅在用户未手动选择地址时，使用后端返回的默认地址
   if (data.addressInfo && deliveryType.value === 1 && !addressId.value) {
@@ -1434,10 +1544,20 @@ onUnmounted(() => {
     border-radius: 16rpx;
     margin-bottom: 16rpx;
     transition: all 0.2s ease;
+    border: 1rpx solid transparent;
 
     &.coupon-selected {
       background: rgba($color-primary, 0.1);
       border: 1rpx solid $color-primary;
+    }
+
+    // 不可用优惠券样式
+    &.coupon-item-disabled {
+      opacity: 0.55;
+
+      .coupon-discount {
+        color: $text-weak;
+      }
     }
 
     .coupon-check {
@@ -1449,6 +1569,7 @@ onUnmounted(() => {
       align-items: center;
       justify-content: center;
       margin-right: 20rpx;
+      flex-shrink: 0;
 
       .check-dot {
         width: 24rpx;
@@ -1460,17 +1581,43 @@ onUnmounted(() => {
 
     .coupon-content {
       flex: 1;
+      min-width: 0;
+
+      .coupon-name-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8rpx;
+      }
 
       .coupon-name {
         font-size: 28rpx;
         color: $text-main;
-        display: block;
-        margin-bottom: 8rpx;
+        margin-right: 12rpx;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .recommend-tag {
+        font-size: 18rpx;
+        color: #FFFFFF;
+        background: $color-primary;
+        padding: 2rpx 10rpx;
+        border-radius: 6rpx;
+        flex-shrink: 0;
       }
 
       .coupon-desc {
         font-size: 24rpx;
         color: $text-weak;
+        display: block;
+      }
+
+      .coupon-reason {
+        font-size: 22rpx;
+        color: $color-primary-danger;
+        display: block;
+        margin-top: 6rpx;
       }
     }
 
@@ -1478,6 +1625,46 @@ onUnmounted(() => {
       font-size: 32rpx;
       color: $color-primary-danger;
       font-weight: 600;
+      flex-shrink: 0;
+      margin-left: 16rpx;
+    }
+  }
+
+  // 加载中
+  .coupon-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 80rpx 0;
+
+    .loading-spinner {
+      width: 48rpx;
+      height: 48rpx;
+      border: 4rpx solid $gray-200;
+      border-top-color: $color-primary;
+      border-radius: 50%;
+      animation: coupon-spin 0.8s linear infinite;
+      margin-bottom: 16rpx;
+    }
+
+    .loading-text {
+      font-size: 26rpx;
+      color: $text-weak;
+    }
+  }
+
+  @keyframes coupon-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  // 空状态
+  .coupon-empty {
+    text-align: center;
+    padding: 80rpx 0;
+
+    .empty-text {
+      font-size: 26rpx;
+      color: $text-weak;
     }
   }
 }

@@ -11,7 +11,11 @@
 // 42901-42999          - 限流错误（请求频率超限）
 // 50001-50099          - 服务器错误（系统内部异常/服务不可用）
 
-const baseUrl = process.env.NODE_ENV === 'development' ? '' : "http://172.20.10.11:8081"
+const baseUrl = process.env.NODE_ENV === 'development' ? "http://172.20.10.11:8081" : "http://172.20.10.11:8081"
+
+// 5xx 服务器错误 toast 节流(避免多个接口同时 500 弹出多个 toast)
+let _lastServerErrorToastTime = 0
+const SERVER_ERROR_TOAST_INTERVAL = 3000  // 3秒内只提示一次
 
 const request = (options) => {
   const { url, method = "GET", data = {}, params = {}, headers = {}, timeout = 30000 } = options
@@ -39,8 +43,16 @@ const request = (options) => {
       timeout,
       success: (res) => {
         const { data: responseData, statusCode } = res
-        
+
         if (statusCode !== 200) {
+          // 5xx 服务器错误:统一提示"服务异常,请稍后重试"(节流避免重复弹出)
+          if (statusCode >= 500 && statusCode < 600) {
+            const now = Date.now()
+            if (now - _lastServerErrorToastTime > SERVER_ERROR_TOAST_INTERVAL) {
+              _lastServerErrorToastTime = now
+              uni.showToast({ title: "服务异常，请稍后重试", icon: "none" })
+            }
+          }
           // 读取后端返回的错误信息，而不是只返回 HTTP 状态码
           if (responseData && typeof responseData === 'object') {
             reject({ ...responseData, statusCode })

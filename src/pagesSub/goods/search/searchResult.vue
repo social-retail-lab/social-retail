@@ -453,6 +453,73 @@ const resetPage = () => {
   hasMore.value = true
 }
 
+/**
+ * 中文关键词分词(滑动窗口策略)
+ * 用于完整关键词无结果时的降级搜索
+ * 例如:"新疆阿克苏苹果" → ["新疆", "阿克", "克苏", "苹果", "阿克苏"]
+ */
+const splitKeyword = (kw) => {
+  const len = kw.length
+  if (len <= 3) return [kw]
+
+  const words = new Set()
+  // 2 字滑动窗口
+  for (let i = 0; i < len - 1; i++) {
+    words.add(kw.substring(i, i + 2))
+  }
+  // 3 字滑动窗口(覆盖"阿克苏"这种 3 字地名)
+  for (let i = 0; i < len - 2; i++) {
+    words.add(kw.substring(i, i + 3))
+  }
+
+  // 简单过滤:去掉首尾字符是常见无意义连接字的词
+  const invalidChars = ['疆阿', '苏苹', '克苏苹', '疆阿克']
+  const filtered = [...words].filter(w => !invalidChars.some(ic => w.includes(ic)))
+
+  // 优先保留 2 字词(产地+产品名),最多取 4 个词避免过多请求
+  const twoCharWords = filtered.filter(w => w.length === 2)
+  const threeCharWords = filtered.filter(w => w.length === 3)
+  return [...twoCharWords.slice(0, 3), ...threeCharWords.slice(0, 2)].slice(0, 4)
+}
+
+/**
+ * 降级搜索:用拆分后的多个子关键词并发搜索,合并去重
+ */
+const fallbackSearch = async (baseParams) => {
+  const subKeywords = splitKeyword(keyword.value)
+  if (subKeywords.length === 0) return { list: [], total: 0, pages: 0 }
+
+  try {
+    const subResults = await Promise.all(
+      subKeywords.map(kw => loadSearchProducts({ ...baseParams, keyword: kw }))
+    )
+
+    // 合并结果,按 productId 去重
+    const mergedList = []
+    const productIdSet = new Set()
+    subResults.forEach(r => {
+      if (r && r.list) {
+        r.list.forEach(item => {
+          const id = item.productId || item.id
+          if (id && !productIdSet.has(id)) {
+            productIdSet.add(id)
+            mergedList.push(item)
+          }
+        })
+      }
+    })
+
+    return {
+      list: mergedList,
+      total: mergedList.length,
+      pages: 1
+    }
+  } catch (error) {
+    console.error('降级搜索失败:', error)
+    return { list: [], total: 0, pages: 0 }
+  }
+}
+
 const loadGoods = async () => {
   if (loading.value && page.value > 1) return
   loading.value = true
@@ -491,7 +558,15 @@ const loadGoods = async () => {
       params.brandId = selectedBrandId.value
     }
 
-    const result = await loadSearchProducts(params)
+    let result = await loadSearchProducts(params)
+
+    // 智能降级搜索:完整关键词无结果且关键词长度 >= 4 时,分词并发搜索
+    if (page.value === 1 && result.list && result.list.length === 0 && keyword.value.length >= 4) {
+      const fallbackResult = await fallbackSearch(params)
+      if (fallbackResult.list.length > 0) {
+        result = fallbackResult
+      }
+    }
 
     if (result.list) {
       if (page.value === 1) {
