@@ -171,7 +171,7 @@
 import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useAfterSale } from '@/hooks/useAfterSale'
-import { uploadFileApi } from '@/api/afterSale'
+import { useFile } from '@/hooks/useFile'
 import { showToast, getValidImageUrl, formatPrice } from '@/utils/common'
 import {
   AFTER_SALE_TYPE,
@@ -179,11 +179,14 @@ import {
   AFTER_SALE_TYPE_DESC,
   AFTER_SALE_REASONS
 } from '@/constants/afterSale'
+import { UPLOAD_TYPE } from '@/constants/file'
 
 const {
   submitting,
   submitAfterSaleApply
 } = useAfterSale()
+
+const { uploadImage, uploading: imageUploading } = useFile()
 
 // 路由参数
 const orderId = ref('')
@@ -260,15 +263,17 @@ const handleChooseImage = () => {
   }
   uni.chooseImage({
     count: remaining,
+    sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
     success: async (res) => {
       const filePaths = res.tempFilePaths || []
       uni.showLoading({ title: '上传中...', mask: true })
       try {
+        // 使用 1.4.1 图片上传接口(按售后凭证类型上传)
         for (const filePath of filePaths) {
-          const url = await uploadFileApi(filePath)
-          if (url) {
-            evidenceImages.value.push(url)
+          const fileData = await uploadImage(filePath, UPLOAD_TYPE.AFTER_SALE, orderId.value || null)
+          if (fileData && fileData.fileUrl) {
+            evidenceImages.value.push(fileData.fileUrl)
           }
         }
       } catch (e) {

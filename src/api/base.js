@@ -11,75 +11,89 @@
 // 42901-42999          - 限流错误（请求频率超限）
 // 50001-50099          - 服务器错误（系统内部异常/服务不可用）
 
-const baseUrl = process.env.NODE_ENV === 'development' ? "http://172.20.10.11:8081" : "http://172.20.10.11:8081"
+const baseUrl = process.env.NODE_ENV === 'development' ? '' : "http://172.20.10.11:8081"
 
-// 5xx 服务器错误 toast 节流(避免多个接口同时 500 弹出多个 toast)
-let _lastServerErrorToastTime = 0
-const SERVER_ERROR_TOAST_INTERVAL = 3000  // 3秒内只提示一次
+// 公开接口白名单(不需要token的接口)
+// 登录、注册、发送验证码等公开接口不注入token,避免过期token导致后端拦截器误拦截
+const PUBLIC_API_LIST = [
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/code',
+  '/api/auth/wechat',
+  '/api/auth/wechat/check-bind'
+]
+
+const isPublicApi = (url) => {
+  return PUBLIC_API_LIST.some(api => url.startsWith(api))
+}
 
 const request = (options) => {
-  const { url, method = "GET", data = {}, params = {}, headers = {}, timeout = 30000 } = options
+  const { url, method = "GET", data = {}, params = {}, headers = {} } = options
   const token = uni.getStorageSync('token')
 
   const defaultHeader = {
     "Content-Type": "application/json"
   }
 
-  if (token) {
+  // 公开接口不注入token(避免过期token导致401)
+  if (token && !isPublicApi(url)) {
     defaultHeader.Authorization = `Bearer ${token}`
   }
 
   const requestHeader = { ...defaultHeader, ...headers }
 
-  // uni.request 不支持 params 参数，GET 请求的查询参数需要放在 data 中
-  const requestData = method.toUpperCase() === 'GET' ? { ...params, ...data } : data
+  // uni.request 不支持 params 参数,只支持 data
+  // 对于 GET 请求,data 会作为 query string 拼接到 URL 上
+  // 这里把 params 合并到 data 中,兼容 axios 风格的调用
+  const upperMethod = (method || 'GET').toUpperCase()
+  const requestData = upperMethod === 'GET'
+    ? { ...params, ...data }
+    : data
 
   return new Promise((resolve, reject) => {
     uni.request({
       url: `${baseUrl}${url}`,
-      method,
+      method: upperMethod,
       data: requestData,
       header: requestHeader,
-      timeout,
       success: (res) => {
         const { data: responseData, statusCode } = res
 
         if (statusCode !== 200) {
-          // 5xx 服务器错误:统一提示"服务异常,请稍后重试"(节流避免重复弹出)
-          if (statusCode >= 500 && statusCode < 600) {
-            const now = Date.now()
-            if (now - _lastServerErrorToastTime > SERVER_ERROR_TOAST_INTERVAL) {
-              _lastServerErrorToastTime = now
-              uni.showToast({ title: "服务异常，请稍后重试", icon: "none" })
+          // HTTP 401 未授权:清除过期token,跳转登录页
+          // 避免过期token持续影响后续请求(包括登录接口)
+          if (statusCode === 401) {
+            uni.removeStorageSync('token')
+            uni.removeStorageSync('userInfo')
+            uni.removeStorageSync('memberInfo')
+            // 非登录页才跳转,避免循环
+            const pages = getCurrentPages()
+            const currentRoute = pages[pages.length - 1]?.route || ''
+            if (!currentRoute.includes('login')) {
+              uni.showToast({ title: "登录已过期，请重新登录", icon: "none" })
+              setTimeout(() => {
+                uni.reLaunch({ url: "/pages/login/login" })
+              }, 1500)
             }
           }
-          // 读取后端返回的错误信息，而不是只返回 HTTP 状态码
-          if (responseData && typeof responseData === 'object') {
-            reject({ ...responseData, statusCode })
-          } else {
-            reject({ statusCode, message: `HTTP ${statusCode}` })
-          }
+          reject({ statusCode, message: `HTTP ${statusCode}` })
           return
         }
-        
+
         if (!responseData || typeof responseData !== 'object') {
           uni.showToast({ title: "服务响应格式错误", icon: "none" })
           reject({ message: "Invalid response format" })
           return
         }
-        
+
         if (responseData.code === 0) {
           resolve(responseData)
           return
         }
-        
+
         handleError(responseData, reject)
       },
       fail: (err) => {
-        if (err.errMsg && err.errMsg.includes('ERR_ABORTED')) {
-          reject({ ...err, aborted: true })
-          return
-        }
         uni.showToast({ title: "网络异常，请稍后重试", icon: "none" })
         reject(err)
       }

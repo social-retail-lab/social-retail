@@ -143,7 +143,7 @@ const maxPrice = ref('')
 const keyword = ref('')
 const categoryId = ref('')
 
-const { fetchProductList, fetchSearchProducts, fetchCategoryProducts } = useGoods()
+const { loadProductList, loadSearchProducts, loadCategoryProducts } = useGoods()
 
 const sortOptions = [
   { label: '综合', value: 'createTime' },
@@ -245,15 +245,15 @@ const loadGoods = async () => {
 
     let result
     if (keyword.value) {
-      result = await fetchSearchProducts({
+      result = await loadSearchProducts({
         ...params,
         keyword: keyword.value,
         categoryId: categoryId.value || undefined
       })
     } else if (categoryId.value) {
-      result = await fetchCategoryProducts(categoryId.value, params)
+      result = await loadCategoryProducts(categoryId.value, params)
     } else {
-      result = await fetchProductList(params)
+      result = await loadProductList(params)
     }
 
     if (result.list) {

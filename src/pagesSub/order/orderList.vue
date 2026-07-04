@@ -134,12 +134,68 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onLoad } from '@dcloudio/uni-app'
 import { getValidImageUrl, formatPrice } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
 
 const orderHook = useOrder()
+
+// 解析支付宝回调参数(兼容两种URL格式)
+// 标准格式: https://域名?orderId=xxx&out_trade_no=xxx#/pagesSub/order/orderList
+// 旧格式:   https://域名/#/pagesSub/order/orderList?orderId=xxx&out_trade_no=xxx
+const parseAlipayCallbackParams = () => {
+  // #ifdef H5
+  if (typeof window === 'undefined' || !window.location) return null
+
+  const params = {}
+
+  // 1. 优先从 window.location.search 解析(# 前面的参数,标准格式)
+  if (window.location.search) {
+    const searchStr = window.location.search.substring(1)
+    searchStr.split('&').forEach(pair => {
+      const [key, value] = pair.split('=')
+      if (key) params[key] = decodeURIComponent(value || '')
+    })
+  }
+
+  // 2. 兼容旧格式:从 hash 中提取参数(# 后面的参数)
+  const hash = window.location.hash || ''
+  const hashQueryIndex = hash.indexOf('?')
+  if (hashQueryIndex !== -1) {
+    const hashQueryStr = hash.substring(hashQueryIndex + 1)
+    // 只提取支付宝回调参数,不提取路由参数(如 status)
+    hashQueryStr.split('&').forEach(pair => {
+      const [key, value] = pair.split('=')
+      if (key && ['out_trade_no', 'trade_no', 'total_amount', 'timestamp', 'orderId'].includes(key)) {
+        if (!params[key]) params[key] = decodeURIComponent(value || '')
+      }
+    })
+  }
+
+  // 如果有支付宝回调参数,返回解析结果
+  if (params.out_trade_no || params.trade_no) {
+    return params
+  }
+  // #endif
+
+  return null
+}
+
+// 处理支付宝支付回调
+const handleAlipayCallback = () => {
+  const alipayParams = parseAlipayCallbackParams()
+  if (alipayParams && alipayParams.out_trade_no) {
+    // 支付回调回来,刷新订单列表以获取最新状态
+    // 清除URL中的支付宝参数,避免刷新时重复处理
+    if (typeof window !== 'undefined' && window.history && window.history.replaceState) {
+      const cleanUrl = window.location.origin + window.location.pathname + window.location.hash
+      window.history.replaceState(null, '', cleanUrl)
+    }
+    // 显示支付成功提示
+    uni.showToast({ title: '支付完成', icon: 'success', duration: 1500 })
+  }
+}
 
 const activeTab = ref('ALL')
 const orderList = ref([])
@@ -300,6 +356,10 @@ onShow(() => {
 })
 
 onMounted(() => {
+  // 1. 处理支付宝支付回调(解析URL参数,清除参数,提示支付完成)
+  handleAlipayCallback()
+
+  // 2. 解析路由参数中的 status
   const pages = getCurrentPages()
   const currentPage = pages[pages.length - 1]
   const status = currentPage.options?.status

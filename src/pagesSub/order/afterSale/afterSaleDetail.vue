@@ -112,13 +112,14 @@
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAfterSale } from '@/hooks/useAfterSale'
-import { uploadFileApi } from '@/api/afterSale'
+import { useFile } from '@/hooks/useFile'
 import { getValidImageUrl, formatPrice } from '@/utils/common'
 import {
   AFTER_SALE_STATUS,
   getAfterSaleStatusClass,
   isAfterSaleCancellable
 } from '@/constants/afterSale'
+import { UPLOAD_TYPE } from '@/constants/file'
 
 const {
   afterSaleStore,
@@ -129,6 +130,8 @@ const {
   confirmCancelAfterSale,
   supplementEvidence
 } = useAfterSale()
+
+const { uploadImage } = useFile()
 
 const afterSaleId = ref('')
 
@@ -191,11 +194,13 @@ const handleSupplyEvidence = () => {
       if (!filePaths.length) return
 
       try {
-        // 1. 先上传图片文件
+        // 1. 先上传图片文件(使用 1.4.1 接口,按售后凭证类型上传)
         const uploadedUrls = []
         for (const filePath of filePaths) {
-          const url = await uploadFileApi(filePath)
-          uploadedUrls.push(url)
+          const fileData = await uploadImage(filePath, UPLOAD_TYPE.AFTER_SALE, afterSaleId.value || null)
+          if (fileData && fileData.fileUrl) {
+            uploadedUrls.push(fileData.fileUrl)
+          }
         }
         // 2. 调用 Hook 保存凭证关联关系
         const success = await supplementEvidence(afterSaleId.value, uploadedUrls)

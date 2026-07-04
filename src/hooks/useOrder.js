@@ -370,8 +370,11 @@ export const useOrder = () => {
 
       // #ifdef H5
       // 构建支付完成后返回前端页面的地址
+      // 注意:支付宝回调参数必须放在 # 前面,否则会被 uni-app hash 路由吞掉
+      // 正确格式: https://域名?orderId=xxx&支付宝回调参数#/pagesSub/order/orderList
+      // 错误格式: https://域名/#/pagesSub/order/orderList?orderId=xxx&支付宝回调参数
       if (typeof window !== 'undefined' && window.location) {
-        params.returnUrl = `${window.location.origin}${window.location.pathname}#/pagesSub/order/pay/payOrder?orderId=${orderId}`
+        params.returnUrl = `${window.location.origin}${window.location.pathname}?orderId=${orderId}#/pagesSub/order/orderList`
       }
       // #endif
 

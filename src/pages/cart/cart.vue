@@ -40,11 +40,7 @@
                 </view>
               </view>
               <view class="merchant-logo-wrap">
-                <image 
-                  :src="getMerchantLogo(group.merchantId)" 
-                  mode="aspectFill" 
-                  class="merchant-logo"
-                />
+                <text class="merchant-logo-text">{{ (group.merchantName || '商').charAt(0) }}</text>
               </view>
               <text class="merchant-name">{{ group.merchantName }}</text>
             </view>
@@ -179,19 +175,11 @@ const refreshing = ref(false)
 const isInvalidExpand = ref(false)
 
 const goShopping = () => {
-  uni.switchTab({ url: '/pages/category/categoryHome' })
+  uni.switchTab({ url: '/pagesSub/goods/category/categoryHome' })
 }
 
 const goToGoodsDetail = (productId) => {
   uni.navigateTo({ url: `/pagesSub/goods/detail/goodsDetail?productId=${productId}` })
-}
-
-const merchantLogoMap = {
-  2001: 'https://cdn.example.com/logo/01.png'
-}
-
-const getMerchantLogo = (merchantId) => {
-  return merchantLogoMap[merchantId] || 'https://cdn.example.com/logo/default.png'
 }
 
 const parseSkuSpec = (skuSpec) => {
@@ -440,13 +428,17 @@ onShow(() => {
   border-radius: 12rpx;
   overflow: hidden;
   margin-right: 16rpx;
-  background: $bg-page-light;
+  background: linear-gradient(135deg, rgba($color-primary, 0.1) 0%, rgba($color-primary-danger, 0.1) 100%);
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.merchant-logo {
-  width: 100%;
-  height: 100%;
+.merchant-logo-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: $color-primary;
 }
 
 .merchant-name {

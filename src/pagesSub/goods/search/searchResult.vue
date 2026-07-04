@@ -346,7 +346,7 @@ const goBack = () => {
 }
 
 const goShopping = () => {
-  uni.switchTab({ url: '/pages/category/categoryHome' })
+  uni.switchTab({ url: '/pagesSub/goods/category/categoryHome' })
 }
 
 const clearKeyword = () => {
@@ -491,7 +491,7 @@ const fallbackSearch = async (baseParams) => {
 
   try {
     const subResults = await Promise.all(
-      subKeywords.map(kw => loadSearchProducts({ ...baseParams, keyword: kw }))
+      subKeywords.map(kw => loadSearchProducts({ ...baseParams, keyword: kw, page: 1 }))
     )
 
     // 合并结果,按 productId 去重
@@ -500,8 +500,9 @@ const fallbackSearch = async (baseParams) => {
     subResults.forEach(r => {
       if (r && r.list) {
         r.list.forEach(item => {
-          const id = item.productId || item.id
-          if (id && !productIdSet.has(id)) {
+          // 优先用 productId,其次 id(两者在 transformProductItem 后值相同)
+          const id = item.productId !== undefined ? item.productId : item.id
+          if (id !== undefined && id !== null && !productIdSet.has(id)) {
             productIdSet.add(id)
             mergedList.push(item)
           }
@@ -570,9 +571,19 @@ const loadGoods = async () => {
 
     if (result.list) {
       if (page.value === 1) {
-        goodsList.value = result.list
+        // 首页直接赋值,并对当前页内做一次去重(防止后端返回重复)
+        const seen = new Set()
+        goodsList.value = result.list.filter(item => {
+          const id = item.productId
+          if (id && seen.has(id)) return false
+          seen.add(id)
+          return true
+        })
       } else {
-        goodsList.value = [...goodsList.value, ...result.list]
+        // 分页去重:过滤掉已存在的商品(后端分页可能返回重复数据)
+        const existingIds = new Set(goodsList.value.map(item => item.productId))
+        const newItems = result.list.filter(item => !existingIds.has(item.productId))
+        goodsList.value = [...goodsList.value, ...newItems]
       }
       totalPages.value = result.pages || Math.ceil((result.total || 0) / pageSize)
       hasMore.value = page.value < totalPages.value
@@ -629,8 +640,10 @@ onMounted(() => {
   const currentPage = pages[pages.length - 1]
   const options = currentPage.options || {}
 
+  // uni-app 路由系统会自动解码 query 参数,不需要手动 decodeURIComponent
+  // 如果手动解码会导致双重解码问题(当关键词含 % 等特殊字符时报错)
   const initKeyword = options.keyword || ''
-  keyword.value = decodeURIComponent(initKeyword)
+  keyword.value = initKeyword
 
   loadCategoryTreeData()
   loadGoods()

@@ -17,10 +17,14 @@
           <view class="form-right">
             <view class="avatar-wrapper" @click="chooseAvatar">
               <image
+                v-if="avatar || userStore.userInfo.avatar"
                 class="avatar"
-                :src="avatar || userStore.userInfo.avatar || defaultAvatar"
+                :src="avatar || userStore.userInfo.avatar"
                 mode="aspectFill"
               />
+              <view v-else class="avatar avatar-default">
+                <text class="avatar-default-icon">👤</text>
+              </view>
               <view class="avatar-upload">
                 <text class="upload-icon">+</text>
               </view>
@@ -52,14 +56,17 @@
 <script setup>
 import { ref, onMounted } from "vue"
 import { useUserStore } from '@/store/user'
+import { useFile } from '@/hooks/useFile'
 import { showToast } from '@/utils/common'
+import { UPLOAD_TYPE } from '@/constants/file'
 
 const userStore = useUserStore()
+const { uploadImage, uploading: avatarUploading } = useFile()
 
 const nickname = ref('')
 const avatar = ref('')
-
-const defaultAvatar = 'https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=simple%20user%20avatar%20icon%20neutral%20background&image_size=square'
+// 标记头像是否已上传(临时路径未上传,需要先上传再保存)
+const avatarUploaded = ref(true)
 
 onMounted(() => {
   nickname.value = userStore.userInfo.nickname || ''
@@ -75,10 +82,32 @@ const chooseAvatar = () => {
     count: 1,
     sizeType: ['compressed'],
     sourceType: ['album', 'camera'],
-    success: (res) => {
+    success: async (res) => {
       const tempFilePath = res.tempFilePaths[0]
+      // 先显示临时图片
       avatar.value = tempFilePath
-      uni.showToast({ title: '头像已选择', icon: 'success' })
+      avatarUploaded.value = false
+      // 立即上传(使用 1.4.1 图片上传接口,类型为用户头像)
+      uni.showLoading({ title: '上传中...', mask: true })
+      try {
+        const fileData = await uploadImage(tempFilePath, UPLOAD_TYPE.USER_AVATAR)
+        if (fileData && fileData.fileUrl) {
+          avatar.value = fileData.fileUrl
+          avatarUploaded.value = true
+          uni.hideLoading()
+          showToast('头像上传成功')
+        } else {
+          // 上传失败,恢复原头像
+          avatar.value = userStore.userInfo.avatar || ''
+          avatarUploaded.value = true
+          uni.hideLoading()
+        }
+      } catch (error) {
+        avatar.value = userStore.userInfo.avatar || ''
+        avatarUploaded.value = true
+        uni.hideLoading()
+        showToast('头像上传失败')
+      }
     },
     fail: () => {
       uni.showToast({ title: '选择图片失败', icon: 'none' })
@@ -87,10 +116,15 @@ const chooseAvatar = () => {
 }
 
 const handleSave = async () => {
+  // 头像未上传完成时阻止保存
+  if (!avatarUploaded.value) {
+    showToast('头像上传中,请稍候')
+    return
+  }
   try {
-    const res = await userStore.fetchUpdateUserInfo({ 
-      nickname: nickname.value, 
-      avatar: avatar.value 
+    const res = await userStore.fetchUpdateUserInfo({
+      nickname: nickname.value,
+      avatar: avatar.value
     })
     if (res) {
       userStore.updateUserInfo(res)
@@ -195,6 +229,18 @@ const handleSave = async () => {
   width: 100%;
   height: 100%;
   border-radius: 50%;
+}
+
+.avatar-default {
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-default-icon {
+  font-size: 56rpx;
+  color: #999999;
 }
 
 .avatar-upload {

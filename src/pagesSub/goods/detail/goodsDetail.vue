@@ -245,7 +245,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onBackPress } from '@dcloudio/uni-app'
 import { getValidImageUrl } from '@/utils/common'
 import { useGoods } from '@/hooks/useGoods'
 import { useCart } from '@/hooks/useCart'
@@ -308,8 +308,23 @@ const specOptions = computed(() => {
 })
 
 const goBack = () => {
-  uni.navigateBack()
+  const pages = getCurrentPages()
+  if (pages.length > 1) {
+    uni.navigateBack({
+      fail: () => {
+        uni.switchTab({ url: '/pages/index/index' })
+      }
+    })
+  } else {
+    uni.switchTab({ url: '/pages/index/index' })
+  }
 }
+
+// 拦截系统返回键，避免陷入死循环
+onBackPress(() => {
+  goBack()
+  return true
+})
 
 const goHome = () => {
   uni.switchTab({ url: '/pages/index/index' })
@@ -499,7 +514,16 @@ const loadProductData = async (productId) => {
       uni.showToast({ title: '商品已下架', icon: 'none' })
       isProductNotFound.value = true
       setTimeout(() => {
-        uni.navigateBack()
+        const pages = getCurrentPages()
+        if (pages.length > 1) {
+          uni.navigateBack({
+            fail: () => {
+              uni.switchTab({ url: '/pages/index/index' })
+            }
+          })
+        } else {
+          uni.switchTab({ url: '/pages/index/index' })
+        }
       }, 1500)
     } else {
       isProductNotFound.value = true

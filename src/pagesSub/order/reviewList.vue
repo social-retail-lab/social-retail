@@ -105,6 +105,9 @@ import { ref, onMounted, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { showToast, getValidImageUrl } from '@/utils/common'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
+import { useOrder } from '@/hooks/useOrder'
+
+const orderHook = useOrder()
 
 const activeTab = ref('PENDING')
 const reviewList = ref([])
@@ -113,6 +116,7 @@ const refreshing = ref(false)
 const page = ref(1)
 const pageSize = ref(20)
 const hasMore = ref(true)
+const totalPages = ref(0)
 
 const tabs = [
   { key: 'PENDING', label: '待评价', badge: 0 },
@@ -120,7 +124,11 @@ const tabs = [
 ]
 
 const handleBack = () => {
-  uni.navigateBack()
+  uni.navigateBack({
+    fail: () => {
+      uni.switchTab({ url: '/pages/index/index' })
+    }
+  })
 }
 
 const goShopping = () => {
@@ -140,71 +148,80 @@ const switchTab = (key) => {
   fetchReviews()
 }
 
+// 将订单列表项展开为可评价的商品项
+const flattenOrderItems = (orderList) => {
+  const items = []
+  orderList.forEach(order => {
+    if (Array.isArray(order.itemList)) {
+      order.itemList.forEach(item => {
+        items.push({
+          id: `${order.orderId}_${item.productId}`,
+          orderId: order.orderId,
+          orderSn: order.orderSn,
+          orderTime: order.createTime || '',
+          productId: item.productId,
+          productName: item.productName || '',
+          productImage: item.productImage || '',
+          skuSpecs: item.skuSpecs || '',
+          finalPrice: Number(item.finalPrice || item.price) || 0,
+          quantity: Number(item.quantity) || 1
+        })
+      })
+    }
+  })
+  return items
+}
+
 const fetchReviews = async (isRefresh = false) => {
   if (loading.value) return
-  
-  loading.value = true
-  
-  const mockData = {
-    PENDING: [
-      {
-        id: 1,
-        orderId: 13,
-        orderSn: 'ORD20260703140445984491383',
-        orderTime: '2026-07-03 14:04',
-        productId: 6001,
-        productName: '新疆阿克苏冰糖心苹果 5斤装',
-        productImage: 'http://172.20.10.11:8081/uploads/temp/upload/E8C8E3A43B7AA5723A3DFF4BA8FE9D70.jpg',
-        skuSpecs: '规格：5斤装，果径：80-85mm',
-        finalPrice: 39.90,
-        quantity: 1
-      },
-      {
-        id: 2,
-        orderId: 14,
-        orderSn: 'ORD20260702102030123456789',
-        orderTime: '2026-07-02 10:20',
-        productId: 6002,
-        productName: '云南褚橙 10斤装',
-        productImage: 'https://cdn.example.com/product/main_02.jpg',
-        skuSpecs: '规格：10斤装，等级：特级果',
-        finalPrice: 85.00,
-        quantity: 2
-      }
-    ],
-    DONE: [
-      {
-        id: 3,
-        orderId: 10,
-        orderSn: 'ORD20260628091522789012345',
-        orderTime: '2026-06-28 09:15',
-        productId: 6003,
-        productName: '智利车厘子 2斤装',
-        productImage: 'https://cdn.example.com/product/cherry.jpg',
-        skuSpecs: '规格：2斤装，果径：JJ级',
-        finalPrice: 128.00,
-        quantity: 1,
-        star: 5,
-        content: '非常新鲜，个头很大，甜度很高，下次还会回购！',
-        images: ['https://cdn.example.com/review/img1.jpg', 'https://cdn.example.com/review/img2.jpg'],
-        reviewTime: '2026-06-29 14:30'
-      }
-    ]
-  }
-  
-  setTimeout(() => {
-    const data = mockData[activeTab.value] || []
-    
-    if (isRefresh || page.value === 1) {
-      reviewList.value = data
-    } else {
-      reviewList.value = [...reviewList.value, ...data]
-    }
-    
-    hasMore.value = reviewList.value.length < 10
+
+  // "已评价"标签页:后端暂无评价列表接口,显示空状态
+  if (activeTab.value === 'DONE') {
+    reviewList.value = []
+    hasMore.value = false
     loading.value = false
     refreshing.value = false
-  }, 800)
+    return
+  }
+
+  loading.value = true
+
+  try {
+    // "待评价":获取已完成(COMPLETED)状态的订单
+    const res = await orderHook.loadOrderList({
+      status: 'COMPLETED',
+      page: page.value,
+      pageSize: pageSize.value
+    })
+
+    if (res && res.list) {
+      const items = flattenOrderItems(res.list)
+      if (isRefresh || page.value === 1) {
+        reviewList.value = items
+      } else {
+        // 分页去重
+        const existingIds = new Set(reviewList.value.map(item => item.id))
+        const newItems = items.filter(item => !existingIds.has(item.id))
+        reviewList.value = [...reviewList.value, ...newItems]
+      }
+      totalPages.value = res.pages || Math.ceil((res.total || 0) / pageSize.value)
+      hasMore.value = page.value < totalPages.value
+    } else {
+      if (isRefresh || page.value === 1) {
+        reviewList.value = []
+      }
+      hasMore.value = false
+    }
+  } catch (error) {
+    console.error('获取评价列表失败:', error)
+    if (isRefresh || page.value === 1) {
+      reviewList.value = []
+    }
+    hasMore.value = false
+  } finally {
+    loading.value = false
+    refreshing.value = false
+  }
 }
 
 const onRefresh = () => {

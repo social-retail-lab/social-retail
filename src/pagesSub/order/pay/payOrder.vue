@@ -115,7 +115,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { onHide, onShow } from '@dcloudio/uni-app'
+import { onHide, onShow, onBackPress } from '@dcloudio/uni-app'
 import { showToast, getValidImageUrl } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 
@@ -183,11 +183,37 @@ const handleBack = () => {
     success: (res) => {
       if (res.confirm) {
         stopAllTimers()
-        uni.navigateBack()
+        // 安全返回:优先 navigateBack,失败则回退到订单详情或首页
+        const pages = getCurrentPages()
+        if (pages.length > 1) {
+          uni.navigateBack({
+            fail: () => {
+              // 页面栈异常,跳转订单详情页
+              if (orderId.value) {
+                uni.redirectTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
+              } else {
+                uni.switchTab({ url: '/pages/index/index' })
+              }
+            }
+          })
+        } else {
+          // 页面栈只有当前页,跳转订单详情或首页
+          if (orderId.value) {
+            uni.redirectTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
+          } else {
+            uni.switchTab({ url: '/pages/index/index' })
+          }
+        }
       }
     }
   })
 }
+
+// 拦截系统返回键(防止返回键直接跳过弹窗确认)
+onBackPress(() => {
+  handleBack()
+  return true // 阻止默认返回行为
+})
 
 const startCountdown = () => {
   if (countdownTimer) {

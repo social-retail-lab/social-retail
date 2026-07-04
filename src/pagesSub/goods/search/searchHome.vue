@@ -179,7 +179,7 @@ const handleSearch = () => {
   }
   saveHistory(searchKeyword)
   uni.navigateTo({
-    url: `/pagesSub/goods/search/searchResult?keyword=${encodeURIComponent(searchKeyword)}`
+    url: `/pagesSub/goods/search/searchResult?keyword=${searchKeyword}`
   })
 }
 
@@ -187,7 +187,7 @@ const handleHistoryClick = (item) => {
   keyword.value = item
   saveHistory(item)
   uni.navigateTo({
-    url: `/pagesSub/goods/search/searchResult?keyword=${encodeURIComponent(item)}`
+    url: `/pagesSub/goods/search/searchResult?keyword=${item}`
   })
 }
 
@@ -195,7 +195,7 @@ const handleHotClick = (item) => {
   keyword.value = item
   saveHistory(item)
   uni.navigateTo({
-    url: `/pagesSub/goods/search/searchResult?keyword=${encodeURIComponent(item)}`
+    url: `/pagesSub/goods/search/searchResult?keyword=${item}`
   })
 }
 
@@ -203,7 +203,7 @@ const handleSuggestClick = (item) => {
   keyword.value = item
   saveHistory(item)
   uni.navigateTo({
-    url: `/pagesSub/goods/search/searchResult?keyword=${encodeURIComponent(item)}`
+    url: `/pagesSub/goods/search/searchResult?keyword=${item}`
   })
 }
 

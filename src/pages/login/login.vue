@@ -172,6 +172,7 @@
 
 <script setup>
 import { ref, onUnmounted } from 'vue'
+import { onLoad } from '@dcloudio/uni-app'
 import { useAuth } from '@/hooks/useAuth'
 
 const {
@@ -186,6 +187,13 @@ const {
   bindSubmit,
   clearTimers
 } = useAuth()
+
+// 登录页加载时清理过期的token,确保登录请求不受过期token影响
+onLoad(() => {
+  uni.removeStorageSync('token')
+  uni.removeStorageSync('userInfo')
+  uni.removeStorageSync('memberInfo')
+})
 
 const isLoginMode = ref(true)
 

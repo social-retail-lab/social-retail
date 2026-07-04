@@ -149,7 +149,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { onShow } from '@dcloudio/uni-app'
+import { onShow, onBackPress } from '@dcloudio/uni-app'
 import { usePromotion } from '@/hooks/usePromotion'
 import { showToast, getValidImageUrl } from '@/utils/common'
 
@@ -279,10 +279,28 @@ const loadProducts = async (isRefresh = false) => {
   })
 
   if (res) {
-    const list = (res.list || []).map(item => ({
-      ...item,
-      productImage: getValidImageUrl(item.productImage)
-    }))
+    const list = (res.list || []).map(item => {
+      // 兼容字段映射：接口返回 title/mainImage，页面使用 productName/productImage
+      const productName = item.productName || item.title || ''
+      const productImage = item.productImage || item.mainImage || ''
+      return {
+        ...item,
+        // 字段映射
+        productName,
+        productImage: getValidImageUrl(productImage),
+        skuSpecs: item.skuSpecs || item.subTitle || '',
+        // 秒杀专属字段（接口未返回时给默认值，避免页面显示异常）
+        seckillProductId: item.seckillProductId || item.productId,
+        seckillPrice: item.seckillPrice || item.price || 0,
+        originPrice: item.originPrice || item.originalPrice || item.price || 0,
+        seckillStock: item.seckillStock || item.stock || 0,
+        limitQuantity: item.limitQuantity || 0,
+        // canBuy 优先取商品级，回落到活动级
+        canBuy: item.canBuy !== undefined ? item.canBuy : (activityInfo.value ? activityInfo.value.canBuy : false),
+        // 按钮文字
+        buttonText: item.buttonText || ''
+      }
+    })
 
     if (isRefresh || page.value === 1) {
       productList.value = list
@@ -326,15 +344,32 @@ const onLoadMore = () => {
 
 // 返回
 const handleBack = () => {
-  uni.navigateBack()
+  const pages = getCurrentPages()
+  if (pages.length > 1) {
+    uni.navigateBack({
+      fail: () => {
+        uni.switchTab({ url: '/pages/index/index' })
+      }
+    })
+  } else {
+    uni.switchTab({ url: '/pages/index/index' })
+  }
 }
+
+// 拦截系统返回键，避免陷入死循环
+onBackPress(() => {
+  handleBack()
+  return true
+})
 
 // 点击商品
 const handleGoodsClick = (item) => {
   // 预热期和进行期都可查看商品详情
-  // 暂时跳转到商品详情页
   uni.navigateTo({
-    url: `/pagesSub/goods/goodsDetail?productId=${item.productId}`
+    url: `/pagesSub/goods/detail/goodsDetail?productId=${item.productId}`,
+    fail: () => {
+      uni.showToast({ title: '跳转失败', icon: 'none' })
+    }
   })
 }
 
