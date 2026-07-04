@@ -12,11 +12,11 @@ import java.util.List;
 public class CartCheckoutPreviewVO {
     private List<CartCheckoutItemVO> items;
     private CartCheckoutPriceDetailVO priceDetail;
+    private CouponBundleVO couponInfo;
     private PointsInfoVO pointsInfo;
     private List<CartPromotionDetailVO> promotionDetail;
-    private CartCouponInfoVO couponInfo;
-    private CartActivityInfoVO activityInfo;
+    private PromotionActivityInfoVO activityInfo;
     private List<Object> availablePromotions;
-    private List<Object> availableCoupons;
+    private AvailableCouponGroupsVO availableCoupons;
     private Integer totalQuantity;
 }

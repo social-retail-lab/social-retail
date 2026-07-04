@@ -40,21 +40,28 @@ public class PointsCalculationService {
 
         int usedPoints = 0;
         if (Boolean.TRUE.equals(usePoints)) {
+            if (requestedPoints != null && requestedPoints > amountLimitedPoints) {
+                throw new BusinessException(40952, HttpStatus.CONFLICT,
+                        "积分抵扣超过本单可用上限",
+                        Map.of("maxUsablePoints", maxUsablePoints,
+                                "requestedPoints", requestedPoints,
+                                "maxDeductionAmount", maxDeduction));
+            }
             if (requestedPoints != null && requestedPoints > balance) {
                 throw new BusinessException(40951, HttpStatus.CONFLICT, "积分余额不足",
-                        Map.of("pointsBalance", balance, "usePoints", requestedPoints));
+                        Map.of("pointsBalance", balance, "usePointsAmount", requestedPoints));
             }
             usedPoints = requestedPoints == null ? maxUsablePoints : requestedPoints;
-            if (usedPoints > amountLimitedPoints) {
-                BigDecimal deduction = pointsToAmount(usedPoints);
-                throw new BusinessException(40952, HttpStatus.CONFLICT,
-                        "积分抵扣金额超过订单可抵扣上限",
-                        Map.of("maxDeductionAmount", maxDeduction, "deductionAmount", deduction));
-            }
         }
         BigDecimal deduction = pointsToAmount(usedPoints);
         return new PointsInfoVO(balance, canUse, maxUsablePoints, usedPoints,
                 deduction, "100积分抵扣1元", maxDeduction);
+    }
+
+    public PointsInfoVO calculateDefault(Long userId, BigDecimal discountedGoodsAmount) {
+        PointsInfoVO preview = calculate(userId, discountedGoodsAmount, false, null);
+        int max = preview.getMaxUsablePoints() == null ? 0 : preview.getMaxUsablePoints();
+        return max <= 0 ? preview : calculate(userId, discountedGoodsAmount, true, max);
     }
 
     private BigDecimal pointsToAmount(int points) {

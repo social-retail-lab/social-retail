@@ -13,8 +13,13 @@ public class SeckillProductView {
     private LocalDateTime endTime;
     private Long productId;
     private Long skuId;
+    private Long merchantId;
     private String productName;
+    private String subTitle;
     private String productImage;
+    private Integer saleType;
+    private Long productSoldCount;
+    private LocalDateTime productCreateTime;
     private String skuSpecs;
     private BigDecimal originPrice;
     private BigDecimal seckillPrice;

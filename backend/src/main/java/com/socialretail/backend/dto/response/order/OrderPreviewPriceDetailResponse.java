@@ -14,7 +14,8 @@ public class OrderPreviewPriceDetailResponse {
     private BigDecimal seckillDiscount;
     private BigDecimal bargainDiscount;
     private BigDecimal promotionDiscount;
-    private BigDecimal couponDiscount;
+    private BigDecimal merchantCouponDiscount;
+    private BigDecimal platformCouponDiscount;
     private BigDecimal pointsDeduction;
     private BigDecimal deliveryFee;
     private BigDecimal payAmount;

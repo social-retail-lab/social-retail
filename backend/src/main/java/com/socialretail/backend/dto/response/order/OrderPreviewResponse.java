@@ -5,8 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import com.socialretail.backend.vo.CartActivityInfoVO;
-import com.socialretail.backend.vo.CartCouponInfoVO;
+import com.socialretail.backend.vo.PromotionActivityInfoVO;
+import com.socialretail.backend.vo.CouponBundleVO;
+import com.socialretail.backend.vo.AvailableCouponGroupsVO;
 import com.socialretail.backend.vo.CartPromotionDetailVO;
 import com.socialretail.backend.vo.PointsInfoVO;
 
@@ -14,15 +15,16 @@ import com.socialretail.backend.vo.PointsInfoVO;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderPreviewResponse {
+    private String previewToken;
+    private Long previewExpireSeconds;
     private List<OrderItemResponse> itemList;
     private OrderPreviewPriceDetailResponse priceDetail;
     private PointsInfoVO pointsInfo;
     private List<CartPromotionDetailVO> promotionDetail;
     private OrderAddressInfoResponse addressInfo;
     private OrderPickupPointInfoResponse pickupPointInfo;
-    private CartCouponInfoVO couponInfo;
-    private CartActivityInfoVO activityInfo;
+    private CouponBundleVO couponInfo;
+    private PromotionActivityInfoVO activityInfo;
     private List<Object> availablePromotions;
-    private List<Object> availableCoupons;
-    private Object promotionSnapshot;
+    private AvailableCouponGroupsVO availableCoupons;
 }

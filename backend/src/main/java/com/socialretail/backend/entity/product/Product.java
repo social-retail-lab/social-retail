@@ -43,4 +43,6 @@ public class Product {
     private LocalDateTime updateTime;
 
     private Long soldCount;
+
+    private Integer forceOffShelf;
 }

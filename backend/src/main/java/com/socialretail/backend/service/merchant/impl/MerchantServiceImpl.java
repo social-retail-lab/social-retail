@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.socialretail.backend.common.JwtUtils;
 import com.socialretail.backend.common.MD5Utils;
 import com.socialretail.backend.common.PageResult;
+import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.member.MerchantApply;
 import com.socialretail.backend.entity.member.MerchantInfoChange;
@@ -30,6 +31,7 @@ import com.socialretail.backend.vo.MerchantUpdateRequest;
 import com.socialretail.backend.vo.QualificationRequest;
 import com.socialretail.backend.vo.QualificationVO;
 import jakarta.annotation.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -136,7 +138,7 @@ public class MerchantServiceImpl implements MerchantService {
     public LoginVO merchantLogin(String phone, String password, String smsCode) {
         // 短信验证码校验（模拟：任意6位数字即通过）
         if (smsCode == null || !smsCode.matches("\\d{6}")) {
-            throw new RuntimeException("短信验证码错误");
+            throw new BusinessException(40102, HttpStatus.UNAUTHORIZED, "短信验证码错误");
         }
 
         // 检查用户是否存在，不存在则自动注册
@@ -157,7 +159,7 @@ public class MerchantServiceImpl implements MerchantService {
         } else {
             // 验证密码
             if (!MD5Utils.verify(password, user.getPassword())) {
-                throw new RuntimeException("密码错误");
+                throw new BusinessException(40102, HttpStatus.UNAUTHORIZED, "手机号或登录凭证错误");
             }
         }
 

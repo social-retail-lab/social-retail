@@ -36,7 +36,7 @@ public class OrderPointsService {
     }
 
     @Transactional
-    public void reserve(Long userId, int points) {
+    public void reserve(Long userId, int points, String orderSn) {
         if (points <= 0) return;
         memberLevelService.getOrCreate(userId);
         Member member = memberMapper.selectByUserIdForUpdate(userId);
@@ -47,21 +47,16 @@ public class OrderPointsService {
         }
         member.setPointsBalance(balance - points);
         if (memberMapper.updateById(member) != 1) throw new IllegalStateException("订单积分预占失败");
+        insertLog(userId, 2, -points, balance - points,
+                "订单创建，积分抵扣，订单号：" + orderSn);
     }
 
     @Transactional
     public void consume(Order order) {
         int points = usedPoints(order);
-        if (points <= 0 || orderMapper.updatePointsStatus(order.getId(), RESERVED, CONSUMED) != 1) return;
-        Member member = memberMapper.selectByUserIdForUpdate(order.getUserId());
-        PointsLog log = new PointsLog();
-        log.setUserId(order.getUserId());
-        log.setType(2);
-        log.setChangePoints(-points);
-        log.setCurrentPoints(balance(member));
-        log.setRemark("订单支付成功，积分抵扣，订单号：" + order.getOrderSn());
-        log.setCreateTime(LocalDateTime.now());
-        if (pointsLogMapper.insert(log) != 1) throw new IllegalStateException("订单积分流水写入失败");
+        if (points > 0) {
+            orderMapper.updatePointsStatus(order.getId(), RESERVED, CONSUMED);
+        }
     }
 
     @Transactional
@@ -72,6 +67,19 @@ public class OrderPointsService {
         if (member == null) throw new IllegalStateException("订单用户会员账户不存在");
         member.setPointsBalance(balance(member) + points);
         if (memberMapper.updateById(member) != 1) throw new IllegalStateException("订单预占积分释放失败");
+        insertLog(order.getUserId(), 5, points, member.getPointsBalance(),
+                "订单取消，退回抵扣积分，订单号：" + order.getOrderSn());
+    }
+
+    private void insertLog(Long userId, int type, int changePoints, int currentPoints, String remark) {
+        PointsLog log = new PointsLog();
+        log.setUserId(userId);
+        log.setType(type);
+        log.setChangePoints(changePoints);
+        log.setCurrentPoints(currentPoints);
+        log.setRemark(remark);
+        log.setCreateTime(LocalDateTime.now());
+        if (pointsLogMapper.insert(log) != 1) throw new IllegalStateException("订单积分流水写入失败");
     }
 
     private int usedPoints(Order order) {

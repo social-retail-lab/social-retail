@@ -331,8 +331,14 @@ CREATE TABLE IF NOT EXISTS `coupon` (
   `min_consume` DECIMAL(10,2) DEFAULT NULL COMMENT '满减门槛金额',
   `discount_amount` DECIMAL(10,2) DEFAULT NULL COMMENT '面值抵扣金额',
   `total_count` INT DEFAULT NULL COMMENT '发行总量',
+  `received_count` INT NOT NULL DEFAULT 0 COMMENT '已领取数量',
+  `per_user_limit` INT NOT NULL DEFAULT 1 COMMENT '每人限领数量',
+  `exchange_points` INT DEFAULT 0 COMMENT '兑换所需积分',
   `valid_start` DATETIME DEFAULT NULL COMMENT '有效期开始时间',
   `valid_end` DATETIME DEFAULT NULL COMMENT '有效期截止时间',
+  `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：0禁用 1启用',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='优惠券主表';
 

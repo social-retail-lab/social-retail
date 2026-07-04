@@ -24,10 +24,17 @@ public class OrderPreviewRequest {
     @Max(value = 2, message = "配送方式仅支持1或2")
     private Integer deliveryType = 1;
 
-    @Positive(message = "优惠券领取记录ID必须大于0")
-    private Long couponUserId;
+    @Positive(message = "平台优惠券领取记录ID必须大于0")
+    private Long platformCouponUserId;
 
-    private Boolean usePoints = false;
+    private Boolean usePlatformCoupon = true;
+
+    @Positive(message = "商家优惠券领取记录ID必须大于0")
+    private Long merchantCouponUserId;
+
+    private Boolean useMerchantCoupon = true;
+
+    private Boolean usePoints = true;
 
     @Positive(message = "使用积分必须大于0")
     private Integer usePointsAmount;

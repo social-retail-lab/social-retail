@@ -43,6 +43,14 @@ public class PointsController {
         return Result.success("兑换成功", pointsService.exchangeCoupon(userId, request));
     }
 
+    @GetMapping("/exchange/coupons")
+    public Result<ExchangeCouponPage> exchangeCoupons(
+            @RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId,
+            @RequestParam(defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer pageSize) {
+        return Result.success(pointsService.listExchangeCoupons(userId, page, pageSize));
+    }
+
     @PostMapping("/sign-in")
     public Result<SignIn> signIn(@RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId) {
         return Result.success("签到成功", pointsService.signIn(userId));

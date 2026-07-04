@@ -7,6 +7,9 @@ import com.socialretail.backend.entity.order.OrderStatusLog;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.service.order.OrderTimeoutService;
 import com.socialretail.backend.service.order.OrderPointsService;
+import com.socialretail.backend.service.order.pricing.PlatformCouponPricingService;
+import com.socialretail.backend.service.order.pricing.SeckillOrderPricingService;
+import com.socialretail.backend.service.order.pricing.MerchantCouponPricingService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +22,21 @@ public class OrderTimeoutServiceImpl implements OrderTimeoutService {
     private final OrderMapper orderMapper;
     private final OrderTimeoutProperties properties;
     private final OrderPointsService orderPointsService;
+    private final PlatformCouponPricingService platformCouponPricingService;
+    private final SeckillOrderPricingService seckillOrderPricingService;
+    private final MerchantCouponPricingService merchantCouponPricingService;
 
     public OrderTimeoutServiceImpl(OrderMapper orderMapper, OrderTimeoutProperties properties,
-                                   OrderPointsService orderPointsService) {
+                                   OrderPointsService orderPointsService,
+                                   PlatformCouponPricingService platformCouponPricingService,
+                                   SeckillOrderPricingService seckillOrderPricingService,
+                                   MerchantCouponPricingService merchantCouponPricingService) {
         this.orderMapper = orderMapper;
         this.properties = properties;
         this.orderPointsService = orderPointsService;
+        this.platformCouponPricingService = platformCouponPricingService;
+        this.seckillOrderPricingService = seckillOrderPricingService;
+        this.merchantCouponPricingService = merchantCouponPricingService;
     }
 
     @Override
@@ -40,10 +52,15 @@ public class OrderTimeoutServiceImpl implements OrderTimeoutService {
                 continue;
             }
             orderPointsService.release(order);
+            platformCouponPricingService.restoreByOrderId(orderId);
+            merchantCouponPricingService.restoreByOrderId(orderId);
             for (OrderItem item : orderMapper.selectItemsByOrderId(orderId)) {
                 if (item.getSkuId() != null
                         && orderMapper.incrementStock(item.getSkuId(), item.getQuantity()) != 1) {
                     throw new IllegalStateException("超时订单库存恢复失败: orderId=" + orderId);
+                }
+                if ("SECKILL".equals(item.getPromotionType())) {
+                    seckillOrderPricingService.release(order.getSeckillId(), item.getQuantity());
                 }
             }
             insertTimeoutLog(orderId);

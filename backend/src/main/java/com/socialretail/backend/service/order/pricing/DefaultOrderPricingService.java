@@ -15,9 +15,24 @@ public class DefaultOrderPricingService implements OrderPricingService {
 
     private static final BigDecimal ZERO = new BigDecimal("0.00");
     private final PointsCalculationService pointsCalculationService;
+    private final PlatformCouponPricingService platformCouponPricingService;
+    private final MerchantCouponPricingService merchantCouponPricingService;
+    private final SeckillOrderPricingService seckillOrderPricingService;
+    private final BargainOrderPricingService bargainOrderPricingService;
+    private final PromotionPricingService promotionPricingService;
 
-    public DefaultOrderPricingService(PointsCalculationService pointsCalculationService) {
+    public DefaultOrderPricingService(PointsCalculationService pointsCalculationService,
+                                      PlatformCouponPricingService platformCouponPricingService,
+                                      MerchantCouponPricingService merchantCouponPricingService,
+                                      SeckillOrderPricingService seckillOrderPricingService,
+                                      BargainOrderPricingService bargainOrderPricingService,
+                                      PromotionPricingService promotionPricingService) {
         this.pointsCalculationService = pointsCalculationService;
+        this.platformCouponPricingService = platformCouponPricingService;
+        this.merchantCouponPricingService = merchantCouponPricingService;
+        this.seckillOrderPricingService = seckillOrderPricingService;
+        this.bargainOrderPricingService = bargainOrderPricingService;
+        this.promotionPricingService = promotionPricingService;
     }
 
     @Override
@@ -34,30 +49,109 @@ public class DefaultOrderPricingService implements OrderPricingService {
             ));
         }
 
-        // 积分只抵扣商品优惠后的金额，配送费不参与 10% 上限计算。
-        PointsInfoVO pointsInfo = pointsCalculationService.calculate(
-                command.userId(), originalAmount, command.usePoints(), command.usePointsAmount());
+        boolean autoSelectAll = Boolean.TRUE.equals(command.autoSelectBenefits());
+        boolean autoSelectActivities = autoSelectAll
+                || (Boolean.TRUE.equals(command.allowAutoSelectActivities())
+                && isEmpty(command.activityContext()));
+        Long requestedSeckillProductId = command.activityContext() == null
+                ? null : command.activityContext().getSeckillProductId();
+        SeckillOrderPricingService.Quote seckill = autoSelectActivities
+                ? seckillOrderPricingService.quoteBest(command.userId(), command.items())
+                : seckillOrderPricingService.quote(command.userId(), requestedSeckillProductId, command.items());
+        if (seckill.applied()) {
+            command.items().stream().filter(item -> seckill.skuId().equals(item.getSkuId()))
+                    .findFirst().ifPresent(item -> itemPrices.put(item.getCartId(), new OrderItemPrice(
+                            seckill.originPrice(), seckill.finalPrice(), seckill.originAmount(),
+                            seckill.finalAmount(), "SECKILL")));
+        }
+
+        Long requestedBargainRecordId = command.activityContext() == null
+                ? null : command.activityContext().getBargainRecordId();
+        BargainOrderPricingService.Quote bargain = bargainOrderPricingService.quote(
+                command.userId(), requestedBargainRecordId, command.items(),
+                autoSelectActivities && !seckill.applied());
+        if (seckill.applied() && bargain.applied() && seckill.skuId().equals(bargain.skuId())) {
+            throw new com.socialretail.backend.common.exception.BusinessException(40918,
+                    org.springframework.http.HttpStatus.CONFLICT, "同一商品不能同时使用秒杀和砍价优惠");
+        }
+        if (bargain.applied()) {
+            command.items().stream().filter(item -> bargain.skuId().equals(item.getSkuId()))
+                    .findFirst().ifPresent(item -> itemPrices.put(item.getCartId(), new OrderItemPrice(
+                            bargain.originPrice(), bargain.finalPrice(), bargain.originAmount(),
+                            bargain.finalAmount(), "BARGAIN")));
+        }
+
+        BigDecimal activityDiscountedAmount = originalAmount.subtract(seckill.discount())
+                .subtract(bargain.discount()).max(BigDecimal.ZERO);
+        List<Long> requestedPromotionIds = command.activityContext() == null
+                ? List.of() : command.activityContext().getPromotionIds();
+        PromotionPricingService.Pricing promotionPricing = promotionPricingService.resolve(
+                command.merchantId(), activityDiscountedAmount, requestedPromotionIds,
+                autoSelectActivities);
+        BigDecimal discountedGoodsAmount = activityDiscountedAmount.subtract(promotionPricing.discount())
+                .max(BigDecimal.ZERO);
+        boolean usePlatformCoupon = autoSelectAll || Boolean.TRUE.equals(command.usePlatformCoupon());
+        boolean useMerchantCoupon = autoSelectAll || Boolean.TRUE.equals(command.useMerchantCoupon());
+        PlatformCouponPricingService.Pricing couponPricing = platformCouponPricingService.resolve(
+                command.userId(), command.platformCouponUserId(), discountedGoodsAmount,
+                usePlatformCoupon, autoSelectAll || command.platformCouponUserId() == null);
+        MerchantCouponPricingService.Pricing merchantCouponPricing = merchantCouponPricingService.resolve(
+                command.userId(), command.merchantId(), command.merchantCouponUserId(), discountedGoodsAmount,
+                useMerchantCoupon, autoSelectAll || command.merchantCouponUserId() == null);
+        BigDecimal merchantCouponDiscount = merchantCouponPricing.discount().min(discountedGoodsAmount);
+        BigDecimal platformCouponDiscount = couponPricing.discount()
+                .min(discountedGoodsAmount.subtract(merchantCouponDiscount).max(BigDecimal.ZERO));
+        if (merchantCouponPricing.selected() != null) {
+            merchantCouponPricing.selected().setDiscountAmount(merchantCouponDiscount);
+        }
+        if (couponPricing.selected() != null) {
+            couponPricing.selected().setDiscountAmount(platformCouponDiscount);
+        }
+        BigDecimal pointsBaseAmount = discountedGoodsAmount.subtract(platformCouponDiscount)
+                .subtract(merchantCouponDiscount).max(BigDecimal.ZERO);
+        PointsInfoVO pointsInfo = Boolean.TRUE.equals(command.autoSelectBenefits())
+                ? pointsCalculationService.calculateDefault(command.userId(), pointsBaseAmount)
+                : pointsCalculationService.calculate(command.userId(), pointsBaseAmount,
+                        command.usePoints(), command.usePointsAmount());
         BigDecimal pointsDeduction = pointsInfo.getDeductionAmount();
-        BigDecimal payableAmount = originalAmount.subtract(pointsDeduction).max(BigDecimal.ZERO);
+        BigDecimal payableAmount = discountedGoodsAmount.subtract(platformCouponDiscount)
+                .subtract(merchantCouponDiscount)
+                .subtract(pointsDeduction).max(BigDecimal.ZERO);
 
         return new OrderPricingResult(
                 originalAmount,
-                pointsDeduction,
+                seckill.discount().add(bargain.discount()).add(promotionPricing.discount())
+                        .add(platformCouponDiscount).add(merchantCouponDiscount).add(pointsDeduction),
                 ZERO,
                 payableAmount,
-                ZERO,
-                ZERO,
-                ZERO,
-                ZERO,
+                seckill.discount(),
+                bargain.discount(),
+                promotionPricing.discount(),
+                platformCouponDiscount,
+                merchantCouponDiscount,
                 pointsDeduction,
-                null,
-                null,
-                null,
+                couponPricing.couponUserId(),
+                merchantCouponPricing.couponUserId(),
+                seckill.seckillProductId(),
+                bargain.recordId(),
+                promotionPricing.appliedIds(),
                 null,
                 itemPrices,
+                promotionPricing.available(),
                 List.of(),
-                List.of(),
-                pointsInfo
+                pointsInfo,
+                couponPricing.selected(),
+                couponPricing.available(),
+                merchantCouponPricing.selected(),
+                merchantCouponPricing.available()
         );
+    }
+
+    private boolean isEmpty(com.socialretail.backend.dto.request.order.OrderActivityContextRequest context) {
+        return context == null
+                || (context.getSeckillProductId() == null
+                && context.getBargainRecordId() == null
+                && context.getGroupId() == null
+                && (context.getPromotionIds() == null || context.getPromotionIds().isEmpty()));
     }
 }

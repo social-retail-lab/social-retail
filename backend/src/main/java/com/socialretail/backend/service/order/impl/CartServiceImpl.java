@@ -1,5 +1,6 @@
 package com.socialretail.backend.service.order.impl;
 
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.cart.CartAddDTO;
 import com.socialretail.backend.dto.request.cart.CartBatchDeleteDTO;
@@ -13,6 +14,12 @@ import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.service.order.CartService;
 import com.socialretail.backend.service.member.PointsCalculationService;
+import com.socialretail.backend.service.order.pricing.PlatformCouponPricingService;
+import com.socialretail.backend.service.order.pricing.SeckillOrderPricingService;
+import com.socialretail.backend.service.order.pricing.OrderPricingService;
+import com.socialretail.backend.service.order.pricing.OrderPricingCommand;
+import com.socialretail.backend.service.order.pricing.OrderPricingResult;
+import com.socialretail.backend.service.order.pricing.OrderItemPrice;
 import com.socialretail.backend.vo.CartAddVO;
 import com.socialretail.backend.vo.CartBatchDeleteVO;
 import com.socialretail.backend.vo.CartItemVO;
@@ -28,6 +35,9 @@ import com.socialretail.backend.vo.CartPromotionDetailVO;
 import com.socialretail.backend.vo.CartInvalidItemVO;
 import com.socialretail.backend.vo.CartInvalidItemListVO;
 import com.socialretail.backend.vo.PointsInfoVO;
+import com.socialretail.backend.vo.CouponBundleVO;
+import com.socialretail.backend.vo.AvailableCouponGroupsVO;
+import com.socialretail.backend.vo.PromotionActivityInfoVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,14 +60,26 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
     private final SkuMapper skuMapper;
     private final ProductMapper productMapper;
+    private final ImageUrlResolver imageUrlResolver;
     private final PointsCalculationService pointsCalculationService;
+    private final PlatformCouponPricingService platformCouponPricingService;
+    private final SeckillOrderPricingService seckillOrderPricingService;
+    private final OrderPricingService orderPricingService;
 
     public CartServiceImpl(CartMapper cartMapper, SkuMapper skuMapper, ProductMapper productMapper,
-                           PointsCalculationService pointsCalculationService) {
+                           ImageUrlResolver imageUrlResolver,
+                           PointsCalculationService pointsCalculationService,
+                           PlatformCouponPricingService platformCouponPricingService,
+                           SeckillOrderPricingService seckillOrderPricingService,
+                           OrderPricingService orderPricingService) {
         this.cartMapper = cartMapper;
         this.skuMapper = skuMapper;
         this.productMapper = productMapper;
+        this.imageUrlResolver = imageUrlResolver;
         this.pointsCalculationService = pointsCalculationService;
+        this.platformCouponPricingService = platformCouponPricingService;
+        this.seckillOrderPricingService = seckillOrderPricingService;
+        this.orderPricingService = orderPricingService;
     }
 
     @Override
@@ -172,6 +194,7 @@ public class CartServiceImpl implements CartService {
         }
 
         BigDecimal totalAmount = ZERO_AMOUNT;
+        Long merchantId = null;
         for (CartItemVO item : items) {
             prepareItem(item);
             if (!Objects.equals(item.getProductStatus(), ON_SALE)
@@ -182,30 +205,33 @@ public class CartServiceImpl implements CartService {
                 throw inventoryInsufficient(item.getSkuId(), safeStock(item.getStock()));
             }
             totalAmount = totalAmount.add(item.getItemAmount());
+            if (item.getMerchantId() == null) {
+                throw new BusinessException(40915, HttpStatus.CONFLICT,
+                        "商品未关联有效商家", Map.of("cartItemIds", ids));
+            }
+            if (merchantId == null) merchantId = item.getMerchantId();
+            else if (!Objects.equals(merchantId, item.getMerchantId())) {
+                throw new BusinessException(40915, HttpStatus.CONFLICT,
+                        "当前订单只能结算同一商家的商品", Map.of("cartItemIds", ids));
+            }
         }
 
         CartPriceDetailVO priceDetail = new CartPriceDetailVO(
                 totalAmount, ZERO_AMOUNT, ZERO_AMOUNT, ZERO_AMOUNT, ZERO_AMOUNT,
                 ZERO_AMOUNT, ZERO_AMOUNT, totalAmount
         );
-        return new CalculationResult(priceDetail, items);
+        return new CalculationResult(priceDetail, items, merchantId);
     }
 
     @Override
     @Transactional(readOnly = true)
     public CartCheckoutPreviewVO checkoutPreview(Long userId, CartCheckoutPreviewDTO dto) {
         CalculationResult calculated = calculate(userId, dto);
-        CartPriceDetailVO calculatedPrice = calculated.priceDetail();
-        BigDecimal discountedGoodsAmount = calculatedPrice.getTotalAmount()
-                .subtract(calculatedPrice.getSeckillDiscount())
-                .subtract(calculatedPrice.getBargainDiscount())
-                .subtract(calculatedPrice.getPromotionDiscount())
-                .subtract(calculatedPrice.getCouponDiscount())
-                .max(BigDecimal.ZERO);
-        PointsInfoVO pointsInfo = pointsCalculationService.calculate(
-                userId, discountedGoodsAmount, dto.getUsePoints(), dto.getUsePointsAmount());
+        OrderPricingResult pricing = orderPricingService.calculate(new OrderPricingCommand(
+                userId, calculated.merchantId(), calculated.items(), true, null, true, null,
+                null, null, null, true, true));
         List<CartCheckoutItemVO> items = calculated.items().stream()
-                .map(this::toCheckoutItem)
+                .map(item -> toCheckoutItem(item, pricing.getItemPrices().get(item.getCartId())))
                 .toList();
         int totalQuantity = calculated.items().stream()
                 .map(CartItemVO::getQuantity)
@@ -214,48 +240,56 @@ public class CartServiceImpl implements CartService {
                 .sum();
 
         CartCheckoutPriceDetailVO priceDetail = new CartCheckoutPriceDetailVO(
-                calculatedPrice.getTotalAmount(),
-                calculatedPrice.getSeckillDiscount(),
-                calculatedPrice.getBargainDiscount(),
-                ZERO_AMOUNT,
-                calculatedPrice.getCouponDiscount(),
-                pointsInfo.getDeductionAmount(),
-                calculatedPrice.getDeliveryFee(),
-                discountedGoodsAmount.add(calculatedPrice.getDeliveryFee())
-                        .subtract(pointsInfo.getDeductionAmount()).max(BigDecimal.ZERO)
+                pricing.getOriginalAmount(), pricing.getSeckillDiscount(), pricing.getBargainDiscount(),
+                pricing.getPromotionDiscount(), pricing.getMerchantCouponDiscount(),
+                pricing.getCouponDiscount(), pricing.getPointsDeduction(), pricing.getDeliveryFee(),
+                pricing.getPayableAmount()
         );
-        CartCouponInfoVO couponInfo = dto.getCouponUserId() == null ? null
-                : new CartCouponInfoVO(dto.getCouponUserId(), null, calculatedPrice.getCouponDiscount());
-        CartActivityInfoVO activityInfo = toActivityInfo(dto.getActivityContext());
+        CouponBundleVO couponInfo = new CouponBundleVO(pricing.getPlatformCoupon(), pricing.getMerchantCoupon());
+        PromotionActivityInfoVO activityInfo = new PromotionActivityInfoVO(
+                pricing.getAppliedSeckillId(), pricing.getAppliedBargainId(), null,
+                pricing.getAppliedPromotionIds());
         return new CartCheckoutPreviewVO(
                 items,
                 priceDetail,
-                pointsInfo,
-                buildPromotionDetails(priceDetail),
                 couponInfo,
+                pricing.getPointsInfo(),
+                buildPromotionDetails(pricing),
                 activityInfo,
-                List.of(),
-                List.of(),
+                pricing.getAvailablePromotions(),
+                new AvailableCouponGroupsVO(pricing.getAvailablePlatformCoupons(),
+                        pricing.getAvailableMerchantCoupons()),
                 totalQuantity
         );
     }
 
-    private CartCheckoutItemVO toCheckoutItem(CartItemVO item) {
+    private CartCheckoutItemVO toCheckoutItem(CartItemVO item,
+                                              OrderItemPrice price) {
+        BigDecimal activityDiscount = price.originAmount().subtract(price.finalAmount()).max(ZERO_AMOUNT);
         return new CartCheckoutItemVO(
                 item.getCartId(), item.getSkuId(), item.getProductId(), item.getProductName(),
-                item.getProductImage(), item.getSkuSpec(), item.getPrice(), item.getPrice(),
-                item.getQuantity(), item.getStock(), item.getItemAmount(), item.getItemAmount(),
-                null, ZERO_AMOUNT, item.getIsValid(), item.getInvalidReason()
+                item.getProductImage(), item.getSkuSpec(), price.originPrice(), price.finalPrice(),
+                item.getQuantity(), item.getStock(), price.originAmount(), price.finalAmount(),
+                price.promotionType(), activityDiscount, item.getIsValid(), item.getInvalidReason()
         );
     }
 
-    private List<CartPromotionDetailVO> buildPromotionDetails(CartCheckoutPriceDetailVO price) {
+    private List<CartPromotionDetailVO> buildPromotionDetails(OrderPricingResult pricing) {
         List<CartPromotionDetailVO> details = new ArrayList<>();
-        addPromotion(details, "SECKILL", "秒杀活动优惠", price.getSeckillDiscount());
-        addPromotion(details, "BARGAIN", "砍价活动优惠", price.getBargainDiscount());
-        addPromotion(details, "PROMOTION", "满减满折优惠", price.getPromotionDiscount());
-        addPromotion(details, "COUPON", "优惠券优惠", price.getCouponDiscount());
-        addPromotion(details, "POINTS", "积分抵扣", price.getPointsDeduction());
+        addPromotion(details, "SECKILL", "秒杀优惠", pricing.getSeckillDiscount());
+        addPromotion(details, "BARGAIN", "砍价优惠", pricing.getBargainDiscount());
+        addPromotion(details, "PROMOTION", "满减优惠", pricing.getPromotionDiscount());
+        addPromotion(details, "MERCHANT_COUPON",
+                pricing.getMerchantCoupon() == null ? "商家优惠券" : pricing.getMerchantCoupon().getTitle(),
+                pricing.getMerchantCouponDiscount());
+        addPromotion(details, "PLATFORM_COUPON",
+                pricing.getPlatformCoupon() == null ? "平台优惠券" : pricing.getPlatformCoupon().getTitle(),
+                pricing.getCouponDiscount());
+        if (pricing.getPointsDeduction() != null
+                && pricing.getPointsDeduction().compareTo(BigDecimal.ZERO) > 0) {
+            details.add(new CartPromotionDetailVO("POINTS", "积分抵扣", pricing.getPointsDeduction(),
+                    pricing.getPointsInfo().getUsedPoints()));
+        }
         return details;
     }
 
@@ -268,16 +302,21 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    private CartActivityInfoVO toActivityInfo(Map<String, Object> context) {
+    private PromotionActivityInfoVO toActivityInfo(Map<String, Object> context) {
         if (context == null) {
-            return new CartActivityInfoVO(null, null, null, List.of());
+            return new PromotionActivityInfoVO(null, null, null, List.of());
         }
-        return new CartActivityInfoVO(
-                toLong(context.get("seckillId")),
-                toLong(context.get("bargainId")),
+        return new PromotionActivityInfoVO(
+                firstLong(context, "seckillProductId", "seckillId"),
+                firstLong(context, "bargainRecordId", "bargainId"),
                 toLong(context.get("groupId")),
                 toLongList(context.get("promotionIds"))
         );
+    }
+
+    private Long firstLong(Map<String, Object> context, String primary, String legacy) {
+        Long value = toLong(context.get(primary));
+        return value == null ? toLong(context.get(legacy)) : value;
     }
 
     private Long toLong(Object value) {
@@ -302,6 +341,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private void prepareItem(CartItemVO item) {
+        item.setProductImage(imageUrlResolver.resolve(item.getProductImage()));
         int quantity = safeQuantity(item.getQuantity());
         BigDecimal price = item.getPrice() == null ? ZERO_AMOUNT : item.getPrice();
         item.setSelected(true);
@@ -370,6 +410,6 @@ public class CartServiceImpl implements CartService {
         );
     }
 
-    private record CalculationResult(CartPriceDetailVO priceDetail, List<CartItemVO> items) {
+    private record CalculationResult(CartPriceDetailVO priceDetail, List<CartItemVO> items, Long merchantId) {
     }
 }

@@ -42,21 +42,26 @@ public class MerchantSeckillController {
             new LambdaQueryWrapper<SeckillProduct>()
                 .eq(SeckillProduct::getSeckillActivityId, activityId)
         );
-        List<Map<String, Object>> result = products.stream().map(p -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("id", p.getId());
-            m.put("activityId", p.getSeckillActivityId());
-            m.put("productId", p.getProductId());
-            m.put("skuId", p.getSkuId());
-            m.put("seckillPrice", p.getSeckillPrice());
-            m.put("seckillStock", p.getSeckillStock());
-            m.put("soldCount", p.getSoldCount());
-            m.put("limitQuantity", p.getLimitQuantity());
-            m.put("status", p.getStatus());
-            Product prod = productMapper.selectById(p.getProductId());
-            m.put("productName", prod != null ? prod.getTitle() : "");
-            return m;
-        }).collect(Collectors.toList());
+        List<Map<String, Object>> result = products.stream()
+            .filter(p -> {
+                Product prod = productMapper.selectById(p.getProductId());
+                return prod != null && prod.getMerchantId() != null && prod.getMerchantId().equals(merchantId);
+            })
+            .map(p -> {
+                Map<String, Object> m = new HashMap<>();
+                m.put("id", p.getId());
+                m.put("activityId", p.getSeckillActivityId());
+                m.put("productId", p.getProductId());
+                m.put("skuId", p.getSkuId());
+                m.put("seckillPrice", p.getSeckillPrice());
+                m.put("seckillStock", p.getSeckillStock());
+                m.put("soldCount", p.getSoldCount());
+                m.put("limitQuantity", p.getLimitQuantity());
+                m.put("status", p.getStatus());
+                Product prod = productMapper.selectById(p.getProductId());
+                m.put("productName", prod != null ? prod.getTitle() : "");
+                return m;
+            }).collect(Collectors.toList());
         return Result.success(result);
     }
 

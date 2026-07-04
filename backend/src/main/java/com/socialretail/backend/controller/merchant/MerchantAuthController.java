@@ -15,6 +15,7 @@ import com.socialretail.backend.vo.QualificationRequest;
 import com.socialretail.backend.vo.QualificationVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -71,7 +72,7 @@ public class MerchantAuthController {
     }
 
     @PostMapping("/auth/login")
-    public Result<LoginVO> merchantLogin(@RequestBody MerchantLoginRequest req) {
+    public Result<LoginVO> merchantLogin(@Valid @RequestBody MerchantLoginRequest req) {
         log.info("[商家登录] 请求体: phone={}, smsCode={}", req.getPhone(), req.getSmsCode());
         try {
             LoginVO vo = merchantService.merchantLogin(req.getPhone(), req.getPassword(), req.getSmsCode());
