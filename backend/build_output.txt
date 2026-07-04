@@ -1,0 +1,665 @@
+﻿[INFO] Scanning for projects...
+[INFO] 
+[INFO] ----------------------< com.socialretail:backend >----------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ backend ---
+[INFO] Deleting H:\asocial\social-retail\backend\target
+[INFO] 
+[INFO] --- resources:3.3.0:resources (default-resources) @ backend ---
+[INFO] Copying 1 resource
+[INFO] Copying 2 resources
+[INFO] Copying 24 resources
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ backend ---
+[INFO] Changes detected - recompiling the module! :source
+[INFO] Compiling 334 source files with javac [debug release 17] to target\classes
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[457,20] ������ com.socialretail.backend.service.pay.impl.PayServiceImpl�ж����˷��� orderStatusText(java.lang.Integer)
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[30,21] �Ҳ�������
+  ����:   ���� setMerchantId(java.lang.Long)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[31,21] �Ҳ�������
+  ����:   ���� setType(java.lang.Integer)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[32,21] �Ҳ�������
+  ����:   ���� setTitle(java.lang.String)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[33,21] �Ҳ�������
+  ����:   ���� setContent(java.lang.String)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[34,21] �Ҳ�������
+  ����:   ���� setRefId(java.lang.Long)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[35,21] �Ҳ�������
+  ����:   ���� setRefType(java.lang.String)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[36,21] �Ҳ�������
+  ����:   ���� setIsRead(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[37,21] �Ҳ�������
+  ����:   ���� setCreateTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[39,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.socialretail.backend.service.merchant.impl.NotificationServiceImpl
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[45,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getMerchantId()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[46,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getIsRead()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[53,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getMerchantId()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[54,29] ����������Ч
+  �Ҳ�������
+    ����:   ���� getCreateTime()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[61,28] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[62,30] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[63,31] �Ҳ�������
+  ����:   ���� getTitle()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[64,33] �Ҳ�������
+  ����:   ���� getContent()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[65,31] �Ҳ�������
+  ����:   ���� getRefId()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[66,33] �Ҳ�������
+  ����:   ���� getRefType()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[67,32] �Ҳ�������
+  ����:   ���� getIsRead()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[68,43] �Ҳ�������
+  ����:   ���� getCreateTime()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[76,49] �Ҳ�������
+  ����:   ���� getMerchantId()
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[77,25] �Ҳ�������
+  ����:   ���� setIsRead(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[78,25] �Ҳ�������
+  ����:   ���� setReadTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[86,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getMerchantId()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[87,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getIsRead()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[90,14] �Ҳ�������
+  ����:   ���� setIsRead(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[91,14] �Ҳ�������
+  ����:   ���� setReadTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[94,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.socialretail.backend.service.merchant.impl.NotificationServiceImpl
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[100,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getMerchantId()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[101,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getRefType()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[102,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getIsRead()
+    λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[105,14] �Ҳ�������
+  ����:   ���� setIsRead(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[106,14] �Ҳ�������
+  ����:   ���� setReadTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[109,9] �Ҳ�������
+  ����:   ���� log
+  λ��: �� com.socialretail.backend.service.merchant.impl.NotificationServiceImpl
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[58,25] ����������Ч
+  �Ҳ�������
+    ����:   ���� getMerchantId()
+    λ��: �� com.socialretail.backend.entity.order.Order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[65,54] ����������Ч
+  �Ҳ�������
+    ����:   ���� getId()
+    λ��: �� com.socialretail.backend.entity.order.Order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[68,20] ����������Ч
+  �Ҳ�������
+    ����:   ���� getOrderId()
+    λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[71,24] ����������Ч
+  �Ҳ�������
+    ����:   ���� getType()
+    λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[74,24] ����������Ч
+  �Ҳ�������
+    ����:   ���� getStatus()
+    λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[77,26] ����������Ч
+  �Ҳ�������
+    ����:   ���� getOrderSn()
+    λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[80,29] ����������Ч
+  �Ҳ�������
+    ����:   ���� getApplyTime()
+    λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[88,38] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[89,34] �Ҳ�������
+  ����:   ���� getOrderSn()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[90,38] �Ҳ�������
+  ����:   ���� getOrderItemId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[91,38] �Ҳ�������
+  ����:   ���� getProductName()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[92,31] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[93,56] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[94,39] �Ҳ�������
+  ����:   ���� getRefundAmount()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[95,33] �Ҳ�������
+  ����:   ���� getReason()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[96,33] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[97,60] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[98,51] �Ҳ�������
+  ����:   ���� getApplyTime()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[100,52] �Ҳ�������
+  ����:   ���� getOrderId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[101,39] �Ҳ�������
+  ����:   ���� getUserId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[102,56] �Ҳ�������
+  ����:   ���� getUserId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[103,61] �Ҳ�������
+  ����:   ���� getNickname()
+  λ��: ����Ϊcom.socialretail.backend.entity.user.User�ı��� user
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[122,55] �Ҳ�������
+  ����:   ���� getOrderId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[126,19] �Ҳ�������
+  ����:   ���� getMerchantId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[131,44] �Ҳ�������
+  ����:   ���� getId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[132,40] �Ҳ�������
+  ����:   ���� getOrderSn()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[133,44] �Ҳ�������
+  ����:   ���� getOrderItemId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[134,44] �Ҳ�������
+  ����:   ���� getProductName()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[135,37] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[136,62] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[137,45] �Ҳ�������
+  ����:   ���� getRefundAmount()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[138,51] �Ҳ�������
+  ����:   ���� getActualRefundAmount()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[139,39] �Ҳ�������
+  ����:   ���� getReason()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[140,39] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[141,66] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[142,57] �Ҳ�������
+  ����:   ���� getApplyTime()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[143,57] �Ҳ�������
+  ����:   ���� getAuditTime()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[144,44] �Ҳ�������
+  ����:   ���� getAuditRemark()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[145,60] �Ҳ�������
+  ����:   ���� getCompleteTime()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[148,22] �Ҳ�������
+  ����:   ���� getOrderItemId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[149,71] �Ҳ�������
+  ����:   ���� getOrderItemId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[150,65] �Ҳ�������
+  ����:   ���� getSkuSpecs()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.OrderItem�ı��� orderItem
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[156,67] �Ҳ�������
+  ����:   ���� getEvidenceImages()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[159,18] �Ҳ�������
+  ����:   ���� getUserId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[160,52] �Ҳ�������
+  ����:   ���� getUserId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[162,49] �Ҳ�������
+  ����:   ���� getNickname()
+  λ��: ����Ϊcom.socialretail.backend.entity.user.User�ı��� user
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[163,46] �Ҳ�������
+  ����:   ���� getPhone()
+  λ��: ����Ϊcom.socialretail.backend.entity.user.User�ı��� user
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[188,55] �Ҳ�������
+  ����:   ���� getOrderId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[189,36] �Ҳ�������
+  ����:   ���� getMerchantId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[193,22] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[193,55] �Ҳ�������
+  ����:   ���� getStatus()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[201,22] �Ҳ�������
+  ����:   ���� setStatus(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[202,22] �Ҳ�������
+  ����:   ���� setAuditRemark(java.lang.String)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[203,22] �Ҳ�������
+  ����:   ���� setAuditTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[205,26] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[205,57] �Ҳ�������
+  ����:   ���� getType()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[206,26] �Ҳ�������
+  ����:   ���� setStatus(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[207,26] �Ҳ�������
+  ����:   ���� setCompleteTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[219,22] �Ҳ�������
+  ����:   ���� setStatus(int)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[220,22] �Ҳ�������
+  ����:   ���� setAuditRemark(java.lang.String)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[221,22] �Ҳ�������
+  ����:   ���� setAuditTime(java.time.LocalDateTime)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[231,22] �Ҳ�������
+  ����:   ���� setActualRefundAmount(java.math.BigDecimal)
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[236,57] �Ҳ�������
+  ����:   ���� getAuditTime()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[248,55] �Ҳ�������
+  ����:   ���� getOrderId()
+  λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[INFO] 100 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.202 s
+[INFO] Finished at: 2026-07-02T14:17:04+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project backend: Compilation failure: Compilation failure: 
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/pay/impl/PayServiceImpl.java:[457,20] ������ com.socialretail.backend.service.pay.impl.PayServiceImpl�ж����˷��� orderStatusText(java.lang.Integer)
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[30,21] �Ҳ�������
+[ERROR]   ����:   ���� setMerchantId(java.lang.Long)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[31,21] �Ҳ�������
+[ERROR]   ����:   ���� setType(java.lang.Integer)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[32,21] �Ҳ�������
+[ERROR]   ����:   ���� setTitle(java.lang.String)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[33,21] �Ҳ�������
+[ERROR]   ����:   ���� setContent(java.lang.String)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[34,21] �Ҳ�������
+[ERROR]   ����:   ���� setRefId(java.lang.Long)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[35,21] �Ҳ�������
+[ERROR]   ����:   ���� setRefType(java.lang.String)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[36,21] �Ҳ�������
+[ERROR]   ����:   ���� setIsRead(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[37,21] �Ҳ�������
+[ERROR]   ����:   ���� setCreateTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[39,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.socialretail.backend.service.merchant.impl.NotificationServiceImpl
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[45,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getMerchantId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[46,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getIsRead()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[53,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getMerchantId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[54,29] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getCreateTime()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[61,28] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[62,30] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[63,31] �Ҳ�������
+[ERROR]   ����:   ���� getTitle()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[64,33] �Ҳ�������
+[ERROR]   ����:   ���� getContent()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[65,31] �Ҳ�������
+[ERROR]   ����:   ���� getRefId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[66,33] �Ҳ�������
+[ERROR]   ����:   ���� getRefType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[67,32] �Ҳ�������
+[ERROR]   ����:   ���� getIsRead()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[68,43] �Ҳ�������
+[ERROR]   ����:   ���� getCreateTime()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[76,49] �Ҳ�������
+[ERROR]   ����:   ���� getMerchantId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[77,25] �Ҳ�������
+[ERROR]   ����:   ���� setIsRead(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[78,25] �Ҳ�������
+[ERROR]   ����:   ���� setReadTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� notification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[86,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getMerchantId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[87,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getIsRead()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[90,14] �Ҳ�������
+[ERROR]   ����:   ���� setIsRead(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[91,14] �Ҳ�������
+[ERROR]   ����:   ���� setReadTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[94,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.socialretail.backend.service.merchant.impl.NotificationServiceImpl
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[100,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getMerchantId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[101,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getRefType()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[102,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getIsRead()
+[ERROR]     λ��: �� com.socialretail.backend.entity.notify.MerchantNotification
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[105,14] �Ҳ�������
+[ERROR]   ����:   ���� setIsRead(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[106,14] �Ҳ�������
+[ERROR]   ����:   ���� setReadTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.notify.MerchantNotification�ı��� n
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/NotificationServiceImpl.java:[109,9] �Ҳ�������
+[ERROR]   ����:   ���� log
+[ERROR]   λ��: �� com.socialretail.backend.service.merchant.impl.NotificationServiceImpl
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[58,25] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getMerchantId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.Order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[65,54] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.Order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[68,20] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getOrderId()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[71,24] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getType()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[74,24] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getStatus()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[77,26] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getOrderSn()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[80,29] ����������Ч
+[ERROR]   �Ҳ�������
+[ERROR]     ����:   ���� getApplyTime()
+[ERROR]     λ��: �� com.socialretail.backend.entity.order.AfterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[88,38] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[89,34] �Ҳ�������
+[ERROR]   ����:   ���� getOrderSn()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[90,38] �Ҳ�������
+[ERROR]   ����:   ���� getOrderItemId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[91,38] �Ҳ�������
+[ERROR]   ����:   ���� getProductName()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[92,31] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[93,56] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[94,39] �Ҳ�������
+[ERROR]   ����:   ���� getRefundAmount()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[95,33] �Ҳ�������
+[ERROR]   ����:   ���� getReason()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[96,33] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[97,60] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[98,51] �Ҳ�������
+[ERROR]   ����:   ���� getApplyTime()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[100,52] �Ҳ�������
+[ERROR]   ����:   ���� getOrderId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� as
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[101,39] �Ҳ�������
+[ERROR]   ����:   ���� getUserId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[102,56] �Ҳ�������
+[ERROR]   ����:   ���� getUserId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[103,61] �Ҳ�������
+[ERROR]   ����:   ���� getNickname()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.user.User�ı��� user
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[122,55] �Ҳ�������
+[ERROR]   ����:   ���� getOrderId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[126,19] �Ҳ�������
+[ERROR]   ����:   ���� getMerchantId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[131,44] �Ҳ�������
+[ERROR]   ����:   ���� getId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[132,40] �Ҳ�������
+[ERROR]   ����:   ���� getOrderSn()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[133,44] �Ҳ�������
+[ERROR]   ����:   ���� getOrderItemId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[134,44] �Ҳ�������
+[ERROR]   ����:   ���� getProductName()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[135,37] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[136,62] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[137,45] �Ҳ�������
+[ERROR]   ����:   ���� getRefundAmount()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[138,51] �Ҳ�������
+[ERROR]   ����:   ���� getActualRefundAmount()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[139,39] �Ҳ�������
+[ERROR]   ����:   ���� getReason()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[140,39] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[141,66] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[142,57] �Ҳ�������
+[ERROR]   ����:   ���� getApplyTime()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[143,57] �Ҳ�������
+[ERROR]   ����:   ���� getAuditTime()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[144,44] �Ҳ�������
+[ERROR]   ����:   ���� getAuditRemark()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[145,60] �Ҳ�������
+[ERROR]   ����:   ���� getCompleteTime()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[148,22] �Ҳ�������
+[ERROR]   ����:   ���� getOrderItemId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[149,71] �Ҳ�������
+[ERROR]   ����:   ���� getOrderItemId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[150,65] �Ҳ�������
+[ERROR]   ����:   ���� getSkuSpecs()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.OrderItem�ı��� orderItem
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[156,67] �Ҳ�������
+[ERROR]   ����:   ���� getEvidenceImages()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[159,18] �Ҳ�������
+[ERROR]   ����:   ���� getUserId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[160,52] �Ҳ�������
+[ERROR]   ����:   ���� getUserId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[162,49] �Ҳ�������
+[ERROR]   ����:   ���� getNickname()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.user.User�ı��� user
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[163,46] �Ҳ�������
+[ERROR]   ����:   ���� getPhone()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.user.User�ı��� user
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[188,55] �Ҳ�������
+[ERROR]   ����:   ���� getOrderId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[189,36] �Ҳ�������
+[ERROR]   ����:   ���� getMerchantId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.Order�ı��� order
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[193,22] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[193,55] �Ҳ�������
+[ERROR]   ����:   ���� getStatus()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[201,22] �Ҳ�������
+[ERROR]   ����:   ���� setStatus(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[202,22] �Ҳ�������
+[ERROR]   ����:   ���� setAuditRemark(java.lang.String)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[203,22] �Ҳ�������
+[ERROR]   ����:   ���� setAuditTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[205,26] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[205,57] �Ҳ�������
+[ERROR]   ����:   ���� getType()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[206,26] �Ҳ�������
+[ERROR]   ����:   ���� setStatus(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[207,26] �Ҳ�������
+[ERROR]   ����:   ���� setCompleteTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[219,22] �Ҳ�������
+[ERROR]   ����:   ���� setStatus(int)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[220,22] �Ҳ�������
+[ERROR]   ����:   ���� setAuditRemark(java.lang.String)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[221,22] �Ҳ�������
+[ERROR]   ����:   ���� setAuditTime(java.time.LocalDateTime)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[231,22] �Ҳ�������
+[ERROR]   ����:   ���� setActualRefundAmount(java.math.BigDecimal)
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[236,57] �Ҳ�������
+[ERROR]   ����:   ���� getAuditTime()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[248,55] �Ҳ�������
+[ERROR]   ����:   ���� getOrderId()
+[ERROR]   λ��: ����Ϊcom.socialretail.backend.entity.order.AfterSale�ı��� afterSale
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

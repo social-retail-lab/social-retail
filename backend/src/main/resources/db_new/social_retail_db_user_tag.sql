@@ -1,0 +1,56 @@
+-- MySQL dump 10.13  Distrib 8.0.46, for Win64 (x86_64)
+--
+-- Host: localhost    Database: social_retail_db
+-- ------------------------------------------------------
+-- Server version	8.0.46
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `user_tag`
+--
+
+DROP TABLE IF EXISTS `user_tag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_tag` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '标签记录ID（主键）',
+  `user_id` bigint DEFAULT NULL COMMENT '指向描摹用户ID',
+  `tag_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '标签名称字符串',
+  `weight` decimal(5,2) DEFAULT NULL COMMENT '数仓偏好模型置信度权重',
+  `update_time` datetime DEFAULT NULL COMMENT '模型刷算计算时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `fk_tag_user` (`user_id`) USING BTREE,
+  CONSTRAINT `fk_tag_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='用户画像标签表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_tag`
+--
+
+LOCK TABLES `user_tag` WRITE;
+/*!40000 ALTER TABLE `user_tag` DISABLE KEYS */;
+INSERT INTO `user_tag` VALUES (1,1004,'高频购买',0.92,'2026-06-15 10:00:00'),(2,1004,'水果偏好',0.85,'2026-06-15 10:00:00'),(3,1007,'活跃用户',0.88,'2026-06-20 14:00:00'),(4,1007,'零食爱好者',0.78,'2026-06-20 14:00:00'),(5,1008,'高频购买',0.76,'2026-06-18 09:30:00'),(6,1008,'品质追求',0.82,'2026-06-18 09:30:00'),(7,1009,'活跃用户',0.90,'2026-06-22 11:00:00'),(8,1009,'价格敏感',0.73,'2026-06-22 11:00:00'),(9,1010,'高频购买',0.81,'2026-06-25 16:00:00'),(10,1010,'水果偏好',0.79,'2026-06-25 16:00:00'),(11,1011,'新用户',0.95,'2026-06-10 08:00:00'),(12,1011,'价格敏感',0.68,'2026-06-28 10:00:00'),(13,1012,'活跃用户',0.74,'2026-06-15 13:00:00'),(14,1013,'新用户',0.91,'2026-06-12 09:00:00'),(15,1014,'活跃用户',0.77,'2026-06-20 15:30:00'),(16,1014,'品质追求',0.71,'2026-06-20 15:30:00'),(17,1015,'新用户',0.88,'2026-06-08 10:00:00'),(18,1016,'沉睡用户',0.65,'2026-07-01 08:00:00'),(19,1017,'新用户',0.86,'2026-06-18 11:30:00'),(20,1018,'零食爱好者',0.72,'2026-06-25 14:00:00');
+/*!40000 ALTER TABLE `user_tag` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2026-07-04 11:00:00
