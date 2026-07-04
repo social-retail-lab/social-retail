@@ -86,14 +86,21 @@ public class PointsServiceImpl implements PointsService {
     @Transactional
     public ExchangeCouponPage listExchangeCoupons(Long userId, int page, int pageSize) {
         LocalDateTime now = LocalDateTime.now();
-        int balance = points(memberLevelService.getOrCreate(userId));
+        Member member = memberLevelService.getOrCreate(userId);
+        int balance = points(member);
+        int memberLevel = positive(member.getMemberLevel(), 1);
         Page<Coupon> result = couponMapper.selectPage(new Page<>(page, pageSize),
                 Wrappers.<Coupon>lambdaQuery()
                         .eq(Coupon::getType, 1)
                         .eq(Coupon::getStatus, 1)
                         .gt(Coupon::getExchangePoints, 0)
-                        .le(Coupon::getValidStart, now)
-                        .ge(Coupon::getValidEnd, now)
+                        .apply("COALESCE(member_level_required, 0) <= {0}", memberLevel)
+                        .and(validity -> validity
+                                .and(fixed -> fixed.eq(Coupon::getValidityType, 1)
+                                        .le(Coupon::getValidStart, now)
+                                        .ge(Coupon::getValidEnd, now))
+                                .or(rolling -> rolling.eq(Coupon::getValidityType, 2)
+                                        .gt(Coupon::getValidityDays, 0)))
                         .orderByAsc(Coupon::getExchangePoints, Coupon::getId));
         List<ExchangeCouponItem> items = result.getRecords().stream()
                 .map(coupon -> toExchangeCouponItem(userId, balance, coupon)).toList();
@@ -108,9 +115,15 @@ public class PointsServiceImpl implements PointsService {
         if (coupon == null || !Integer.valueOf(1).equals(coupon.getType())
                 || !Integer.valueOf(1).equals(coupon.getStatus())
                 || coupon.getExchangePoints() == null || coupon.getExchangePoints() <= 0
-                || coupon.getValidStart() == null || coupon.getValidEnd() == null
-                || now.isBefore(coupon.getValidStart()) || now.isAfter(coupon.getValidEnd())) {
+                || !isExchangePeriodAvailable(coupon, now)) {
             throw new BusinessException(40451, HttpStatus.NOT_FOUND, "优惠券不存在");
+        }
+        Member member = memberLevelService.getOrCreate(userId);
+        int memberLevel = positive(member.getMemberLevel(), 1);
+        int requiredLevel = value(coupon.getMemberLevelRequired());
+        if (memberLevel < requiredLevel) {
+            throw new BusinessException(40351, HttpStatus.FORBIDDEN, "会员等级不足",
+                    Map.of("memberLevel", memberLevel, "memberLevelRequired", requiredLevel));
         }
         int received = value(coupon.getReceivedCount());
         if (coupon.getTotalCount() == null || received >= coupon.getTotalCount()) {
@@ -123,8 +136,7 @@ public class PointsServiceImpl implements PointsService {
             throw new BusinessException(40955, HttpStatus.CONFLICT, "已达到每人限兑数量",
                     Map.of("couponId", coupon.getId(), "perUserLimit", perUserLimit));
         }
-        memberLevelService.getOrCreate(userId);
-        Member member = memberMapper.selectByUserIdForUpdate(userId);
+        member = memberMapper.selectByUserIdForUpdate(userId);
         int balance = points(member);
         int usePoints = coupon.getExchangePoints();
         if (balance < usePoints) {
@@ -147,7 +159,8 @@ public class PointsServiceImpl implements PointsService {
         couponUser.setReceiveTime(now);
         if (couponUserMapper.insert(couponUser) != 1) throw new IllegalStateException("优惠券领取记录写入失败");
         return new Exchange(couponUser.getId(), coupon.getId(), coupon.getTitle(), usePoints,
-                current, format(now), format(coupon.getValidStart()), format(coupon.getValidEnd()));
+                current, format(now), format(effectiveStart(coupon, now)),
+                format(effectiveEnd(coupon, now)));
     }
 
     @Override
@@ -202,10 +215,29 @@ public class PointsServiceImpl implements PointsService {
         else if (remaining <= 0) statusText = "已兑完";
         else if (balance < requiredPoints) statusText = "积分不足";
         else statusText = "立即兑换";
+        LocalDateTime now = LocalDateTime.now();
         return new ExchangeCouponItem(coupon.getId(), coupon.getTitle(), coupon.getType(), "满减券",
                 coupon.getMinConsume(), coupon.getDiscountAmount(), requiredPoints,
                 "立即兑换".equals(statusText), statusText, total, received, remaining, limit, already,
-                format(coupon.getValidStart()), format(coupon.getValidEnd()));
+                format(effectiveStart(coupon, now)), format(effectiveEnd(coupon, now)));
+    }
+
+    private boolean isExchangePeriodAvailable(Coupon coupon, LocalDateTime now) {
+        if (Integer.valueOf(2).equals(coupon.getValidityType())) {
+            return coupon.getValidityDays() != null && coupon.getValidityDays() > 0;
+        }
+        return coupon.getValidStart() != null && coupon.getValidEnd() != null
+                && !now.isBefore(coupon.getValidStart()) && !now.isAfter(coupon.getValidEnd());
+    }
+
+    private LocalDateTime effectiveStart(Coupon coupon, LocalDateTime receiveTime) {
+        return Integer.valueOf(2).equals(coupon.getValidityType())
+                ? receiveTime : coupon.getValidStart();
+    }
+
+    private LocalDateTime effectiveEnd(Coupon coupon, LocalDateTime receiveTime) {
+        return Integer.valueOf(2).equals(coupon.getValidityType())
+                ? receiveTime.plusDays(positive(coupon.getValidityDays(), 1)) : coupon.getValidEnd();
     }
 
     private int userExchangeCount(Long userId, Long couponId) {

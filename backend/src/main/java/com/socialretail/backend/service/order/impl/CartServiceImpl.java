@@ -1,5 +1,6 @@
 package com.socialretail.backend.service.order.impl;
 
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.cart.CartAddDTO;
 import com.socialretail.backend.dto.request.cart.CartBatchDeleteDTO;
@@ -59,12 +60,14 @@ public class CartServiceImpl implements CartService {
     private final CartMapper cartMapper;
     private final SkuMapper skuMapper;
     private final ProductMapper productMapper;
+    private final ImageUrlResolver imageUrlResolver;
     private final PointsCalculationService pointsCalculationService;
     private final PlatformCouponPricingService platformCouponPricingService;
     private final SeckillOrderPricingService seckillOrderPricingService;
     private final OrderPricingService orderPricingService;
 
     public CartServiceImpl(CartMapper cartMapper, SkuMapper skuMapper, ProductMapper productMapper,
+                           ImageUrlResolver imageUrlResolver,
                            PointsCalculationService pointsCalculationService,
                            PlatformCouponPricingService platformCouponPricingService,
                            SeckillOrderPricingService seckillOrderPricingService,
@@ -72,6 +75,7 @@ public class CartServiceImpl implements CartService {
         this.cartMapper = cartMapper;
         this.skuMapper = skuMapper;
         this.productMapper = productMapper;
+        this.imageUrlResolver = imageUrlResolver;
         this.pointsCalculationService = pointsCalculationService;
         this.platformCouponPricingService = platformCouponPricingService;
         this.seckillOrderPricingService = seckillOrderPricingService;
@@ -337,6 +341,7 @@ public class CartServiceImpl implements CartService {
     }
 
     private void prepareItem(CartItemVO item) {
+        item.setProductImage(imageUrlResolver.resolve(item.getProductImage()));
         int quantity = safeQuantity(item.getQuantity());
         BigDecimal price = item.getPrice() == null ? ZERO_AMOUNT : item.getPrice();
         item.setSelected(true);

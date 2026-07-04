@@ -21,7 +21,7 @@ import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.service.product.ProductService;
 import com.socialretail.backend.vo.ProductDetailVO;
-import com.socialretail.backend.vo.ProductListVO;
+import com.socialretail.backend.vo.ProductCardVO;
 import com.socialretail.backend.vo.ProductSkuListVO;
 import com.socialretail.backend.vo.ProductSkuVO;
 import com.socialretail.backend.vo.ProductMerchantInfoVO;
@@ -39,6 +39,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -81,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResult<ProductListVO> listProducts(ProductQueryDTO dto) {
+    public PageResult<ProductCardVO> listProducts(ProductQueryDTO dto) {
         int page = dto.getPage() == null ? 1 : dto.getPage();
         int size = dto.getSize() == null ? 10 : dto.getSize();
 
@@ -114,8 +115,11 @@ public class ProductServiceImpl implements ProductService {
         Map<Long, List<Sku>> skusByProduct = findSkusByProduct(products);
         Map<Long, Product> productsById = products.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
-        List<ProductListVO> result = products.stream()
-                .map(product -> toListVO(product, skusByProduct.getOrDefault(product.getId(), List.of())))
+        Map<Long, Merchant> merchantsById = findMerchantsByProduct(products);
+        List<ProductCardVO> result = products.stream()
+                .map(product -> toListVO(product,
+                        skusByProduct.getOrDefault(product.getId(), List.of()),
+                        merchantsById.get(product.getMerchantId())))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         result.sort(resolveSort(dto.getSort(), productsById));
@@ -196,7 +200,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResult<ProductListVO> searchProducts(ProductQueryDTO dto) {
+    public PageResult<ProductCardVO> searchProducts(ProductQueryDTO dto) {
         return listProducts(dto);
     }
 
@@ -223,14 +227,33 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.groupingBy(Sku::getProductId));
     }
 
-    private ProductListVO toListVO(Product product, List<Sku> skus) {
-        return new ProductListVO(
+    private ProductCardVO toListVO(Product product, List<Sku> skus, Merchant merchant) {
+        BigDecimal price = minimumPrice(skus);
+        int stock = skus.stream().map(Sku::getStock).filter(value -> value != null)
+                .mapToInt(Integer::intValue).sum();
+        return new ProductCardVO(
                 product.getId(),
                 product.getTitle(),
                 imageUrlResolver.resolve(product.getMainImage()),
-                minimumPrice(skus),
-                soldCount(product)
+                price,
+                price,
+                soldCount(product),
+                stock,
+                List.of(),
+                product.getMerchantId(),
+                merchant == null ? null : merchant.getMerchantName(),
+                null
         );
+    }
+
+    private Map<Long, Merchant> findMerchantsByProduct(List<Product> products) {
+        List<Long> merchantIds = products.stream().map(Product::getMerchantId)
+                .filter(Objects::nonNull).distinct().toList();
+        if (merchantIds.isEmpty()) {
+            return Map.of();
+        }
+        return merchantMapper.selectBatchIds(merchantIds).stream()
+                .collect(Collectors.toMap(Merchant::getId, Function.identity()));
     }
 
     private SkuVO toSkuVO(Sku sku) {
@@ -308,29 +331,29 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    private Comparator<ProductListVO> resolveSort(String sort, Map<Long, Product> productsById) {
+    private Comparator<ProductCardVO> resolveSort(String sort, Map<Long, Product> productsById) {
         String normalized = StringUtils.hasText(sort)
                 ? sort.trim().toLowerCase(Locale.ROOT)
                 : "default";
-        Comparator<ProductListVO> byIdDesc = Comparator.comparing(
-                ProductListVO::getProductId,
+        Comparator<ProductCardVO> byIdDesc = Comparator.comparing(
+                ProductCardVO::getProductId,
                 Comparator.nullsLast(Comparator.reverseOrder())
         );
         return switch (normalized) {
             case "price_asc" -> Comparator.comparing(
-                    ProductListVO::getPrice,
+                    ProductCardVO::getPrice,
                     Comparator.nullsLast(Comparator.naturalOrder())
             ).thenComparing(byIdDesc);
             case "price_desc" -> Comparator.comparing(
-                    ProductListVO::getPrice,
+                    ProductCardVO::getPrice,
                     Comparator.nullsLast(Comparator.reverseOrder())
             ).thenComparing(byIdDesc);
             case "sales_desc" -> Comparator.comparing(
-                    ProductListVO::getSales,
+                    ProductCardVO::getSoldCount,
                     Comparator.nullsLast(Comparator.reverseOrder())
             ).thenComparing(byIdDesc);
             case "newest", "time_desc" -> Comparator.comparing(
-                    (ProductListVO vo) -> {
+                    (ProductCardVO vo) -> {
                         Product product = productsById.get(vo.getProductId());
                         return product == null || product.getCreateTime() == null
                                 ? LocalDateTime.MIN

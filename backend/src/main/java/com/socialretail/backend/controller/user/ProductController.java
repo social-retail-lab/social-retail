@@ -5,7 +5,7 @@ import com.socialretail.backend.common.result.Result;
 import com.socialretail.backend.dto.request.product.ProductQueryDTO;
 import com.socialretail.backend.service.product.ProductService;
 import com.socialretail.backend.vo.ProductDetailVO;
-import com.socialretail.backend.vo.ProductListVO;
+import com.socialretail.backend.vo.ProductCardVO;
 import com.socialretail.backend.vo.ProductSkuListVO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -28,7 +28,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public Result<PageResult<ProductListVO>> listProducts(
+    public Result<PageResult<ProductCardVO>> listProducts(
             @Valid @ModelAttribute ProductQueryDTO dto) {
         return Result.success(productService.listProducts(dto));
     }
@@ -46,7 +46,7 @@ public class ProductController {
     }
 
     @GetMapping("/search")
-    public Result<PageResult<ProductListVO>> searchProducts(
+    public Result<PageResult<ProductCardVO>> searchProducts(
             @Valid @ModelAttribute ProductQueryDTO dto) {
         return Result.success(productService.searchProducts(dto));
     }

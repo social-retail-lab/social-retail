@@ -524,6 +524,7 @@ public class AuditService {
         product.setStatus(0);
         product.setAuditStatus(2);  // 标记为审核拒绝，上架需重新审核
         product.setAuditRemark(reason != null ? reason : "管理员下架");
+        product.setForceOffShelf(1);
         product.setAuditTime(LocalDateTime.now());
         productMapper.updateById(product);
 

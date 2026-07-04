@@ -1,6 +1,7 @@
 package com.socialretail.backend.service.product.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.product.CatalogProductQueryDTO;
 import com.socialretail.backend.entity.product.Category;
@@ -41,15 +42,18 @@ public class CategoryServiceImpl implements CategoryService {
     private final ProductCategoryRelationMapper relationMapper;
     private final ProductMapper productMapper;
     private final SkuMapper skuMapper;
+    private final ImageUrlResolver imageUrlResolver;
 
     public CategoryServiceImpl(CategoryMapper categoryMapper,
                                ProductCategoryRelationMapper relationMapper,
                                ProductMapper productMapper,
-                               SkuMapper skuMapper) {
+                               SkuMapper skuMapper,
+                               ImageUrlResolver imageUrlResolver) {
         this.categoryMapper = categoryMapper;
         this.relationMapper = relationMapper;
         this.productMapper = productMapper;
         this.skuMapper = skuMapper;
+        this.imageUrlResolver = imageUrlResolver;
     }
 
     @Override
@@ -150,7 +154,7 @@ public class CategoryServiceImpl implements CategoryService {
         int stock = skus.stream().map(Sku::getStock).filter(value -> value != null)
                 .mapToInt(Integer::intValue).sum();
         return new CatalogProductVO(
-                product.getId(), product.getTitle(), product.getMainImage(), price, price,
+                product.getId(), product.getTitle(), imageUrlResolver.resolve(product.getMainImage()), price, price,
                 product.getSoldCount() == null ? 0L : product.getSoldCount(), stock, List.of()
         );
     }

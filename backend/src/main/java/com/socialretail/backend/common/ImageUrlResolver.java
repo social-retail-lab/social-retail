@@ -47,10 +47,19 @@ public class ImageUrlResolver {
             int staticMarker = lowerUrl.indexOf("/static/");
             if (staticMarker >= 0) {
                 String relative = normalizedUrl.substring(staticMarker + "/static/".length());
-                return requestBaseUrl() + "/uploads/"
+                return requestBaseUrl() + "/static/"
                         + UriUtils.encodePath(relative, StandardCharsets.UTF_8);
             }
             return value;
+        }
+
+        String normalizedValue = value.replace('\\', '/');
+        String lowerValue = normalizedValue.toLowerCase(Locale.ROOT);
+        if (lowerValue.startsWith("/static/") || lowerValue.startsWith("static/")) {
+            String relative = normalizedValue.replaceFirst("^/+", "")
+                    .substring("static/".length());
+            return requestBaseUrl() + "/static/"
+                    + UriUtils.encodePath(relative, StandardCharsets.UTF_8);
         }
 
         String relative = relativeUploadPath(value);

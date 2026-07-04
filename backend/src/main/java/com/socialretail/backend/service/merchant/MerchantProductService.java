@@ -260,6 +260,9 @@ public class MerchantProductService {
         if (!product.getMerchantId().equals(merchantId)) {
             throw new RuntimeException("无权操作该商品");
         }
+        if (product.getForceOffShelf() != null && product.getForceOffShelf() == 1) {
+            throw new RuntimeException("该商品已被管理员强制下架，无法再次上架");
+        }
 
         // 更新商品字段
         if (req.getBrandId() != null) {
@@ -424,8 +427,11 @@ public class MerchantProductService {
             throw new RuntimeException("无权操作该商品");
         }
 
-        // 上架前检查审核状态
+        // 上架前检查强制下架标记
         if (status != null && status == 1) {
+            if (product.getForceOffShelf() != null && product.getForceOffShelf() == 1) {
+                throw new RuntimeException("该商品已被管理员强制下架，无法再次上架");
+            }
             if (product.getAuditStatus() == null || product.getAuditStatus() != 1) {
                 throw new RuntimeException("商品审核未通过，无法上架");
             }

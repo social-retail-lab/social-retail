@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.socialretail.backend.common.OrderNoUtils;
 import com.socialretail.backend.common.OrderStatus;
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.config.OrderTimeoutProperties;
 import com.socialretail.backend.dto.request.order.OrderCancelRequest;
@@ -104,6 +105,7 @@ public class OrderServiceImpl implements OrderService {
     private final ObjectMapper objectMapper;
     private final MerchantCouponPricingService merchantCouponPricingService;
     private final OrderPreviewCacheService previewCacheService;
+    private final ImageUrlResolver imageUrlResolver;
 
     public OrderServiceImpl(OrderMapper orderMapper,
                             CartMapper cartMapper,
@@ -117,7 +119,8 @@ public class OrderServiceImpl implements OrderService {
                             SeckillOrderPricingService seckillOrderPricingService,
                             ObjectMapper objectMapper,
                             MerchantCouponPricingService merchantCouponPricingService,
-                            OrderPreviewCacheService previewCacheService) {
+                            OrderPreviewCacheService previewCacheService,
+                            ImageUrlResolver imageUrlResolver) {
         this.orderMapper = orderMapper;
         this.cartMapper = cartMapper;
         this.addressMapper = addressMapper;
@@ -131,6 +134,7 @@ public class OrderServiceImpl implements OrderService {
         this.objectMapper = objectMapper;
         this.merchantCouponPricingService = merchantCouponPricingService;
         this.previewCacheService = previewCacheService;
+        this.imageUrlResolver = imageUrlResolver;
     }
 
     @Override
@@ -338,6 +342,7 @@ public class OrderServiceImpl implements OrderService {
         Set<Long> merchantIds = new LinkedHashSet<>();
         BigDecimal total = ZERO;
         for (CartItemVO item : items) {
+            item.setProductImage(imageUrlResolver.resolve(item.getProductImage()));
             if (!Objects.equals(item.getProductStatus(), ON_SALE)
                     || !Objects.equals(item.getProductAuditStatus(), AUDIT_APPROVED)) {
                 throw new BusinessException(40402, HttpStatus.NOT_FOUND, "商品不存在或已下架");
@@ -686,7 +691,7 @@ public class OrderServiceImpl implements OrderService {
         response.setSkuId(item.getSkuId());
         response.setProductId(item.getProductId());
         response.setProductName(item.getProductName());
-        response.setProductImage(item.getProductImage());
+        response.setProductImage(imageUrlResolver.resolve(item.getProductImage()));
         response.setSkuSpecs(item.getSkuSpecs());
         response.setOriginPrice(item.getOriginPrice());
         response.setFinalPrice(item.getFinalPrice());

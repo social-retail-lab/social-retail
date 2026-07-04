@@ -354,9 +354,13 @@ public class AfterSaleServiceImpl {
             map.put("typeText", getAfterSaleTypeText(as.getType()));
             map.put("refundAmount", as.getRefundAmount());
             map.put("reason", as.getReason());
+            map.put("appealReason", as.getReason() != null ? as.getReason() : "无");
             map.put("status", as.getStatus());
             map.put("statusText", getAfterSaleStatusText(as.getStatus()));
             map.put("applyTime", formatDateTime(as.getApplyTime()));
+            map.put("appealTime", formatDateTime(as.getApplyTime()));
+            map.put("merchantAuditRemark", as.getRejectReason() != null ? as.getRejectReason() : "无");
+            map.put("evidenceImages", as.getEvidenceImages());
 
             Order order = orderMapper.selectById(as.getOrderId());
             if (order != null && order.getUserId() != null) {
