@@ -114,7 +114,6 @@ const menus = [
   { path: '/after-sale', label: '售后管理', badge: 'afterSale' },
   { path: '/distribution', label: '分销设置' },
   { path: '/promotion', label: '店铺促销' },
-  { path: '/seckill', label: '秒杀活动' },
   { path: '/earnings', label: '我的收益' }
 ]
 

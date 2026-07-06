@@ -104,7 +104,23 @@
           </div>
           <div class="form-item">
             <label>品牌名称</label>
-            <input v-model="form.brandName" placeholder="请输入品牌名称" />
+            <div class="brand-search">
+              <input
+                v-model="brandKeyword"
+                type="text"
+                placeholder="输入关键字搜索品牌（非必填）"
+                @input="onBrandSearch"
+                @focus="onBrandSearch"
+                @blur="onBrandBlur"
+              />
+              <ul v-if="brandOptions.length > 0" class="brand-dropdown">
+                <li
+                  v-for="b in brandOptions"
+                  :key="b.brandId"
+                  @mousedown.prevent="selectBrand(b)"
+                >{{ b.brandName }}</li>
+              </ul>
+            </div>
           </div>
           <div class="form-item">
             <label>商品主图</label>
@@ -161,7 +177,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { getGoodsList, getGoodsDetail, getCategories, createGoods, updateGoods, updateGoodsStatus, uploadImage } from '@/api/goods'
+import { getGoodsList, getGoodsDetail, getCategories, searchBrands, createGoods, updateGoods, updateGoodsStatus, uploadImage } from '@/api/goods'
 
 // ---------- filter state ----------
 const keyword = ref('')
@@ -185,6 +201,9 @@ const editingGoods = ref<any>(null)
 const uploadingMainImage = ref(false)
 const uploadingDetailImages = ref(false)
 const formLevel2Categories = ref<any[]>([])
+const brandKeyword = ref('')
+const brandOptions = ref<any[]>([])
+const selectedBrandId = ref<number | null>(null)
 
 const emptySku = () => ({ specs: '', price: 0, stock: 0, skuCode: '' })
 
@@ -262,6 +281,38 @@ const loadFormLevel2Categories = async (parentId: number) => {
   }
 }
 
+// ---------- brand search ----------
+let brandSearchTimer: any = null
+const onBrandSearch = () => {
+  clearTimeout(brandSearchTimer)
+  brandSearchTimer = setTimeout(async () => {
+    const kw = brandKeyword.value.trim()
+    try {
+      const res = await searchBrands(kw || undefined)
+      if (res.code === 0) {
+        brandOptions.value = res.data || []
+      }
+    } catch { brandOptions.value = [] }
+  }, 200)
+}
+const selectBrand = (b: any) => {
+  brandKeyword.value = b.brandName
+  selectedBrandId.value = b.brandId
+  form.brandName = b.brandName
+  brandOptions.value = []
+}
+const onBrandBlur = () => {
+  setTimeout(() => {
+    brandOptions.value = []
+    // 未从下拉列表选择则清空输入
+    if (!selectedBrandId.value || brandKeyword.value !== form.brandName) {
+      brandKeyword.value = ''
+      selectedBrandId.value = null
+      form.brandName = ''
+    }
+  }, 150)
+}
+
 // ---------- filter handlers ----------
 const searchGoods = () => {
   currentPage.value = 1
@@ -316,6 +367,8 @@ const editGoods = async (goods: any) => {
       form.categoryId1 = detail.categoryIds ? detail.categoryIds[0] || 0 : (detail.categoryId1 || 0)
       form.categoryId2 = detail.categoryIds ? detail.categoryIds[1] || 0 : (detail.categoryId2 || 0)
       form.brandName = detail.brandName || ''
+      brandKeyword.value = detail.brandName || ''
+      selectedBrandId.value = detail.brandId || null
       form.mainImage = detail.mainImage || ''
       form.detailImages = detail.detailImages || []
       form.detailDesc = detail.detailDesc || ''
@@ -363,6 +416,8 @@ const submitGoods = async () => {
     title: form.title,
     subTitle: form.subTitle || undefined,
     categoryIds: [form.categoryId1, form.categoryId2].filter(Boolean),
+    brandId: selectedBrandId.value || undefined,
+    brandName: form.brandName || undefined,
     mainImage: form.mainImage,
     detailImages: form.detailImages.length > 0 ? form.detailImages : undefined,
     detailDesc: form.detailDesc || undefined,
@@ -408,6 +463,9 @@ const resetForm = () => {
   form.saleType = 3
   form.skus = [emptySku()]
   formLevel2Categories.value = []
+  brandKeyword.value = ''
+  brandOptions.value = []
+  selectedBrandId.value = null
 }
 
 // ---------- SKU ----------
@@ -868,6 +926,47 @@ onMounted(() => {
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
+}
+
+.brand-search {
+  position: relative;
+}
+
+.brand-search input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.brand-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #dcdcdc;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  z-index: 100;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.brand-dropdown li {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #1D2129;
+}
+
+.brand-dropdown li:hover {
+  background: #E6F7FF;
 }
 
 .modal-footer {

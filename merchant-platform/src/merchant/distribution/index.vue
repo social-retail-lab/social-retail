@@ -60,9 +60,9 @@
             <td>{{ item.productName }}</td>
             <td>
               <div class="ratio-cell">
-                <button class="mini-btn" @click="adjustRatio(item, -1)" :disabled="item.ratio <= 1">−</button>
-                <span class="ratio-text">{{ item.ratio }}%</span>
-                <button class="mini-btn" @click="adjustRatio(item, 1)" :disabled="item.ratio >= 50">+</button>
+                <button class="mini-btn" @click="adjustRatio(item, -1)" :disabled="(item.commissionRate || item.ratio) <= 1">−</button>
+                <span class="ratio-text">{{ item.commissionRate || item.ratio }}%</span>
+                <button class="mini-btn" @click="adjustRatio(item, 1)" :disabled="(item.commissionRate || item.ratio) >= 50">+</button>
               </div>
             </td>
             <td>
@@ -80,12 +80,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import request from '@/utils/request'
 
 interface DistributionItem {
+  id: number
   productId: number
   productName: string
-  ratio: number
+  commissionRate: number
+  status: number
 }
 
 const productId = ref('')
@@ -93,6 +96,18 @@ const ratio = ref(5)
 const selectedProduct = ref<any>(null)
 const selectError = ref('')
 const distributionList = ref<DistributionItem[]>([])
+
+// 加载分销商品列表
+const loadList = async () => {
+  try {
+    const res = await request.get('/merchant/distribution/products')
+    if (res.code === 0) {
+      distributionList.value = res.data || []
+    }
+  } catch (e: any) {
+    console.error('[分销] 加载列表失败:', e.message)
+  }
+}
 
 const searchProduct = async () => {
   selectError.value = ''
@@ -102,37 +117,65 @@ const searchProduct = async () => {
     selectError.value = '请输入有效的商品ID'
     return
   }
-  // 不连接后端，返回空结果
-  selectError.value = '未找到该商品（API未连接）'
+  try {
+    const res = await request.get(`/merchant/distribution/product-info/${id}`)
+    if (res.code === 0) {
+      selectedProduct.value = res.data
+    } else {
+      selectError.value = res.message || '未找到该商品'
+    }
+  } catch {
+    selectError.value = '查询商品失败，请检查商品ID'
+  }
 }
 
-const addProduct = () => {
+const addProduct = async () => {
   if (!selectedProduct.value) return
-  const exists = distributionList.value.find(d => d.productId === selectedProduct.value.id)
-  if (exists) {
-    exists.ratio = ratio.value
-    alert('已更新该商品的分销比例')
-    return
-  }
-  distributionList.value.push({
-    productId: selectedProduct.value.id,
-    productName: selectedProduct.value.title,
-    ratio: ratio.value
-  })
-  selectedProduct.value = null
-  productId.value = ''
-  ratio.value = 5
-}
-
-const adjustRatio = (item: DistributionItem, delta: number) => {
-  item.ratio = Math.max(1, Math.min(50, item.ratio + delta))
-}
-
-const removeProduct = (item: DistributionItem) => {
-  if (confirm(`确认移除商品 "${item.productName}" 的分销设置？`)) {
-    distributionList.value = distributionList.value.filter(d => d.productId !== item.productId)
+  try {
+    const res = await request.post('/merchant/distribution/products', {
+      productId: selectedProduct.value.id,
+      commissionRate: ratio.value
+    })
+    if (res.code === 0) {
+      selectedProduct.value = null
+      productId.value = ''
+      ratio.value = 5
+      await loadList()
+    } else {
+      alert(res.message || '添加失败')
+    }
+  } catch (e: any) {
+    alert('添加失败: ' + (e.message || '网络错误'))
   }
 }
+
+const adjustRatio = async (item: DistributionItem, delta: number) => {
+  const newRate = Math.max(1, Math.min(50, item.commissionRate + delta))
+  try {
+    const res = await request.put(`/merchant/distribution/products/${item.id}`, {
+      commissionRate: newRate
+    })
+    if (res.code === 0) {
+      item.commissionRate = newRate
+    }
+  } catch (e: any) {
+    console.error('[分销] 更新比例失败:', e.message)
+  }
+}
+
+const removeProduct = async (item: DistributionItem) => {
+  if (!confirm(`确认移除商品 "${item.productName}" 的分销设置？`)) return
+  try {
+    const res = await request.delete(`/merchant/distribution/products/${item.id}`)
+    if (res.code === 0) {
+      distributionList.value = distributionList.value.filter(d => d.id !== item.id)
+    }
+  } catch (e: any) {
+    alert('删除失败: ' + (e.message || '网络错误'))
+  }
+}
+
+onMounted(loadList)
 </script>
 
 <style scoped>

@@ -32,15 +32,19 @@
           <td>{{ item.contactPhone }}</td>
           <td>{{ auditMap[item.auditStatus] }}</td>
           <td>
-            <button @click="openDialog(item)">审核</button>
+            <button
+              :disabled="item.auditStatus !== 0"
+              :class="{ disabled: item.auditStatus !== 0 }"
+              @click="openDialog(item)"
+            >审核</button>
           </td>
         </tr>
       </tbody>
     </table>
     <div class="page">
       <button :disabled="page === 1" @click="page--">上一页</button>
-      <span>第{{page}}页</span>
-      <button @click="page++">下一页</button>
+      <span>第{{ page }}页 / 共{{ Math.ceil(total / 10) || 1 }}页</span>
+      <button :disabled="page * 10 >= total" @click="page++">下一页</button>
     </div>
 
     <!-- 审核弹窗 -->
@@ -68,11 +72,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { getMerchantApplies, auditMerchantApply } from '@/api/audit'
 const keyword = ref('')
 const auditStatus = ref('')
 const page = ref(1)
+const total = ref(0)
 const tableList = ref<any[]>([])
 const auditMap:Record<string,string> = {'0':'待审核','1':'通过','2':'驳回'}
 const showMask = ref(false)
@@ -94,8 +99,12 @@ const getList = async ()=>{
   const res = await getMerchantApplies(params)
   if (res.code === 0) {
     tableList.value = res.data.list || res.data || []
+    total.value = res.data.total || tableList.value.length
   }
 }
+
+watch(page, () => getList())
+
 const openDialog = (row:any)=>{
   curApplyId.value = row.applyId
   curAuditStatus.value = 1
@@ -148,6 +157,14 @@ button {
   color: #fff;
   border: none;
   cursor: pointer;
+}
+button.disabled {
+  background: #c0c4cc;
+  cursor: not-allowed;
+}
+button:disabled {
+  background: #c0c4cc;
+  cursor: not-allowed;
 }
 table {
   width: 100%;

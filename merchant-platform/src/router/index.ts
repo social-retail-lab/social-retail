@@ -76,11 +76,6 @@ const routes = [
         path: '/promotion',
         name: '店铺促销',
         component: () => import('@/merchant/promotion/index.vue')
-      },
-      {
-        path: '/seckill',
-        name: '秒杀活动',
-        component: () => import('@/merchant/promotion/seckill.vue')
       }
     ]
   }

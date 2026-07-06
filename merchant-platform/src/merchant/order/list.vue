@@ -24,7 +24,7 @@
         <div class="order-header">
           <div class="order-info">
             <span class="order-sn">订单号: {{ order.orderSn }}</span>
-            <span :class="['status-tag', getStatusClass(order.status)]">{{ order.statusText }}</span>
+            <span :class="['status-tag', getStatusClass(order.status)]">{{ order.statusText || getStatusText(order.status, order.deliveryType) }}</span>
           </div>
           <span class="order-time">{{ order.createTime }}</span>
         </div>
@@ -53,28 +53,69 @@
             <button v-if="order.status === 2" class="action-btn primary" @click="handlePrepareOrder(order)">备货</button>
             <button v-if="order.status === 3 && order.deliveryType === 1" class="action-btn info" @click="viewDelivery(order)">查看配送</button>
             <button v-if="order.status === 3 && order.deliveryType === 2" class="action-btn primary" @click="handleConfirmPickup(order)">确认自提</button>
-            <button v-if="order.status === 4" class="action-btn success" @click="viewDetail(order)">查看详情</button>
             <button v-if="order.status === 1" class="action-btn cancel" @click="handleCancelOrder(order)">取消订单</button>
+            <button class="action-btn detail" @click="openDetail(order)">查看详情</button>
           </div>
         </div>
       </div>
     </div>
 
-    <div v-if="orderList.length === 0" class="empty-state">
+    <div v-if="orderList.length === 0 && !loading" class="empty-state">
       <div class="empty-icon">📦</div>
       <div class="empty-text">暂无订单</div>
     </div>
 
+    <!-- 订单详情弹窗 -->
+    <div v-if="showDetail" class="modal-mask" @click.self="showDetail = false">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h2>订单详情</h2>
+          <button class="close-btn" @click="showDetail = false">×</button>
+        </div>
+        <div v-if="detailLoading" class="modal-loading">加载中...</div>
+        <div v-else-if="detailData">
+          <div class="detail-section">
+            <h3>订单信息</h3>
+            <div class="detail-grid">
+              <div class="detail-item"><span class="key">订单号：</span><span class="val">{{ detailData.orderSn }}</span></div>
+              <div class="detail-item"><span class="key">订单状态：</span><span :class="['status-tag', getStatusClass(detailData.status)]">{{ detailData.statusText || getStatusText(detailData.status, detailData.deliveryType) }}</span></div>
+              <div class="detail-item"><span class="key">配送方式：</span><span class="val">{{ detailData.deliveryTypeText || (detailData.deliveryType === 1 ? '配送' : '自提') }}</span></div>
+              <div class="detail-item"><span class="key">下单时间：</span><span class="val">{{ detailData.createTime }}</span></div>
+              <div class="detail-item"><span class="key">支付金额：</span><span class="val price">¥{{ (detailData.payAmount || 0).toFixed(2) }}</span></div>
+              <div class="detail-item"><span class="key">支付方式：</span><span class="val">{{ getPayMethodText(detailData.payMethod) }}</span></div>
+            </div>
+          </div>
+          <div class="detail-section" v-if="detailData.orderItems && detailData.orderItems.length > 0">
+            <h3>商品明细</h3>
+            <div class="detail-items">
+              <div v-for="item in detailData.orderItems" :key="item.id" class="detail-product">
+                <img :src="item.productImage || 'https://via.placeholder.com/60'" class="dp-img" />
+                <div class="dp-info">
+                  <div class="dp-name">{{ item.productName }}</div>
+                  <div class="dp-spec">{{ item.skuSpecs }}</div>
+                </div>
+                <div class="dp-right">
+                  <span class="dp-price">¥{{ (item.price || 0).toFixed(2) }}</span>
+                  <span class="dp-qty">x{{ item.quantity }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-else class="modal-loading">暂无数据</div>
+      </div>
+    </div>
+
     <div class="pagination">
-      <button :disabled="currentPage <= 1" @click="currentPage--" class="page-btn">上一页</button>
+      <button :disabled="currentPage <= 1" @click="currentPage--; loadData()" class="page-btn">上一页</button>
       <span class="page-info">第{{ currentPage }}页 / 共{{ totalPages }}页</span>
-      <button :disabled="currentPage >= totalPages" @click="currentPage++" class="page-btn">下一页</button>
+      <button :disabled="currentPage >= totalPages" @click="currentPage++; loadData()" class="page-btn">下一页</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { getOrderList, getOrderDetail, acceptOrder, prepareOrder, cancelOrder as cancelOrderApi, confirmPickupCode } from '@/api/order'
 
 interface OrderItem {
@@ -122,17 +163,40 @@ const tabs = [
 ]
 
 const orderList = ref<Order[]>([])
+const loading = ref(false)
 
 const getStatusClass = (status: number) => {
+  if (status === 0) return 'WAIT_PAY'
   if (status === 1) return 'WAIT_ACCEPT'
   if (status === 2) return 'ACCEPTED'
-  if (status === 3) return 'SHIPPING'
+  if (status === 3) return 'IN_PROGRESS'
   if (status === 4) return 'COMPLETED'
   if (status === 5) return 'CANCELLED'
+  if (status === 6) return 'CLOSED'
   return ''
 }
 
+const getStatusText = (status: number, deliveryType?: number) => {
+  if (status === 0) return '待支付'
+  if (status === 1) return '待商家接单'
+  if (status === 2) return '商家已接单'
+  if (status === 3) return deliveryType === 2 ? '待自提' : '配送中'
+  if (status === 4) return '已完成'
+  if (status === 5) return '已取消'
+  if (status === 6) return '已关闭'
+  return '未知'
+}
+
+const getPayMethodText = (payMethod: number) => {
+  if (payMethod === 1) return '微信支付'
+  if (payMethod === 2) return '支付宝'
+  if (payMethod === 3) return '银行卡'
+  if (payMethod === 0) return '未支付'
+  return payMethod != null ? `方式${payMethod}` : '-'
+}
+
 const loadData = async () => {
+  loading.value = true
   const tab = tabs.find(t => t.value === activeTab.value)
   const params: any = {
     pageNum: currentPage.value,
@@ -162,6 +226,8 @@ const loadData = async () => {
     }
   } catch (e: any) {
     console.error('[订单列表] 请求异常:', e.message || e)
+  } finally {
+    loading.value = false
   }
 }
 
@@ -210,6 +276,27 @@ const viewDetail = async (order: Order) => {
   }
 }
 
+// 详情弹窗
+const showDetail = ref(false)
+const detailLoading = ref(false)
+const detailData = ref<any>(null)
+
+const openDetail = async (order: Order) => {
+  showDetail.value = true
+  detailLoading.value = true
+  detailData.value = null
+  try {
+    const res = await getOrderDetail(order.orderId)
+    if (res.code === 0) {
+      detailData.value = res.data
+    }
+  } catch (e: any) {
+    console.error('[订单详情] 加载失败:', e.message)
+  } finally {
+    detailLoading.value = false
+  }
+}
+
 const handleConfirmPickup = async (order: Order) => {
   const pickupCode = prompt(`请输入订单 ${order.orderSn} 的自提码（6位数字，万能测试码：111111）：`)
   if (!pickupCode) return
@@ -238,6 +325,12 @@ const handleCancelOrder = async (order: Order) => {
 }
 
 onMounted(() => {
+  loadData()
+})
+
+// Tab 切换时自动刷新
+watch(activeTab, () => {
+  currentPage.value = 1
   loadData()
 })
 </script>
@@ -356,11 +449,13 @@ onMounted(() => {
   border-radius: 4px;
 }
 
-.status-tag.WAIT_ACCEPT { background: #FFF7E6; color: #E67E22; }
+.status-tag.WAIT_PAY { background: #FFF2F0; color: #FF4D4F; }
+.status-tag.WAIT_ACCEPT { background: #FFF2F0; color: #FF4D4F; }
 .status-tag.ACCEPTED { background: #E6F7FF; color: #1890FF; }
-.status-tag.SHIPPING { background: #F6FFED; color: #52C41A; }
+.status-tag.IN_PROGRESS { background: #E6F7FF; color: #1890FF; }
 .status-tag.COMPLETED { background: #F6FFED; color: #52C41A; }
 .status-tag.CANCELLED { background: #F5F5F5; color: #999; }
+.status-tag.CLOSED { background: #F5F5F5; color: #999; }
 
 .order-time {
   font-size: 12px;
@@ -482,6 +577,17 @@ onMounted(() => {
   color: white;
 }
 
+.action-btn.detail {
+  background: #fff;
+  color: #595959;
+  border: 1px solid #dcdcdc;
+}
+
+.action-btn.detail:hover {
+  border-color: #E66100;
+  color: #E66100;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -525,4 +631,30 @@ onMounted(() => {
   font-size: 14px;
   color: #595959;
 }
+
+/* 详情弹窗 */
+.modal-mask { position: fixed; inset: 0; background: rgba(0,0,0,.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+.modal-box { background: #fff; border-radius: 8px; padding: 24px; width: 640px; max-height: 80vh; overflow-y: auto; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.modal-header h2 { font-size: 17px; margin: 0; }
+.close-btn { background: none; border: none; font-size: 22px; color: #999; cursor: pointer; }
+.modal-loading { text-align: center; padding: 40px; color: #999; font-size: 14px; }
+
+.detail-section { margin-bottom: 20px; }
+.detail-section h3 { font-size: 14px; color: #333; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #f0f0f0; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; }
+.detail-item { display: flex; font-size: 13px; }
+.detail-item .key { color: #86909C; min-width: 70px; }
+.detail-item .val { color: #1D2129; }
+.detail-item .val.price { color: #E66100; font-weight: 600; }
+
+.detail-items { display: flex; flex-direction: column; gap: 10px; }
+.detail-product { display: flex; gap: 12px; align-items: center; padding: 8px; background: #fafafa; border-radius: 6px; }
+.dp-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; }
+.dp-info { flex: 1; }
+.dp-name { font-size: 13px; color: #333; }
+.dp-spec { font-size: 12px; color: #999; margin-top: 4px; }
+.dp-right { text-align: right; }
+.dp-price { color: #E66100; font-weight: 600; font-size: 13px; }
+.dp-qty { font-size: 12px; color: #999; margin-left: 8px; }
 </style>

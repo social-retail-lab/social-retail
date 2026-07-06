@@ -19,16 +19,20 @@
     </div>
 
     <div class="two-col">
-      <!-- 商家销售额排行 -->
+      <!-- 商家销售额排行 - 横向条形图（按月显示前五） -->
       <div class="chart-box">
-        <h3>商家销售额排行 Top10</h3>
-        <el-table :data="merchantRank" size="small" max-height="420">
-          <el-table-column type="index" label="排名" width="60" />
-          <el-table-column prop="merchantName" label="商家" />
-          <el-table-column prop="totalSales" label="销售额">
-            <template #default="{ row }">¥{{ fmt(row.totalSales) }}</template>
-          </el-table-column>
-        </el-table>
+        <div class="chart-title-row">
+          <h3>店铺销售前五排行</h3>
+          <div class="month-tabs">
+            <button
+              v-for="m in availableMonths"
+              :key="m"
+              :class="['month-tab', { active: activeMonth === m }]"
+              @click="switchMonth(m)"
+            >{{ formatMonthLabel(m) }}</button>
+          </div>
+        </div>
+        <div class="bar-chart" ref="rankChartRef"></div>
       </div>
 
       <!-- 商家入驻趋势 -->
@@ -65,26 +69,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, nextTick, computed } from 'vue'
 import * as echarts from 'echarts'
 import request from '@/utils/request'
 
 const refreshing = ref(false)
 const overview = reactive({ totalSales: '0', totalOrders: 0, totalUsers: 0, individualMerchants: 0, enterpriseMerchants: 0, totalMerchants: 0, avgOrderValue: '0' })
-const merchantRank = ref<any[]>([])
 const merchantTrend = ref<any[]>([])
 const merchantTiers = reactive({ head: 0, waist: 0, tail: 0 })
 const commission = reactive({ commission: '0', subsidy: '0', netIncome: '0' })
 const categoryProportion = ref<any[]>([])
 
+// 月度排行数据
+const monthRankData = ref<any>({ months: [], monthRankList: [] })
+const activeMonth = ref('')
+const availableMonths = ref<string[]>([])
+
 const trendChartRef = ref<HTMLElement | null>(null)
 const tiersChartRef = ref<HTMLElement | null>(null)
 const catChartRef = ref<HTMLElement | null>(null)
+const rankChartRef = ref<HTMLElement | null>(null)
 let trendChart: echarts.ECharts | null = null
 let tiersChart: echarts.ECharts | null = null
 let catChart: echarts.ECharts | null = null
+let rankChart: echarts.ECharts | null = null
 
 const fmt = (v: any) => (Number(v) || 0).toFixed(2)
+
+const formatMonthLabel = (m: string) => {
+  const parts = m.split('-')
+  if (parts.length === 2) return `${parseInt(parts[1])}月`
+  return m
+}
+
+const switchMonth = (m: string) => {
+  activeMonth.value = m
+  renderRankChart()
+}
 
 const fetchAll = async () => {
   refreshing.value = true
@@ -98,7 +119,13 @@ const fetchAll = async () => {
       request.get('/admin/dashboard/category-proportion')
     ])
     if (ov.code === 0) Object.assign(overview, ov.data)
-    if (mr.code === 0) merchantRank.value = mr.data || []
+    if (mr.code === 0) {
+      monthRankData.value = mr.data
+      availableMonths.value = mr.data.months || []
+      if (availableMonths.value.length > 0 && !activeMonth.value) {
+        activeMonth.value = availableMonths.value[0]
+      }
+    }
     if (mt.code === 0) merchantTrend.value = mt.data || []
     if (tr.code === 0) Object.assign(merchantTiers, tr.data)
     if (cm.code === 0) Object.assign(commission, cm.data)
@@ -109,7 +136,14 @@ const fetchAll = async () => {
   renderCharts()
 }
 
+const getCurrentMonthRank = () => {
+  const list = monthRankData.value.monthRankList || []
+  const found = list.find((m: any) => m.month === activeMonth.value)
+  return found ? (found.rankList || []) : []
+}
+
 const renderCharts = () => {
+  renderRankChart()
   // 入驻趋势折线图
   if (trendChartRef.value && merchantTrend.value.length > 0) {
     if (!trendChart) trendChart = echarts.init(trendChartRef.value)
@@ -154,11 +188,78 @@ const renderCharts = () => {
   }
 }
 
+const renderRankChart = () => {
+  const rankList = getCurrentMonthRank()
+  if (!rankChartRef.value || rankList.length === 0) return
+  if (!rankChart) rankChart = echarts.init(rankChartRef.value)
+
+  // 横向条形图，数据倒序（第一名在上）
+  const names = rankList.slice().reverse().map((r: any) => r.merchantName)
+  const values = rankList.slice().reverse().map((r: any) => Number(r.totalSales) || 0)
+  const colors = ['#FF6B6B', '#FFA94D', '#FFD43B', '#69DB7C', '#4DABF7']
+
+  rankChart.setOption({
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: (params: any) => {
+        const p = params[0]
+        return `${p.name}<br/>销售额: ¥${p.value.toFixed(2)}`
+      }
+    },
+    grid: { left: 100, right: 60, top: 10, bottom: 20 },
+    xAxis: {
+      type: 'value',
+      name: '销售额(¥)',
+      axisLabel: {
+        formatter: (v: number) => '¥' + (v >= 10000 ? (v / 10000).toFixed(1) + '万' : v.toFixed(0))
+      }
+    },
+    yAxis: {
+      type: 'category',
+      data: names,
+      axisLabel: { fontSize: 13, fontWeight: 'bold' },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: values.map((v: number, i: number) => ({
+        value: v,
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: colors[i] || '#409EFF' },
+            { offset: 1, color: (colors[i] || '#409EFF') + '88' }
+          ]),
+          borderRadius: [0, 6, 6, 0],
+          borderWidth: 0
+        }
+      })),
+      barWidth: 24,
+      label: {
+        show: true,
+        position: 'right',
+        fontSize: 12,
+        fontWeight: 'bold',
+        formatter: (p: any) => '¥' + p.value.toFixed(2)
+      },
+      emphasis: {
+        itemStyle: { shadowBlur: 10, shadowOffsetX: 0, shadowColor: 'rgba(0,0,0,0.2)' }
+      }
+    }]
+  }, true)
+}
+
 const refresh = () => fetchAll()
 
 onMounted(() => {
   fetchAll()
-  window.addEventListener('resize', () => { trendChart?.resize(); tiersChart?.resize(); catChart?.resize() })
+  window.addEventListener('resize', () => {
+    trendChart?.resize()
+    tiersChart?.resize()
+    catChart?.resize()
+    rankChart?.resize()
+  })
 })
 </script>
 
@@ -175,6 +276,22 @@ onMounted(() => {
 .chart-box { background: #fff; border-radius: 8px; padding: 18px; min-height: 300px; }
 .chart-box h3 { margin: 0 0 12px; font-size: 15px; }
 .line-chart, .pie-chart { width: 100%; height: 300px; }
+.bar-chart { width: 100%; height: 350px; }
+.chart-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.chart-title-row h3 { margin: 0; }
+.month-tabs { display: flex; gap: 6px; }
+.month-tab {
+  padding: 4px 14px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 13px;
+  color: #606266;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.month-tab:hover { border-color: #409EFF; color: #409EFF; }
+.month-tab.active { background: #409EFF; color: #fff; border-color: #409EFF; }
 .commission-cards { display: flex; gap: 12px; justify-content: center; margin-top: 40px; }
 .comm-card { flex: 1; text-align: center; padding: 24px 12px; border-radius: 8px; color: #fff; }
 .comm-card.income { background: linear-gradient(135deg, #409EFF, #337ECC); }

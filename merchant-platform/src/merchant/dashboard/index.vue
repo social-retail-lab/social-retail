@@ -45,6 +45,7 @@
 import { ref, reactive, onMounted, watch, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import request from '@/utils/request'
+import { ElMessage } from 'element-plus'
 
 const refreshing = ref(false)
 const metrics = reactive({ todaySales: '0.00', todayOrders: 0, activeProducts: 0 })
@@ -74,7 +75,10 @@ const fetchAll = async () => {
       salesTrend.daily = t.data.daily || []
       salesTrend.weekly = t.data.weekly || []
     }
-  } catch { /* */ }
+  } catch (e: any) {
+    console.error('[店铺看板] 数据加载失败:', e)
+    ElMessage.warning('看板数据加载失败，请稍后重试')
+  }
   refreshing.value = false
   await nextTick()
   renderCharts()
@@ -98,10 +102,29 @@ const renderCharts = () => {
   noTrendData.value = data.length === 0
   if (data.length > 0 && lineChartRef.value) {
     if (!lineChart) lineChart = echarts.init(lineChartRef.value)
+
+    // 日期格式化："07-06" → "7.6"，并拼接首尾展示区间
+    const formatDate = (d: string) => {
+      if (!d) return ''
+      const parts = d.split('-')
+      if (parts.length === 2) return parseInt(parts[0]) + '.' + parseInt(parts[1])
+      return d
+    }
+    const labels = data.map(d => formatDate(d[label]))
+    const rangeLabel = labels.length > 0 ? labels[0] + '~' + labels[labels.length - 1] : ''
+
     lineChart.setOption({
       tooltip: { trigger: 'axis' },
       grid: { left: 50, right: 20, top: 10, bottom: 40 },
-      xAxis: { type: 'category', data: data.map(d => d[label]), axisLabel: { rotate: 30, fontSize: 10 } },
+      xAxis: {
+        type: 'category',
+        data: labels,
+        axisLabel: { rotate: 0, fontSize: 10 },
+        name: trendType.value === 'daily' ? rangeLabel : '',
+        nameLocation: 'middle',
+        nameGap: 28,
+        nameTextStyle: { fontSize: 12, color: '#666', fontWeight: 500 }
+      },
       yAxis: { type: 'value', name: '销售额(元)' },
       series: [{ type: 'line', data: data.map(d => Number(d.amount)), color: '#67C23A', smooth: true, areaStyle: { opacity: 0.15 } }]
     }, true)

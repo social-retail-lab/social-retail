@@ -26,6 +26,10 @@ export const auditProduct = (productId: number, data: { auditStatus: number; aud
   return request.post(`/admin/operation/products/${productId}/audit`, data)
 }
 
+export const offShelfProduct = (productId: number, data: { reason?: string }) => {
+  return request.patch(`/admin/operation/products/${productId}/off-shelf`, data)
+}
+
 // ========== 信息变更审核 ==========
 export const getInfoChanges = (params: { auditStatus?: number; keyword?: string; pageNum?: number; pageSize?: number }) => {
   return request.get('/admin/operation/info-changes', { params })

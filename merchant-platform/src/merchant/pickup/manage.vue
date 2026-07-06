@@ -24,8 +24,8 @@
           <td>{{ item.address }}</td>
           <td>{{ item.contactPhone }}</td>
           <td>
-            <span :class="['status-tag', getAuditClass(item.auditStatus)]">
-              {{ getAuditText(item.auditStatus) }}
+            <span :class="['status-tag', getStatusClass(item.status)]">
+              {{ getStatusText(item.status) }}
             </span>
           </td>
           <td>
@@ -174,28 +174,28 @@ const cancelAdd = () => {
   showAddDialog.value = false
 }
 
-const getAuditClass = (status: number) => {
-  if (status === 0) return 'WAIT'
-  if (status === 1) return 'PASSED'
-  if (status === 2) return 'REJECTED'
-  return ''
+const getStatusClass = (status: number) => {
+  if (status === 1) return 'ENABLED'
+  if (status === 0) return 'DISABLED'
+  return 'UNKNOWN'
 }
-
-const getAuditText = (status: number) => {
-  if (status === 0) return '待审核'
-  if (status === 1) return '已通过'
-  if (status === 2) return '已驳回'
+const getStatusText = (status: number) => {
+  if (status === 1) return '营业中'
+  if (status === 0) return '已关闭'
   return '未知'
 }
 
 const fetchList = async () => {
+  console.log('[自提点管理] fetchList 开始...')
   try {
     const res = await getPickupPoints()
+    console.log('[自提点管理] 接口返回:', res)
     if (res.code === 0) {
       list.value = res.data || []
+      console.log('[自提点管理] 数据条数:', list.value.length)
     }
   } catch (e: any) {
-    console.log('[自提点列表] 异常:', e.message)
+    console.error('[自提点管理] 异常:', e.message, e)
   }
 }
 
@@ -238,6 +238,7 @@ const handleDelete = async (id: number) => {
 }
 
 onMounted(() => {
+  console.log('[自提点管理] 组件已挂载')
   fetchList()
 })
 </script>

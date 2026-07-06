@@ -24,10 +24,10 @@
     <el-table :data="list" border stripe v-loading="loading" style="width: 100%">
       <el-table-column prop="id" label="ID" width="80" align="center" />
       <el-table-column prop="merchantName" label="商家名称" min-width="160" />
-      <el-table-column prop="changeType" label="请求类型" width="180" align="center">
+      <el-table-column prop="requestType" label="请求类型" width="180" align="center">
         <template #default="{ row }">
-          <el-tag :type="row.changeType === 'QUALIFICATION_UPGRADE' ? 'warning' : 'info'" size="small">
-            {{ changeTypeMap[row.changeType] || row.changeType }}
+          <el-tag :type="row.requestType === 'QUALIFICATION_UPGRADE' ? 'warning' : 'info'" size="small">
+            {{ row.requestTypeText || changeTypeMap[row.requestType] || row.requestType || '-' }}
           </el-tag>
         </template>
       </el-table-column>

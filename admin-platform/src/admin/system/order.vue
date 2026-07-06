@@ -14,26 +14,6 @@
           <option value="REFUNDING">退款中</option>
         </select>
         <button @click="search" class="search-btn">搜索</button>
-        <button @click="exportOrders" class="export-btn">导出订单</button>
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.totalOrders }}</div>
-        <div class="stat-label">总订单数</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">¥{{ stats.totalGMV.toFixed(2) }}</div>
-        <div class="stat-label">总GMV</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.todayOrders }}</div>
-        <div class="stat-label">今日订单</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-value">{{ stats.refundRate }}%</div>
-        <div class="stat-label">退款率</div>
       </div>
     </div>
 
@@ -112,13 +92,6 @@ const totalPages = ref(1)
 const totalCount = ref(0)
 const pageSize = ref(10)
 
-const stats = ref({
-  totalOrders: 0,
-  totalGMV: 0,
-  todayOrders: 0,
-  refundRate: 0
-})
-
 const orderList = ref<Order[]>([])
 
 const getStatusText = (status: string) => {
@@ -157,10 +130,6 @@ const loadData = async () => {
 const search = () => {
   currentPage.value = 1
   loadData()
-}
-
-const exportOrders = () => {
-  alert('订单导出功能开发中...')
 }
 
 const viewDetail = async (order: Order) => {
@@ -241,42 +210,6 @@ onMounted(() => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.export-btn {
-  padding: 8px 20px;
-  background: #6B7280;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.stats-row {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.stat-card {
-  flex: 1;
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.stat-value {
-  font-size: 24px;
-  font-weight: bold;
-  color: #165DFF;
-}
-
-.stat-label {
-  font-size: 12px;
-  color: #86909C;
-  margin-top: 4px;
 }
 
 .table-container {

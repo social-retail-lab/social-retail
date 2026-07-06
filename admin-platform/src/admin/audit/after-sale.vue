@@ -155,7 +155,9 @@ const search = () => { pageNum.value = 1; loadData() }
 const loadData = async () => {
   const params: any = { pageNum: pageNum.value, pageSize: 10 }
   if (keyword.value) params.keyword = keyword.value
+  console.log('[售后申诉] 开始加载...')
   const res = await getAppealedAfterSales(params)
+  console.log('[售后申诉] 结果:', res.code, res.data)
   if (res.code === 0) {
     list.value = res.data.list || res.data.records || []
     total.value = res.data.total || list.value.length

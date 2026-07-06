@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+// 品牌搜索
+export const searchBrands = (keyword?: string) => {
+  const params: any = {}
+  if (keyword) params.keyword = keyword
+  return request.get('/merchant/brands', { params })
+}
+
 // 商品列表
 export const getGoodsList = (params: { status?: string; auditStatus?: string; pageNum?: number; pageSize?: number; keyword?: string; categoryId?: number }) => {
   return request.get('/merchant/products', { params })

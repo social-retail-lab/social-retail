@@ -196,16 +196,19 @@ const loadData = async () => {
   const tab = tabs.find(t => t.value === activeTab.value)
   const params: any = { pageNum: pageNum.value, pageSize: 10 }
   if (tab && tab.status !== undefined) params.status = tab.status
+  console.log('[售后管理] loadData 开始, params:', params)
   try {
     const res = await getAfterSaleList(params)
+    console.log('[售后管理] 接口返回:', res)
     if (res.code === 0) {
       const data = res.data
       list.value = data.list || data.records || []
+      console.log('[售后管理] 数据条数:', list.value.length)
       const total = data.total || list.value.length
       totalPages.value = Math.max(1, Math.ceil(total / 10))
     }
   } catch (e: any) {
-    console.log('[售后列表] 请求异常:', e.message)
+    console.error('[售后管理] 请求异常:', e.message, e)
   }
 }
 
@@ -270,6 +273,7 @@ const handleReturnConfirm = async (receivedStatus: number) => {
 }
 
 onMounted(() => {
+  console.log('[售后管理] 组件已挂载')
   loadData()
 })
 </script>
