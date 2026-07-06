@@ -15,7 +15,6 @@ import com.socialretail.backend.vo.QualificationRequest;
 import com.socialretail.backend.vo.QualificationVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +27,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/merchant")
 public class MerchantAuthController {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MerchantAuthController.class);
 
     @Resource
     private MerchantService merchantService;
@@ -295,3 +295,4 @@ public class MerchantAuthController {
         }
     }
 }
+

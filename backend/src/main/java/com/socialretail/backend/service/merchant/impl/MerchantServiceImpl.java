@@ -11,7 +11,7 @@ import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.member.MerchantApply;
 import com.socialretail.backend.entity.member.MerchantInfoChange;
 import com.socialretail.backend.entity.member.MerchantQualification;
-import com.socialretail.backend.entity.user.User;
+import com.socialretail.backend.entity.member.User;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.mapper.member.MerchantApplyMapper;
 import com.socialretail.backend.mapper.member.MerchantInfoChangeMapper;

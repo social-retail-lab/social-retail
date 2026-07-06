@@ -7,17 +7,17 @@ import com.socialretail.backend.vo.AdminInfoVO;
 import com.socialretail.backend.vo.LoginVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/admin/operation")
 public class AdminAuthController {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AdminAuthController.class);
 
     @Resource
     private AdminService adminService;
@@ -56,3 +56,4 @@ public class AdminAuthController {
         }
     }
 }
+

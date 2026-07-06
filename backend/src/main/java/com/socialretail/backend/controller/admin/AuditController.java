@@ -11,7 +11,6 @@ import com.socialretail.backend.vo.MerchantApplicationListVO;
 import com.socialretail.backend.vo.MerchantListVO;
 import com.socialretail.backend.vo.ProductAuditListVO;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,10 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/admin/operation")
 public class AuditController {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AuditController.class);
 
     @Resource
     private AuditService auditService;
@@ -250,3 +250,4 @@ public class AuditController {
         }
     }
 }
+

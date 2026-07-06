@@ -16,7 +16,6 @@ import com.socialretail.backend.vo.StockUpdateRequest;
 import com.socialretail.backend.vo.StockUpdateVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,10 +39,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/merchant")
 public class MerchantGoodsController {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MerchantGoodsController.class);
 
     @Resource
     private MerchantProductService merchantProductService;
@@ -116,7 +116,7 @@ public class MerchantGoodsController {
             File dest = dirPath.resolve(newFileName).toFile();
             file.transferTo(dest);
 
-            String url = baseUrl + "/uploads/images/" + dateDir + "/" + newFileName;
+            String url = baseUrl + "/static/images/" + dateDir + "/" + newFileName;
             Map<String, String> result = Map.of("url", url, "fileName", newFileName);
             log.info("[图片上传] 成功, url={}", url);
             return Result.ok("上传成功", result);
@@ -266,3 +266,4 @@ public class MerchantGoodsController {
         }
     }
 }
+

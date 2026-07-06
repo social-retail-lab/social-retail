@@ -29,8 +29,10 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         "/api/merchant/auth/login",
+                        "/api/merchant/notifications/**",
                         "/api/admin/operation/auth/login",
                         "/api/admin/system/auth/login",
+                        "/api/admin/notifications/**",
                         "/api/user/sms/**"
                 );
     }
@@ -47,14 +49,17 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 映射上传目录为静态资源，使用绝对路径避免 Tomcat temp 目录问题
+        // 映射static目录为静态资源，使用绝对路径
         Path basePath;
         if (uploadPath != null && !uploadPath.isEmpty()) {
             basePath = Paths.get(uploadPath).toAbsolutePath();
         } else {
-            basePath = Paths.get(System.getProperty("user.dir"), "uploads").toAbsolutePath();
+            basePath = Paths.get(System.getProperty("user.dir"), "src", "main", "resources", "static").toAbsolutePath();
         }
+        String basePathStr = "file:" + basePath.toString().replace("\\", "/") + "/";
+        registry.addResourceHandler("/static/**")
+                .addResourceLocations(basePathStr);
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:" + basePath.toString().replace("\\", "/") + "/");
+                .addResourceLocations(basePathStr);
     }
 }

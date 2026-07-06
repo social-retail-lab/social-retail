@@ -1,6 +1,6 @@
 package com.socialretail.backend.controller.admin;
 
-import com.socialretail.backend.common.result.Result;
+import com.socialretail.backend.common.Result;
 import com.socialretail.backend.entity.promotion.Coupon;
 import com.socialretail.backend.service.promotion.CouponService;
 import org.springframework.web.bind.annotation.*;

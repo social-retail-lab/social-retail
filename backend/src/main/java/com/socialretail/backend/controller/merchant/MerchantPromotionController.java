@@ -1,6 +1,6 @@
 package com.socialretail.backend.controller.merchant;
 
-import com.socialretail.backend.common.result.Result;
+import com.socialretail.backend.common.Result;
 import com.socialretail.backend.entity.promotion.MerchantCoupon;
 import com.socialretail.backend.service.merchant.MerchantCouponService;
 import com.socialretail.backend.service.promotion.PromotionService;
