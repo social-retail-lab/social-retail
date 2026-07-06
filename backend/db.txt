@@ -1,0 +1,9 @@
+良品铺子七彩蔬菜干
+干脆果蔬零食，七种果蔬，0添加色素
+
+ALTER TABLE seckill_product 
+  ADD COLUMN create_time DATETIME DEFAULT NULL COMMENT '创建时间',
+  ADD COLUMN update_time DATETIME DEFAULT NULL COMMENT '更新时间';
+
+
+ALTER TABLE product ADD COLUMN force_off_shelf TINYINT DEFAULT 0 COMMENT '管理员强制下架标记 0-正常 1-强制下架不可恢复' AFTER status;
