@@ -2,7 +2,7 @@ package com.socialretail.backend.controller.admin;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.socialretail.backend.common.result.Result;
+import com.socialretail.backend.common.Result;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.promotion.*;
 import com.socialretail.backend.mapper.product.ProductMapper;

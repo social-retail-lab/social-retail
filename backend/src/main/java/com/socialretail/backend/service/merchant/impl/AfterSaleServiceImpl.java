@@ -13,7 +13,6 @@ import com.socialretail.backend.mapper.order.*;
 import com.socialretail.backend.mapper.system.NotificationMapper;
 import com.socialretail.backend.mapper.user.UserMapper;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +22,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 public class AfterSaleServiceImpl {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AfterSaleServiceImpl.class);
 
     @Resource
     private AfterSaleMapper afterSaleMapper;
@@ -565,3 +565,4 @@ public class AfterSaleServiceImpl {
         return timeline;
     }
 }
+
