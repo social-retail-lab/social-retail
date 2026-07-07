@@ -561,11 +561,28 @@ const loadGoods = async () => {
 
     let result = await loadSearchProducts(params)
 
-    // 智能降级搜索:完整关键词无结果且关键词长度 >= 4 时,分词并发搜索
-    if (page.value === 1 && result.list && result.list.length === 0 && keyword.value.length >= 4) {
-      const fallbackResult = await fallbackSearch(params)
-      if (fallbackResult.list.length > 0) {
-        result = fallbackResult
+    // 智能降级搜索:当关键词长度 >= 4 时,检查返回结果是否与关键词相关
+    // 如果结果为空或结果中没有包含关键词中核心词的商品,触发降级搜索
+    const shouldFallback = page.value === 1 && keyword.value.length >= 4
+    if (shouldFallback) {
+      // 提取关键词中的所有2字词作为核心词
+      const coreWords = []
+      for (let i = 0; i < keyword.value.length - 1; i++) {
+        coreWords.push(keyword.value.substring(i, i + 2))
+      }
+      
+      // 检查返回的商品名是否包含任何核心词
+      const hasRelevantResult = result.list && result.list.length > 0 &&
+        result.list.some(item => {
+          const productName = item.productName || item.name || ''
+          return coreWords.some(word => productName.includes(word))
+        })
+      
+      if (!hasRelevantResult) {
+        const fallbackResult = await fallbackSearch(params)
+        if (fallbackResult.list.length > 0) {
+          result = fallbackResult
+        }
       }
     }
 

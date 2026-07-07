@@ -150,8 +150,12 @@ const filterMerchantId = ref(null)
 const currentPage = ref(1)
 const pageSize = 10
 
-// 优惠券列表(从 store 获取)
-const couponList = computed(() => couponStore.myCouponList)
+// 优惠券列表(从 store 获取，按当前 tab 状态过滤)
+const couponList = computed(() => {
+  return couponStore.myCouponList.filter(coupon =>
+    Number(coupon.status) === activeStatus.value
+  )
+})
 
 // 是否还有更多
 const hasMore = computed(() => currentPage.value < couponStore.couponPages)
@@ -245,10 +249,10 @@ const handleCouponClick = (coupon) => {
   })
 }
 
-// 去领券(跳转优惠券中心)
+// 去领券(跳转积分商城)
 const goGetCoupon = () => {
   uni.navigateTo({
-    url: '/pagesSub/promotion/coupon/couponCenter',
+    url: '/pagesSub/member/point/pointMall',
     animationType: 'slide-in-right',
     animationDuration: 200
   })

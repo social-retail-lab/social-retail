@@ -354,13 +354,18 @@
 
 <script setup>
 import { computed } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import { useMine } from '@/hooks/useMine'
+import { useDistributor } from '@/hooks/useDistributor'
 import { useUserStore } from '@/store/user'
 import { useMemberStore } from '@/store/member'
+import { useTabBarStore } from '@/store/tabBar'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
 
 const userStore = useUserStore()
 const memberStore = useMemberStore()
+const tabBarStore = useTabBarStore()
+const { smartGoDistributor } = useDistributor()
 
 const {
   loading,
@@ -470,11 +475,9 @@ const handleOrder = (type) => {
 
 const handleDistribution = () => {
   if (!userStore.isLogin) return handleLogin()
-  if (userStore.isDistributor) {
-    uni.showToast({ title: '进入分销中心', icon: 'none' })
-  } else {
-    uni.showToast({ title: '申请成为分销员', icon: 'none' })
-  }
+  // 智能跳转：根据当前用户分销员状态自动跳转对应页面
+  // 未申请 → 申请页 / 待审核·已拒绝 → 结果页 / 审核通过 → 工作台
+  smartGoDistributor()
 }
 
 const handleMessageCenter = () => {
@@ -496,6 +499,11 @@ const handleService = () => {
   if (!userStore.isLogin) return handleLogin()
   uni.showToast({ title: '专属客服', icon: 'none' })
 }
+
+// 页面显示时同步TabBar选中状态(修复switchTab后图标不同步)
+onShow(() => {
+  tabBarStore.updateCurrentIndex()
+})
 </script>
 
 <style lang="scss" scoped>

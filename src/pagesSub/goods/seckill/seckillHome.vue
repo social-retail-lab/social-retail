@@ -406,8 +406,9 @@ const handleBuy = async (item) => {
   }
 
   // 校验通过，跳转确认订单页面（秒杀商品通过 productId + skuId 加入购物车）
+  // 传递 seckillProductId 作为活动上下文，后端据此匹配秒杀价格
   uni.navigateTo({
-    url: `/pagesSub/order/confirmOrder?source=buyNow&productId=${item.productId}&skuId=${item.skuId}&quantity=1`
+    url: `/pagesSub/order/confirmOrder?source=buyNow&productId=${item.productId}&skuId=${item.skuId}&quantity=1&seckillProductId=${item.seckillProductId}`
   })
 }
 

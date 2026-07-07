@@ -27,11 +27,8 @@
         @click="handleBannerClick"
       />
 
-      <!-- 分类快捷入口 -->
-      <category-entry
-        :categories="categories"
-        @select="handleCategorySelect"
-      />
+      <!-- 分类快捷入口（金刚区） -->
+      <category-entry />
 
       <!-- 限时秒杀活动 -->
       <seckill-activity
@@ -66,6 +63,8 @@
  * 功能：轮播图展示、分类快捷入口、限时秒杀活动入口、商品推荐列表
  */
 import { ref, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useTabBarStore } from '@/store/tabBar'
 import { useHome } from '@/hooks/useHome'
 
 // 导入组件
@@ -79,7 +78,6 @@ import CustomTabBar from '@/components/global/CustomTabBar.vue'
 // 使用首页Hook
 const {
   banners,
-  categories,
   seckillData,
   recommendGoods,
   loading,
@@ -91,6 +89,8 @@ const {
   onPageScroll
 } = useHome()
 
+const tabBarStore = useTabBarStore()
+
 // 下拉刷新状态
 const refreshing = ref(false)
 
@@ -99,6 +99,11 @@ const refreshing = ref(false)
 onMounted(() => {
   // 获取首页数据
   fetchHomeData()
+})
+
+// 页面显示时同步TabBar选中状态(修复switchTab后图标不同步)
+onShow(() => {
+  tabBarStore.updateCurrentIndex()
 })
 
 // ============ 事件处理 ============
@@ -145,12 +150,6 @@ const handleMessage = () => {
 const handleBannerClick = (banner, index) => {
   console.log('点击Banner', banner, index)
   // 跳转逻辑在BannerSwiper组件内处理
-}
-
-// 选择分类
-const handleCategorySelect = (category) => {
-  console.log('选择分类', category)
-  // 跳转逻辑在CategoryEntry组件内处理
 }
 
 // 选择秒杀商品

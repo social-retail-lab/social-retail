@@ -60,22 +60,30 @@
           </view>
 
           <view class="order-goods">
-            <view class="goods-thumbnails">
-              <view
-                v-for="(item, index) in order.itemList.slice(0, 3)"
-                :key="index"
-                class="thumbnail-item"
-              >
-                <image
-                  :src="getValidImageUrl(item.productImage)"
-                  class="thumbnail-image"
-                  mode="aspectFill"
-                />
-                <view v-if="index === 2 && order.itemList.length > 3" class="thumbnail-more">
-                  <text>+{{ order.itemList.length - 3 }}</text>
+            <!-- 整单合并展示：所有商品横向滚动展示，不拆分订单 -->
+            <scroll-view scroll-x class="goods-scroll" :show-scrollbar="false">
+              <view class="goods-row">
+                <view
+                  v-for="item in order.itemList"
+                  :key="item.orderItemId || item.productId"
+                  class="goods-item"
+                >
+                  <image
+                    :src="getValidImageUrl(item.productImage)"
+                    class="goods-image"
+                    mode="aspectFill"
+                  />
+                  <view class="goods-info">
+                    <text class="goods-name">{{ item.productName }}</text>
+                    <text v-if="item.skuSpecs" class="goods-spec">{{ item.skuSpecs }}</text>
+                    <view class="goods-price-row">
+                      <text class="goods-price">¥{{ formatPrice(item.finalPrice || item.price) }}</text>
+                      <text class="goods-qty">×{{ item.quantity }}</text>
+                    </view>
+                  </view>
                 </view>
               </view>
-            </view>
+            </scroll-view>
             <view class="goods-summary">
               <text class="summary-text">共计 {{ getTotalQuantity(order) }} 件商品</text>
             </view>
@@ -615,40 +623,79 @@ onMounted(() => {
 .order-goods {
   padding: 24rpx;
 
-  .goods-thumbnails {
-    display: flex;
-    gap: 16rpx;
+  .goods-scroll {
+    width: 100%;
+    white-space: nowrap;
   }
 
-  .thumbnail-item {
-    position: relative;
-    width: 160rpx;
-    height: 160rpx;
-    flex-shrink: 0;
+  .goods-row {
+    display: inline-flex;
+    gap: 16rpx;
+    padding-bottom: 4rpx;
+  }
 
-    .thumbnail-image {
-      width: 100%;
-      height: 100%;
-      border-radius: 16rpx;
-      background: $bg-page-light;
+  .goods-item {
+    display: inline-flex;
+    width: 280rpx;
+    padding: 16rpx;
+    background: $bg-page-light;
+    border-radius: 8rpx;
+    flex-shrink: 0;
+    box-sizing: border-box;
+
+    .goods-image {
+      width: 120rpx;
+      height: 120rpx;
+      border-radius: 6rpx;
+      background: $bg-card;
+      flex-shrink: 0;
+      margin-right: 16rpx;
     }
 
-    .thumbnail-more {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      border-radius: 16rpx;
+    .goods-info {
+      flex: 1;
+      min-width: 0;
       display: flex;
-      align-items: center;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
 
-      text {
-        color: #FFFFFF;
-        font-size: 32rpx;
-        font-weight: 600;
+      .goods-name {
+        font-size: 26rpx;
+        color: $text-main;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .goods-spec {
+        font-size: 22rpx;
+        color: $text-weak;
+        margin-top: 4rpx;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .goods-price-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-top: 4rpx;
+
+        .goods-price {
+          font-size: 26rpx;
+          color: $color-primary-danger;
+          font-weight: 500;
+        }
+
+        .goods-qty {
+          font-size: 22rpx;
+          color: $text-weak;
+        }
       }
     }
   }

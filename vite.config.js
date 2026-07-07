@@ -10,19 +10,11 @@ export default defineConfig({
     }
   },
   server: {
-    host: "0.0.0.0",
-    allowedHosts: [
-      'j8b3daa4.natappfree.cc',
-      'localhost',
-      '127.0.0.1'
-    ],
+    host: '0.0.0.0',
+    port: 5173,
+    allowedHosts: ['j8b3daa4.natappfree.cc'],
     proxy: {
       '/api': {
-        target: 'http://172.20.10.11:8081',
-        changeOrigin: true,
-        secure: false
-      },
-      '/static': {
         target: 'http://172.20.10.11:8081',
         changeOrigin: true,
         secure: false

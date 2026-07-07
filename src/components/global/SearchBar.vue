@@ -1,11 +1,5 @@
 <template>
   <view class="search-bar" :class="{ 'search-bar-fixed': fixed }">
-    <!-- 左侧分类入口 -->
-    <view class="category-btn" @click="handleCategory">
-      <text class="icon-menu">☰</text>
-      <text class="category-text">分类</text>
-    </view>
-
     <!-- 中间搜索框 -->
     <view class="search-input" @click="handleSearch">
       <image src="/static/fonts/search.svg" class="icon-search" mode="aspectFit" />
@@ -44,16 +38,7 @@ const props = defineProps({
 })
 
 // Emits定义
-const emit = defineEmits(['category', 'search', 'message'])
-
-// 点击分类入口
-const handleCategory = () => {
-  emit('category')
-  // 跳转到分类页面
-  uni.navigateTo({
-    url: '/pagesSub/goods/category/categoryHome'
-  })
-}
+const emit = defineEmits(['search', 'message'])
 
 // 点击搜索框
 const handleSearch = () => {
@@ -102,44 +87,13 @@ const handleMessage = () => {
   }
 }
 
-// 分类入口按钮
-.category-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 84rpx;
-  height: 72rpx;
-  background: linear-gradient(135deg, rgba(255, 106, 0, 0.08) 0%, rgba(255, 77, 79, 0.05) 100%);
-  border-radius: $radius-md;
-  transition: all $duration-fast $ease-out-quart;
-
-  &:active {
-    transform: scale(0.92);
-    opacity: 0.85;
-    background: linear-gradient(135deg, rgba(255, 106, 0, 0.16) 0%, rgba(255, 77, 79, 0.10) 100%);
-  }
-
-  .icon-menu {
-    font-size: 30rpx;
-    color: $color-primary;
-    margin-bottom: 4rpx;
-  }
-
-  .category-text {
-    font-size: 20rpx;
-    color: $text-sub;
-    font-weight: 500;
-  }
-}
-
 // 搜索输入框
 .search-input {
   flex: 1;
   display: flex;
   align-items: center;
   height: 72rpx;
-  margin: 0 20rpx;
+  margin: 0 20rpx 0 0;
   padding: 0 24rpx;
   background: $neutral-100;
   border: 2rpx solid transparent;

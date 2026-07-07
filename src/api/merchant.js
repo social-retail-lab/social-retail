@@ -291,3 +291,43 @@ export const receiveMerchantCouponApi = (couponId) => {
     throw error
   })
 }
+
+/**
+ * 2.9.7 查询商家自提点列表
+ * GET /api/merchants/{merchantId}/pickup-points
+ * 查询指定商家的可用自提点列表，用于用户在订单确认页选择自提方式时展示
+ */
+export const getPickupPointsApi = (merchantId) => {
+  if (!merchantId) {
+    return Promise.reject(new Error('商家ID不能为空'))
+  }
+
+  return request({
+    url: `/api/merchants/${merchantId}/pickup-points`,
+    method: 'get'
+  }).then(response => {
+    if (response.code === 0) {
+      return {
+        ...response,
+        data: Array.isArray(response.data) ? response.data.map(normalizePickupPoint) : []
+      }
+    }
+    return response
+  }).catch(error => {
+    console.error('获取自提点列表失败:', error)
+    throw error
+  })
+}
+
+const normalizePickupPoint = (item) => {
+  return {
+    pickupPointId: item.pickupPointId || null,
+    merchantId: item.merchantId || null,
+    name: item.name || '',
+    address: item.address || '',
+    contactPhone: item.contactPhone || '',
+    businessHours: item.businessHours || '',
+    image: item.image || ''
+  }
+}
+

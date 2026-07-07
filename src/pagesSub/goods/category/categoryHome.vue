@@ -105,6 +105,8 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
+import { useTabBarStore } from '@/store/tabBar'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
 import EmptyView from '@/components/global/EmptyView.vue'
 import { useGoods } from '@/hooks/useGoods'
@@ -120,6 +122,8 @@ const finished = ref(false)
 const loading = ref(false)
 
 const { loadCategoryTree, loadCategoryProducts } = useGoods()
+
+const tabBarStore = useTabBarStore()
 
 const firstLevelCategories = computed(() => {
   return categoryTree.value.filter(item => item.level === 1)
@@ -254,12 +258,24 @@ const onScrollToLower = () => {
   loadCategoryGoods(activeSecondCategoryId.value)
 }
 
-const initPage = async () => {
+const initPage = async (targetCategoryName = '') => {
   try {
     const list = await loadCategoryTree()
     if (list.length > 0) {
       categoryTree.value = list
-      const firstCategory = list.find(item => item.level === 1)
+
+      // 优先按首页金刚区传入的分类名匹配
+      let firstCategory = null
+      if (targetCategoryName) {
+        firstCategory = list.find(item =>
+          item.level === 1 && item.categoryName && item.categoryName.includes(targetCategoryName)
+        )
+      }
+      // 兜底：取第一个一级分类
+      if (!firstCategory) {
+        firstCategory = list.find(item => item.level === 1)
+      }
+
       if (firstCategory) {
         activeFirstCategoryId.value = firstCategory.categoryId
         if (firstCategory.children && firstCategory.children.length > 0) {
@@ -274,7 +290,28 @@ const initPage = async () => {
 }
 
 onMounted(() => {
-  initPage()
+  // 首次加载检查是否有首页金刚区传入的待选分类
+  const pendingName = tabBarStore.consumePendingCategoryName()
+  initPage(pendingName)
+})
+
+// 页面显示时同步TabBar选中状态(修复switchTab后图标不同步)
+// 同时检查是否有新的待选分类（从首页金刚区点击跳转过来）
+onShow(() => {
+  tabBarStore.updateCurrentIndex()
+
+  const pendingName = tabBarStore.consumePendingCategoryName()
+  if (pendingName) {
+    // 已有分类树数据时直接切换，否则重新加载
+    const matched = categoryTree.value.find(item =>
+      item.level === 1 && item.categoryName && item.categoryName.includes(pendingName)
+    )
+    if (matched) {
+      handleFirstCategorySelect(matched)
+    } else if (categoryTree.value.length === 0) {
+      initPage(pendingName)
+    }
+  }
 })
 </script>
 

@@ -82,6 +82,13 @@
         "navigationStyle": "custom",
         "navigationBarTitleText": "修改登录密码"
       }
+    },
+    {
+      "path": "pages/product/detail",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "商品详情"
+      }
     }
   ],
   "globalStyle": {
@@ -299,6 +306,27 @@
             "navigationStyle": "custom",
             "navigationBarTitleText": "售后详情"
           }
+        },
+        {
+          "path": "comment/postComment",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "发布评价"
+          }
+        },
+        {
+          "path": "comment/myComments",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的评价"
+          }
+        },
+        {
+          "path": "comment/commentDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "评价详情"
+          }
         }
       ]
     },
@@ -353,6 +381,34 @@
           }
         },
         {
+          "path": "applyResult",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "申请结果"
+          }
+        },
+        {
+          "path": "products",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "可推广商品"
+          }
+        },
+        {
+          "path": "myProducts",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "我的推广"
+          }
+        },
+        {
+          "path": "productDetail",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "推广详情"
+          }
+        },
+        {
           "path": "commission/commissionRecord",
           "style": {
             "navigationStyle": "custom",
@@ -364,6 +420,20 @@
           "style": {
             "navigationStyle": "custom",
             "navigationBarTitleText": "提现申请"
+          }
+        },
+        {
+          "path": "commission/orders",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "推广订单"
+          }
+        },
+        {
+          "path": "commission/withdrawRecords",
+          "style": {
+            "navigationStyle": "custom",
+            "navigationBarTitleText": "提现记录"
           }
         },
         {

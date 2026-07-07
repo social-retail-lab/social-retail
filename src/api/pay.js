@@ -132,7 +132,8 @@ export const mockPaySuccessApi = (data) => {
     return response
   }).catch(error => {
     const errorCodeMap = {
-      40925: '支付金额与订单应付金额不一致'
+      40925: '支付金额与订单应付金额不一致',
+      40931: '自提点不可用或不属于当前商家'
     }
     if (errorCodeMap[error?.code]) {
       console.error(`模拟支付错误[${error.code}]:`, errorCodeMap[error.code])
@@ -183,7 +184,13 @@ const normalizeMockPayData = (data) => {
     orderStatus: data.orderStatus || '',
     payAmount: Number(data.payAmount) || 0,
     payTime: data.payTime || '',
-    failReason: data.failReason || ''
+    failReason: data.failReason || '',
+    // 配送方式：1-配送，2-自提
+    deliveryType: Number(data.deliveryType) || 1,
+    // 自提点ID（配送订单为 null）
+    pickupPointId: data.pickupPointId || null,
+    // 六位自提码（仅自提订单返回，配送订单为 null）
+    pickupCode: data.pickupCode || ''
   }
 }
 

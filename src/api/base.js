@@ -42,19 +42,12 @@ const request = (options) => {
 
   const requestHeader = { ...defaultHeader, ...headers }
 
-  // uni.request 不支持 params 参数,只支持 data
-  // 对于 GET 请求,data 会作为 query string 拼接到 URL 上
-  // 这里把 params 合并到 data 中,兼容 axios 风格的调用
-  const upperMethod = (method || 'GET').toUpperCase()
-  const requestData = upperMethod === 'GET'
-    ? { ...params, ...data }
-    : data
-
   return new Promise((resolve, reject) => {
     uni.request({
       url: `${baseUrl}${url}`,
-      method: upperMethod,
-      data: requestData,
+      method,
+      data,
+      params,
       header: requestHeader,
       success: (res) => {
         const { data: responseData, statusCode } = res

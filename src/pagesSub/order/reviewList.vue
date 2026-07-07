@@ -148,18 +148,20 @@ const switchTab = (key) => {
   fetchReviews()
 }
 
-// 将订单列表项展开为可评价的商品项
+// 将订单列表项展开为可评价的商品项（按单品明细展示）
 const flattenOrderItems = (orderList) => {
   const items = []
   orderList.forEach(order => {
     if (Array.isArray(order.itemList)) {
       order.itemList.forEach(item => {
         items.push({
-          id: `${order.orderId}_${item.productId}`,
+          id: `${order.orderId}_${item.orderItemId}`,
           orderId: order.orderId,
+          orderItemId: item.orderItemId,
           orderSn: order.orderSn,
           orderTime: order.createTime || '',
           productId: item.productId,
+          skuId: item.skuId || '',
           productName: item.productName || '',
           productImage: item.productImage || '',
           skuSpecs: item.skuSpecs || '',
@@ -238,7 +240,18 @@ const onLoadMore = () => {
 }
 
 const handleWriteReview = (item) => {
-  uni.navigateTo({ url: `/pagesSub/goods/detail/reviewPublish?orderId=${item.orderId}&productId=${item.productId}` })
+  const commentParams = {
+    orderId: item.orderId,
+    orderItemId: item.orderItemId,
+    productId: item.productId,
+    skuId: item.skuId || null,
+    productName: item.productName || '',
+    productImage: item.productImage || '',
+    skuSpecs: item.skuSpecs || '',
+    finalPrice: item.finalPrice || 0
+  }
+  uni.setStorageSync('tempCommentParams', JSON.stringify(commentParams))
+  uni.navigateTo({ url: '/pagesSub/order/comment/postComment' })
 }
 
 watch(activeTab, () => {

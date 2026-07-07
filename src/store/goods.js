@@ -27,8 +27,8 @@ export const useGoodsStore = defineStore('goods', () => {
     return { list: [], total: 0, pages: 0, page: 1, pageSize: 10 }
   }
 
-  const fetchProductDetail = async (productId) => {
-    const res = await getProductDetailApi(productId)
+  const fetchProductDetail = async (productId, promotionCode = null) => {
+    const res = await getProductDetailApi(productId, promotionCode)
     if (res.code === 0 && res.data) {
       productDetail.value = res.data
       return res.data

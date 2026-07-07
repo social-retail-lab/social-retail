@@ -49,7 +49,12 @@ const normalizeCartItem = (item) => {
     invalidReason: item.invalidReason || null,
     merchantId: item.merchantId || null,
     merchantName: item.merchantName || '',
-    itemAmount: Number(item.itemAmount) || 0
+    itemAmount: Number(item.itemAmount) || 0,
+    // 分销相关字段
+    distributorProductId: item.distributorProductId || null,
+    promotionCode: item.promotionCode || '',
+    commissionRate: Number(item.commissionRate) || 0,
+    promotionExpiresAt: item.promotionExpiresAt || ''
   }
 }
 
@@ -93,16 +98,23 @@ const validateAddCartParams = (data) => {
   if (!data?.skuId) {
     throw new Error('商品SKU不能为空')
   }
-  
+
   const quantity = Number(data?.quantity) || 1
   if (quantity <= 0) {
     throw new Error('加入数量必须大于0')
   }
-  
-  return {
+
+  const params = {
     skuId: data.skuId,
     quantity
   }
+
+  // 携带推广码（可选）：推广归因从加入购物车开始保留 7 天
+  if (data.promotionCode) {
+    params.promotionCode = data.promotionCode
+  }
+
+  return params
 }
 
 const handleAddCartError = (error) => {

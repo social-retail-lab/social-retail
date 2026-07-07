@@ -13,7 +13,7 @@
     <!-- 搜索栏(2.9.6 商家主页搜索商品) -->
     <view v-if="merchantHome" class="search-bar">
       <view class="search-input-wrap">
-        <text class="search-icon">🔍</text>
+        <image class="search-icon" src="/static/fonts/search.svg" mode="aspectFit" />
         <input
           class="search-input"
           type="text"
@@ -168,7 +168,6 @@
       <view v-if="merchantHome.recommendProducts && merchantHome.recommendProducts.length > 0" class="section recommend-section">
         <view class="section-header">
           <text class="section-title">店铺推荐</text>
-          <text class="section-more">查看全部 ›</text>
         </view>
         <scroll-view scroll-x class="recommend-scroll" :show-scrollbar="false">
           <view class="recommend-list">
@@ -571,9 +570,10 @@ onUnload(() => {
   }
 
   .search-icon {
-    font-size: 26rpx;
+    width: 32rpx;
+    height: 32rpx;
     margin-right: 12rpx;
-    opacity: 0.6;
+    opacity: 0.5;
     flex-shrink: 0;
   }
 

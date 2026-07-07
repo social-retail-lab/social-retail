@@ -90,14 +90,15 @@ export const searchProductsApi = (params = {}) => {
   })
 }
 
-export const getProductDetailApi = (productId) => {
+export const getProductDetailApi = (productId, promotionCode = null) => {
   if (!productId) {
     return Promise.reject(new Error('商品ID不能为空'))
   }
-  
+
   return request({
     url: `/api/products/${productId}`,
-    method: 'get'
+    method: 'get',
+    params: promotionCode ? { promotionCode } : undefined
   }).then(response => {
     if (response.code === 0) {
       return {
@@ -108,7 +109,8 @@ export const getProductDetailApi = (productId) => {
     return response
   }).catch(error => {
     const errorCodeMap = {
-      40402: '商品不存在或已下架'
+      40402: '商品不存在或已下架',
+      40464: '推广码不存在、已失效或与当前商品不匹配'
     }
     if (errorCodeMap[error?.code]) {
       console.error(`获取商品详情错误[${error.code}]:`, errorCodeMap[error.code])
@@ -135,6 +137,24 @@ const normalizeProductDetailData = (data) => {
     stock: Number(data.stock) || 0,
     status: data.status || '',
     tags: Array.isArray(data.tags) ? data.tags : [],
+    // 评价相关字段
+    ratingScore: Number(data.ratingScore) || 0,
+    commentCount: Number(data.commentCount) || 0,
+    latestComments: Array.isArray(data.latestComments) ? data.latestComments.map(c => ({
+      commentId: c.commentId || null,
+      userId: c.userId || null,
+      nickname: c.nickname || '',
+      avatar: c.avatar || '',
+      score: Number(c.score) || 0,
+      content: c.content || '',
+      images: Array.isArray(c.images) ? c.images : [],
+      anonymous: Number(c.anonymous) || 0,
+      createTime: c.createTime || ''
+    })) : [],
+    // 分销相关字段
+    distributorProductId: data.distributorProductId || null,
+    promotionCode: data.promotionCode || '',
+    promotionExpiresAt: data.promotionExpiresAt || '',
     merchantInfo: data.merchantInfo ? {
       merchantId: data.merchantInfo.merchantId || null,
       merchantName: data.merchantInfo.merchantName || '',

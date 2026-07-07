@@ -14,8 +14,24 @@
       :refresher-enabled="false"
       :scroll-with-animation="true"
     >
+      <!-- 加载中状态 -->
+      <view v-if="orderHook.previewLoading.value && !previewData.itemList.length" class="loading-state">
+        <view class="loading-spinner"></view>
+        <text class="loading-text">订单预览中...</text>
+      </view>
+
+      <!-- 加载失败状态 -->
+      <view v-else-if="previewError && !previewData.itemList.length" class="error-state">
+        <text class="error-icon">⚠</text>
+        <text class="error-title">订单预览失败</text>
+        <text class="error-desc">{{ previewError }}</text>
+        <view class="retry-btn" @click="retryPreview">
+          <text class="retry-text">重新加载</text>
+        </view>
+      </view>
+
       <!-- 模块1: 配送方式切换 -->
-      <view class="delivery-tabs">
+      <view v-else class="delivery-tabs">
         <view
           class="delivery-tab"
           :class="{ 'tab-active': deliveryType === 1 }"
@@ -87,7 +103,7 @@
             />
             <view class="goods-info">
               <text class="goods-name">{{ item.productName }}</text>
-              <text v-if="item.skuSpecs" class="goods-sku">{{ item.skuSpecs }}</text>
+              <text v-if="item.skuSpecs" class="goods-sku">{{ formatSkuSpecs(item.skuSpecs) }}</text>
               <view class="goods-bottom">
                 <view class="goods-price-wrap">
                   <text
@@ -405,6 +421,57 @@
         </scroll-view>
       </view>
     </view>
+
+    <!-- 自提点选择弹窗 -->
+    <view
+      v-if="showPickupPopup"
+      class="popup-mask"
+      @click="showPickupPopup = false"
+    >
+      <view class="coupon-popup" @click.stop>
+        <view class="popup-header">
+          <text class="popup-title">选择自提点</text>
+          <text class="popup-close" @click="showPickupPopup = false">×</text>
+        </view>
+        <scroll-view scroll-y class="coupon-scroll">
+          <!-- 加载中 -->
+          <view v-if="pickupLoading" class="coupon-loading">
+            <text>加载中...</text>
+          </view>
+          <!-- 自提点列表 -->
+          <template v-else>
+            <view
+              v-for="point in pickupPointList"
+              :key="point.pickupPointId"
+              class="pickup-point-item"
+              :class="{ 'pickup-point-active': pickupPointId === point.pickupPointId }"
+              @click="onPickupPointSelected(point)"
+            >
+              <view class="pickup-point-header">
+                <text class="pickup-point-name">{{ point.name }}</text>
+                <view
+                  v-if="pickupPointId === point.pickupPointId"
+                  class="pickup-point-check"
+                >✓</view>
+              </view>
+              <text class="pickup-point-address">{{ point.address }}</text>
+              <view v-if="point.businessHours" class="pickup-point-row">
+                <text class="pickup-point-label">营业时间：</text>
+                <text class="pickup-point-value">{{ point.businessHours }}</text>
+              </view>
+              <view v-if="point.contactPhone" class="pickup-point-row">
+                <text class="pickup-point-label">联系电话：</text>
+                <text class="pickup-point-value">{{ point.contactPhone }}</text>
+              </view>
+            </view>
+            <!-- 空状态 -->
+            <view v-if="!pickupLoading && pickupPointList.length === 0" class="coupon-empty">
+              <text class="empty-text">该商家暂无自提点</text>
+            </view>
+          </template>
+        </scroll-view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -442,6 +509,11 @@ const activityContext = ref({})
 
 const showPlatformCouponPopup = ref(false)
 const showMerchantCouponPopup = ref(false)
+
+// 自提点选择
+const showPickupPopup = ref(false)
+const pickupLoading = ref(false)
+const pickupPointList = ref([])
 
 // 4.3.4 预览订单可用优惠券
 const couponHook = useCoupon()
@@ -503,6 +575,9 @@ const previewData = ref({
 const addressInfo = ref(null)
 const pickupPointInfo = ref(null)
 
+// 预览错误信息（503/网络异常等）
+const previewError = ref('')
+
 // ==================== 计算属性 ====================
 // 可用优惠券数量:优先使用 4.3.4 返回的数据(过滤 available=true),否则用预览接口数据
 const availablePlatformCouponCount = computed(() => {
@@ -550,6 +625,20 @@ const formatPrice = (price) => {
   return (Number(price) || 0).toFixed(2)
 }
 
+// 格式化 SKU 规格（API 返回 JSON 字符串，需解析为可读文本）
+const formatSkuSpecs = (skuSpecs) => {
+  if (!skuSpecs) return ''
+  try {
+    const parsed = typeof skuSpecs === 'string' ? JSON.parse(skuSpecs) : skuSpecs
+    if (parsed && typeof parsed === 'object') {
+      return Object.values(parsed).join(' / ')
+    }
+    return String(parsed)
+  } catch (e) {
+    return skuSpecs
+  }
+}
+
 const handleBack = () => {
   uni.navigateBack()
 }
@@ -591,10 +680,10 @@ const onAddressSelected = (data) => {
   addressId.value = data.addressId
   addressInfo.value = {
     addressId: data.addressId,
-    receiverName: data.receiverName,
-    receiverPhone: data.receiverPhone,
+    receiverName: data.receiverName || data.consignee || '',
+    receiverPhone: data.receiverPhone || data.phone || '',
     fullAddress: data.fullAddress ||
-      `${data.province || ''}${data.city || ''}${data.district || ''}${data.detailAddress || ''}`
+      `${data.province || ''}${data.city || ''}${data.district || ''}${data.detailAddress || data.detailedAddress || ''}`
   }
   if (cartItemIds.value.length > 0) {
     fetchOrderPreview()
@@ -605,8 +694,55 @@ defineExpose({
   onSelectAddress: onAddressSelected
 })
 
-const selectPickupPoint = () => {
-  showToast('自提点选择功能开发中')
+const selectPickupPoint = async () => {
+  // 从 cartItemIds 匹配的购物车商品获取 merchantId（不能取 cartList[0]，可能不是当前结算商品）
+  const targetCartItem = cartHook.cartStore.cartList?.find(
+    item => cartItemIds.value.includes(item.cartItemId)
+  )
+  const merchantId = previewData.value.itemList?.[0]?.merchantId
+    || targetCartItem?.merchantId
+    || null
+
+  if (!merchantId) {
+    showToast('无法获取商家信息')
+    return
+  }
+
+  showPickupPopup.value = true
+  pickupLoading.value = true
+  try {
+    const { getPickupPointsApi } = await import('@/api/merchant')
+    const res = await getPickupPointsApi(merchantId)
+    if (res && res.code === 0) {
+      pickupPointList.value = res.data || []
+      if (pickupPointList.value.length === 0) {
+        showToast('该商家暂无自提点')
+      }
+    } else {
+      showToast('获取自提点失败')
+    }
+  } catch (error) {
+    console.error('获取自提点列表失败:', error)
+    showToast(error?.message || '获取自提点失败')
+  } finally {
+    pickupLoading.value = false
+  }
+}
+
+// 选择自提点
+const onPickupPointSelected = (point) => {
+  pickupPointId.value = point.pickupPointId
+  pickupPointInfo.value = {
+    pickupPointId: point.pickupPointId,
+    name: point.name,
+    address: point.address,
+    contactPhone: point.contactPhone,
+    businessHours: point.businessHours
+  }
+  showPickupPopup.value = false
+  if (cartItemIds.value.length > 0) {
+    fetchOrderPreview()
+  }
 }
 
 // ==================== 配送方式切换 ====================
@@ -620,6 +756,11 @@ const changeDeliveryType = (type) => {
     addressId.value = null
     addressInfo.value = null
   }
+  // 自提方式下，未选择自提点时不调用预览（等用户选完自提点后再预览）
+  if (type === 2 && !pickupPointId.value) {
+    showToast('请先选择自提点')
+    return
+  }
   if (cartItemIds.value.length > 0) {
     fetchOrderPreview()
   }
@@ -628,42 +769,27 @@ const changeDeliveryType = (type) => {
 // ==================== 优惠券选择 ====================
 
 /**
- * 打开平台优惠券弹窗(4.3.4 接口获取可用列表)
+ * 打开平台优惠券弹窗
+ * 可用优惠券从订单预览响应的 availableCoupons 字段获取，无需单独请求
  */
-const openPlatformCouponPopup = async () => {
+const openPlatformCouponPopup = () => {
   showPlatformCouponPopup.value = true
-  if (cartItemIds.value.length === 0) return
-  availableCouponsLoading.value = true
-  try {
-    const data = await couponHook.loadAvailableCoupons(cartItemIds.value)
-    if (data) {
-      availablePlatformCoupons.value = data.platformCoupons || []
-      availableMerchantCoupons.value = data.merchantCoupons || []
-    }
-  } finally {
-    availableCouponsLoading.value = false
-  }
+  // 直接使用预览返回的可用优惠券数据
+  const available = previewData.value.availableCoupons || {}
+  availablePlatformCoupons.value = available.platformCoupons || []
+  availableMerchantCoupons.value = available.merchantCoupons || []
 }
 
 /**
- * 打开商家优惠券弹窗(4.3.4 接口获取可用列表)
+ * 打开商家优惠券弹窗
+ * 可用优惠券从订单预览响应的 availableCoupons 字段获取，无需单独请求
  */
-const openMerchantCouponPopup = async () => {
+const openMerchantCouponPopup = () => {
   showMerchantCouponPopup.value = true
-  if (cartItemIds.value.length === 0) return
-  // 平台券和商家券一起返回,若已加载过则直接复用
-  if (availablePlatformCoupons.value.length === 0 && availableMerchantCoupons.value.length === 0) {
-    availableCouponsLoading.value = true
-    try {
-      const data = await couponHook.loadAvailableCoupons(cartItemIds.value)
-      if (data) {
-        availablePlatformCoupons.value = data.platformCoupons || []
-        availableMerchantCoupons.value = data.merchantCoupons || []
-      }
-    } finally {
-      availableCouponsLoading.value = false
-    }
-  }
+  // 直接使用预览返回的可用优惠券数据
+  const available = previewData.value.availableCoupons || {}
+  availablePlatformCoupons.value = available.platformCoupons || []
+  availableMerchantCoupons.value = available.merchantCoupons || []
 }
 
 const selectPlatformCoupon = (coupon) => {
@@ -751,9 +877,10 @@ const fetchDefaultAddress = async () => {
   if (res && res.addressId) {
     addressInfo.value = {
       addressId: res.addressId,
-      receiverName: res.receiverName || '',
-      receiverPhone: res.receiverPhone || '',
-      fullAddress: `${res.province || ''}${res.city || ''}${res.district || ''}${res.detailAddress || ''}`
+      receiverName: res.receiverName || res.consignee || '',
+      receiverPhone: res.receiverPhone || res.phone || '',
+      fullAddress: res.fullAddress ||
+        `${res.province || ''}${res.city || ''}${res.district || ''}${res.detailAddress || res.detailedAddress || ''}`
     }
     addressId.value = res.addressId
   } else {
@@ -782,8 +909,8 @@ const applyPreviewData = (data) => {
   availablePlatformCoupons.value = []
   availableMerchantCoupons.value = []
 
-  // 同步地址信息：仅在用户未手动选择地址时，使用后端返回的默认地址
-  if (data.addressInfo && deliveryType.value === 1 && !addressId.value) {
+  // 同步地址信息：始终使用后端返回的地址，确保 UI 与后端实际使用的地址一致
+  if (data.addressInfo && deliveryType.value === 1) {
     addressInfo.value = data.addressInfo
     addressId.value = data.addressInfo.addressId
   }
@@ -812,11 +939,11 @@ const applyPreviewData = (data) => {
     usePointsAmount.value = (data.pointsInfo.usedPoints || 0).toString()
   }
 
-  // 同步活动上下文
+  // 同步活动上下文（后端返回实际采用的活动，回填到请求参数中）
   if (data.activityInfo) {
     activityContext.value = {
-      seckillId: data.activityInfo.seckillProductId || activityContext.value.seckillId || null,
-      bargainId: data.activityInfo.bargainRecordId || activityContext.value.bargainId || null,
+      seckillProductId: data.activityInfo.seckillProductId || activityContext.value.seckillProductId || null,
+      bargainRecordId: data.activityInfo.bargainRecordId || activityContext.value.bargainRecordId || null,
       groupId: data.activityInfo.groupId || activityContext.value.groupId || null,
       promotionIds: data.activityInfo.promotionIds || activityContext.value.promotionIds || []
     }
@@ -826,6 +953,8 @@ const applyPreviewData = (data) => {
 // ==================== 预览接口调用 ====================
 const fetchOrderPreview = async () => {
   if (cartItemIds.value.length === 0) return
+
+  previewError.value = ''
 
   const data = {
     cartItemIds: cartItemIds.value,
@@ -854,7 +983,16 @@ const fetchOrderPreview = async () => {
       setupTokenExpireTimer(previewExpireSeconds.value)
     }
     applyPreviewData(res)
+  } else {
+    // 预览失败：设置错误信息（503/网络异常等）
+    previewError.value = '订单预览服务暂时不可用，请稍后重试'
   }
+}
+
+// 重试预览
+const retryPreview = () => {
+  previewError.value = ''
+  fetchOrderPreview()
 }
 
 // ==================== 提交订单 ====================
@@ -920,8 +1058,9 @@ const initOrderData = async () => {
   const source = options.source || 'cart'
 
   // 解析活动上下文（从 URL 参数）
-  if (options.seckillId) activityContext.value.seckillId = parseInt(options.seckillId)
-  if (options.bargainId) activityContext.value.bargainId = parseInt(options.bargainId)
+  // 字段名与后端 API 文档一致
+  if (options.seckillProductId) activityContext.value.seckillProductId = parseInt(options.seckillProductId)
+  if (options.bargainRecordId) activityContext.value.bargainRecordId = parseInt(options.bargainRecordId)
   if (options.groupId) activityContext.value.groupId = parseInt(options.groupId)
 
   if (source === 'buyNow') {
@@ -1021,6 +1160,80 @@ onUnmounted(() => {
 .page-content {
   flex: 1;
   padding-top: calc(88rpx + env(safe-area-inset-top));
+}
+
+// 加载中状态
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+
+  .loading-spinner {
+    width: 64rpx;
+    height: 64rpx;
+    border: 6rpx solid $neutral-200;
+    border-top-color: $color-primary;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 24rpx;
+  }
+
+  .loading-text {
+    font-size: 28rpx;
+    color: $text-weak;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// 错误状态
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 32rpx;
+
+  .error-icon {
+    font-size: 100rpx;
+    color: $color-primary-danger;
+    margin-bottom: 24rpx;
+  }
+
+  .error-title {
+    font-size: 32rpx;
+    font-weight: 600;
+    color: $ink-900;
+    margin-bottom: 12rpx;
+  }
+
+  .error-desc {
+    font-size: 26rpx;
+    color: $text-weak;
+    margin-bottom: 40rpx;
+    text-align: center;
+  }
+
+  .retry-btn {
+    padding: 20rpx 56rpx;
+    background: $gradient-warm;
+    border-radius: $radius-full;
+    box-shadow: $shadow-primary;
+
+    &:active {
+      transform: scale(0.96);
+    }
+
+    .retry-text {
+      color: #FFFFFF;
+      font-size: 28rpx;
+      font-weight: 600;
+    }
+  }
 }
 
 .delivery-tabs {
@@ -1665,6 +1878,72 @@ onUnmounted(() => {
     .empty-text {
       font-size: 26rpx;
       color: $text-weak;
+    }
+  }
+
+  // 自提点列表项
+  .pickup-point-item {
+    padding: 24rpx;
+    background: $bg-page-light;
+    border-radius: 12rpx;
+    margin-bottom: 16rpx;
+    border: 2rpx solid transparent;
+    transition: all 0.2s ease;
+
+    &.pickup-point-active {
+      background: rgba($color-primary, 0.08);
+      border: 2rpx solid $color-primary;
+    }
+
+    .pickup-point-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12rpx;
+    }
+
+    .pickup-point-name {
+      font-size: 30rpx;
+      font-weight: 600;
+      color: $text-main;
+      flex: 1;
+    }
+
+    .pickup-point-check {
+      width: 40rpx;
+      height: 40rpx;
+      border-radius: 50%;
+      background: $color-primary;
+      color: #fff;
+      font-size: 24rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .pickup-point-address {
+      display: block;
+      font-size: 26rpx;
+      color: $text-sub;
+      line-height: 1.5;
+      margin-bottom: 8rpx;
+    }
+
+    .pickup-point-row {
+      display: flex;
+      align-items: center;
+      margin-top: 8rpx;
+
+      .pickup-point-label {
+        font-size: 24rpx;
+        color: $text-weak;
+      }
+
+      .pickup-point-value {
+        font-size: 24rpx;
+        color: $text-sub;
+      }
     }
   }
 }

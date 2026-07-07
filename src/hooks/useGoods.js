@@ -52,7 +52,6 @@ export const useGoods = () => {
 
   const loadSearchProducts = async (params = {}) => {
     if (!params?.keyword) {
-      showToast('请输入搜索关键词')
       return { list: [], total: 0, pages: 0, page: 1, pageSize: 10 }
     }
     
@@ -79,16 +78,16 @@ export const useGoods = () => {
     }
   }
 
-  const loadProductDetail = async (productId) => {
+  const loadProductDetail = async (productId, promotionCode = null) => {
     if (!productId) {
       showToast('商品ID不能为空')
       return null
     }
-    
+
     detailLoading.value = true
-    
+
     try {
-      const res = await goodsStore.fetchProductDetail(productId)
+      const res = await goodsStore.fetchProductDetail(productId, promotionCode)
       if (res) {
         return {
           productId: res.productId,
@@ -107,6 +106,14 @@ export const useGoods = () => {
           stock: res.stock,
           status: res.status,
           tags: res.tags || [],
+          // 评价相关字段
+          ratingScore: res.ratingScore || 0,
+          commentCount: res.commentCount || 0,
+          latestComments: res.latestComments || [],
+          // 分销相关字段
+          distributorProductId: res.distributorProductId || null,
+          promotionCode: res.promotionCode || '',
+          promotionExpiresAt: res.promotionExpiresAt || '',
           merchantInfo: res.merchantInfo ? {
             merchantId: res.merchantInfo.merchantId,
             merchantName: res.merchantInfo.merchantName,
@@ -120,7 +127,8 @@ export const useGoods = () => {
       console.error('获取商品详情失败:', error)
       
       const errorCodeMap = {
-        40402: '商品不存在或已下架'
+        40402: '商品不存在或已下架',
+        40464: '推广码不存在、已失效或与当前商品不匹配'
       }
       
       if (errorCodeMap[error?.code]) {

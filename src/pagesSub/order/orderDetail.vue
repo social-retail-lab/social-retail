@@ -41,9 +41,9 @@
           <view class="pickup-content">
             <text class="pickup-name">{{ orderDetail.pickupPointInfo.name }}</text>
             <text class="pickup-address">{{ orderDetail.pickupPointInfo.address }}</text>
-            <view v-if="orderDetail.pickupPointInfo.phone" class="pickup-row">
+            <view v-if="orderDetail.pickupPointInfo.contactPhone" class="pickup-row">
               <text class="pickup-label">联系电话：</text>
-              <text class="pickup-value">{{ orderDetail.pickupPointInfo.phone }}</text>
+              <text class="pickup-value">{{ orderDetail.pickupPointInfo.contactPhone }}</text>
             </view>
             <view v-if="orderDetail.pickupPointInfo.businessHours" class="pickup-row">
               <text class="pickup-label">营业时间：</text>
@@ -81,7 +81,7 @@
               </view>
               <view class="goods-subtotal">
                 <text class="subtotal-label">小计</text>
-                <text class="subtotal-value">¥{{ formatPrice(item.itemAmount) }}</text>
+                <text class="subtotal-value">¥{{ formatPrice(getItemSubtotal(item)) }}</text>
               </view>
               <!-- 申请售后按钮(仅已支付/已完成订单显示) -->
               <view v-if="canApplyAfterSale" class="goods-actions">
@@ -519,6 +519,18 @@ const getStatusDesc = (status) => {
 // 金额格式化
 const formatPrice = (price) => {
   return (Number(price) || 0).toFixed(2)
+}
+
+// 计算商品小计
+// 优先使用后端返回的 itemAmount，为空或0时用单价 × 数量计算
+const getItemSubtotal = (item) => {
+  if (item == null) return 0
+  if (item.itemAmount != null && Number(item.itemAmount) > 0) {
+    return Number(item.itemAmount)
+  }
+  const price = Number(item.finalPrice || item.price || item.originPrice || 0)
+  const qty = Number(item.quantity || 1)
+  return price * qty
 }
 
 // 手机号脱敏

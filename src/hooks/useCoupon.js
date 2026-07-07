@@ -83,7 +83,7 @@ export const useCoupon = () => {
       showToast('该优惠券不可使用')
       return
     }
-    // 商家券:跳转商家主页
+    // 商家券:跳转对应商家主页
     if (coupon.source === 'MERCHANT' && coupon.merchantId) {
       uni.navigateTo({
         url: `/pagesSub/shop/shopHome?merchantId=${coupon.merchantId}`,
@@ -92,8 +92,12 @@ export const useCoupon = () => {
       })
       return
     }
-    // 平台券:跳转首页挑选商品
-    uni.switchTab({ url: '/pages/home/home' })
+    // 平台券:跳转商品列表页挑选商品
+    uni.navigateTo({
+      url: '/pagesSub/goods/list/list',
+      animationType: 'slide-in-right',
+      animationDuration: 200
+    })
   }
 
   /**

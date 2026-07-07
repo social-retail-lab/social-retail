@@ -19,17 +19,6 @@
         <view class="nav-back" @click="goBack">
           <text class="back-icon">‹</text>
         </view>
-        <view class="nav-actions">
-          <view class="action-item" @click="handleCompare">
-            <text class="action-icon-text">☰</text>
-          </view>
-          <view class="action-item" @click="handleShare">
-            <image src="/static/fonts/share.svg" class="action-icon" mode="aspectFit" />
-          </view>
-          <view class="action-item" @click="handleFavorite">
-            <text class="action-icon-text" :class="{ 'favorite-active': isFavorite }">{{ isFavorite ? '♥' : '♡' }}</text>
-          </view>
-        </view>
       </view>
 
       <scroll-view scroll-y class="detail-scroll" @scroll="onScroll">
@@ -62,14 +51,14 @@
             >{{ tag }}</text>
           </view>
           <view class="stats-row">
+            <view v-if="Number(productDetail.ratingScore) > 0" class="stat-item">
+              <text class="stat-value rating-score">{{ Number(productDetail.ratingScore).toFixed(1) }}</text>
+              <text class="stat-label">评分</text>
+            </view>
+            <view v-if="Number(productDetail.ratingScore) > 0" class="stat-divider"></view>
             <view class="stat-item">
               <text class="stat-value">{{ productDetail.soldCount || 0 }}</text>
               <text class="stat-label">已售</text>
-            </view>
-            <view class="stat-divider"></view>
-            <view class="stat-item">
-              <text class="stat-value rating">{{ productDetail.rating || 4.9 }}</text>
-              <text class="stat-label">评分</text>
             </view>
             <view class="stat-divider"></view>
             <view class="stat-item">
@@ -98,14 +87,14 @@
           <view class="merchant-info">
             <view class="merchant-header">
               <text class="merchant-name">{{ productDetail.merchantName || '' }}</text>
-              <view class="merchant-rating">
+              <view v-if="productDetail.merchantInfo?.rating" class="merchant-rating">
                 <text class="star-icon">★</text>
-                <text class="rating-value">{{ productDetail.merchantInfo?.rating || 4.8 }}</text>
+                <text class="rating-value">{{ productDetail.merchantInfo.rating }}</text>
               </view>
             </view>
-            <view class="merchant-stats">
-              <text class="merchant-stat">月销{{ productDetail.merchantInfo?.monthSales || 0 }}+</text>
-              <text class="merchant-delivery">{{ productDetail.merchantInfo?.deliveryRange || '全国配送' }}</text>
+            <view v-if="productDetail.merchantInfo?.monthSales || productDetail.merchantInfo?.deliveryRange" class="merchant-stats">
+              <text v-if="productDetail.merchantInfo?.monthSales" class="merchant-stat">月销{{ productDetail.merchantInfo.monthSales }}+</text>
+              <text v-if="productDetail.merchantInfo?.deliveryRange" class="merchant-delivery">{{ productDetail.merchantInfo.deliveryRange }}</text>
             </view>
           </view>
           <text class="merchant-arrow">›</text>
@@ -139,6 +128,91 @@
                 <text class="sku-stock-info">{{ sku.stock > 0 ? `库存: ${sku.stock}件` : '缺货' }}</text>
               </view>
             </view>
+          </view>
+        </view>
+
+        <!-- 商品评价区块 -->
+        <view class="comment-section">
+          <view class="comment-header">
+            <text class="comment-title">商品评价</text>
+            <text class="comment-count" v-if="commentStore.productCommentsTotal > 0">
+              （{{ commentStore.productCommentsTotal }}条）
+            </text>
+          </view>
+
+          <!-- 评分筛选标签 -->
+          <view class="comment-filter-tabs">
+            <view
+              v-for="tab in SCORE_FILTER_TABS"
+              :key="tab.value"
+              class="filter-tab"
+              :class="{ 'filter-tab-active': commentScoreFilter === tab.value }"
+              @click="handleCommentFilter(tab.value)"
+            >
+              <text class="tab-text">{{ tab.label }}</text>
+            </view>
+          </view>
+
+          <!-- 评价列表 -->
+          <view v-if="commentStore.productComments.length > 0" class="comment-list">
+            <view
+              v-for="item in commentStore.productComments"
+              :key="item.commentId"
+              class="comment-item"
+            >
+              <!-- 用户与评分 -->
+              <view class="comment-user-row">
+                <image
+                  :src="getCommentUserAvatar(item)"
+                  mode="aspectFill"
+                  class="comment-user-avatar"
+                />
+                <view class="comment-user-info">
+                  <text class="comment-user-name">{{ getCommentUserNickname(item) }}</text>
+                  <view class="comment-score-row">
+                    <text
+                      v-for="star in 5"
+                      :key="star"
+                      class="comment-star"
+                      :class="{ 'comment-star-active': star <= item.score }"
+                    >★</text>
+                  </view>
+                </view>
+                <text class="comment-time">{{ formatCommentTime(item.createTime) }}</text>
+              </view>
+
+              <!-- 评价内容 -->
+              <text class="comment-content-text" v-if="item.content">{{ item.content }}</text>
+
+              <!-- 评价配图（横向滚动） -->
+              <scroll-view
+                v-if="item.imageUrls && item.imageUrls.length > 0"
+                scroll-x
+                class="comment-images-scroll"
+                :show-scrollbar="false"
+              >
+                <view class="comment-images-row">
+                  <image
+                    v-for="(img, index) in item.imageUrls"
+                    :key="index"
+                    :src="img"
+                    mode="aspectFill"
+                    class="comment-thumb"
+                    @click="previewCommentImage(item.imageUrls, img)"
+                  />
+                </view>
+              </scroll-view>
+
+              <!-- 规格（底部弱化） -->
+              <view class="comment-spec-row" v-if="item.skuSpecs">
+                <text class="comment-spec">{{ item.skuSpecs }}</text>
+              </view>
+            </view>
+          </view>
+
+          <!-- 空评价 -->
+          <view v-else class="comment-empty">
+            <text class="comment-empty-text">暂无评价</text>
           </view>
         </view>
 
@@ -249,12 +323,12 @@ import { onShow, onBackPress } from '@dcloudio/uni-app'
 import { getValidImageUrl } from '@/utils/common'
 import { useGoods } from '@/hooks/useGoods'
 import { useCart } from '@/hooks/useCart'
+import { useComment } from '@/hooks/useComment'
 import { useUserStore } from '@/store/user'
 
 const productDetail = ref({})
 const isProductNotFound = ref(false)
 const loading = ref(true)
-const isFavorite = ref(false)
 const isNavBarScrolled = ref(false)
 
 const skuList = ref([])
@@ -265,7 +339,20 @@ const quantity = ref(1)
 
 const { loadProductDetail, loadProductSkus } = useGoods()
 const { loadAddToCart, cartStore, loadCartData } = useCart()
+const {
+  commentStore,
+  loadProductComments,
+  switchScoreFilter,
+  previewCommentImage,
+  goCommentDetail,
+  SCORE_FILTER_TABS,
+  DEFAULT_AVATAR,
+  ANONYMOUS_NICKNAME
+} = useComment()
 const userStore = useUserStore()
+
+// 评价相关
+const commentScoreFilter = ref(0)
 
 const bannerImages = computed(() => {
   const images = productDetail.value.bannerImages || productDetail.value.images || []
@@ -347,21 +434,8 @@ const goCart = () => {
   uni.switchTab({ url: '/pages/cart/cart' })
 }
 
-const handleShare = () => {
-  uni.showToast({ title: '分享功能开发中', icon: 'none' })
-}
-
-const handleCompare = () => {
-  uni.showToast({ title: '已添加到对比列表', icon: 'success' })
-}
-
 const onScroll = (e) => {
   isNavBarScrolled.value = e.detail.scrollTop > 100
-}
-
-const handleFavorite = () => {
-  isFavorite.value = !isFavorite.value
-  uni.showToast({ title: isFavorite.value ? '收藏成功' : '已取消收藏', icon: 'success' })
 }
 
 const handleImageClick = () => {
@@ -433,15 +507,17 @@ const confirmAddCart = async () => {
     uni.showToast({ title: '请选择规格', icon: 'none' })
     return
   }
-  
+
   const skuId = selectedSku.value?.skuId || null
-  
+
   if (!skuId) {
     uni.showToast({ title: '商品信息异常', icon: 'none' })
     return
   }
-  
-  await loadAddToCart(skuId, quantity.value)
+
+  // 携带缓存的推广码（分销归因从加入购物车开始保留 7 天）
+  const promotionCode = uni.getStorageSync('promotionCode') || ''
+  await loadAddToCart(skuId, quantity.value, promotionCode || null)
   showSkuPopup.value = false
 }
 
@@ -483,10 +559,38 @@ const confirmBuy = async () => {
   })
 }
 
-const loadProductData = async (productId) => {
+// 评价筛选切换
+const handleCommentFilter = (score) => {
+  commentScoreFilter.value = score
+  commentStore.setScoreFilter(score)
+  const productId = productDetail.value.productId
+  if (productId) {
+    loadProductComments(productId, false)
+  }
+}
+
+// 获取评价用户头像（匿名用默认头像）
+const getCommentUserAvatar = (item) => {
+  if (item.anonymous === 1) return DEFAULT_AVATAR
+  return item.userInfo?.avatar || DEFAULT_AVATAR
+}
+
+// 获取评价用户昵称（匿名显示"匿名用户"）
+const getCommentUserNickname = (item) => {
+  if (item.anonymous === 1) return ANONYMOUS_NICKNAME
+  return item.userInfo?.nickname || ANONYMOUS_NICKNAME
+}
+
+// 格式化评价时间（只显示日期）
+const formatCommentTime = (time) => {
+  if (!time) return ''
+  return time.substring(0, 10)
+}
+
+const loadProductData = async (productId, promotionCode = '') => {
   loading.value = true
   try {
-    const detailData = await loadProductDetail(productId)
+    const detailData = await loadProductDetail(productId, promotionCode || null)
     
     if (detailData) {
       productDetail.value = {
@@ -496,6 +600,9 @@ const loadProductData = async (productId) => {
         merchantLogo: detailData.merchantInfo?.merchantLogo || ''
       }
       isProductNotFound.value = false
+
+      // 加载商品评价
+      loadProductComments(productId)
     } else {
       isProductNotFound.value = true
       return
@@ -525,6 +632,11 @@ const loadProductData = async (productId) => {
           uni.switchTab({ url: '/pages/index/index' })
         }
       }, 1500)
+    } else if (error?.code === 40464) {
+      // 推广码不存在、已失效或与当前商品不匹配
+      uni.showToast({ title: '推广链接已失效或商品不匹配', icon: 'none' })
+      // 清除无效推广码缓存
+      uni.removeStorageSync('promotionCode')
     } else {
       isProductNotFound.value = true
     }
@@ -538,9 +650,17 @@ onMounted(() => {
   const currentPage = pages[pages.length - 1]
   const options = currentPage.options || {}
   const productId = options.id || options.productId
+  const promotionCode = options.promotionCode || ''
+
+  // 推广码处理：URL 参数优先，保存到缓存；无 URL 参数时从缓存读取
+  if (promotionCode) {
+    uni.setStorageSync('promotionCode', promotionCode)
+  }
 
   if (productId) {
-    loadProductData(productId)
+    // 优先使用 URL 推广码，其次使用缓存推广码
+    const cachedPromotionCode = promotionCode || uni.getStorageSync('promotionCode') || ''
+    loadProductData(productId, cachedPromotionCode)
   }
 })
 
@@ -1123,6 +1243,10 @@ onShow(() => {
   &.rating {
     color: $color-primary-danger;
   }
+
+  &.rating-score {
+    color: #FF9500;
+  }
 }
 
 .stat-label {
@@ -1255,6 +1379,169 @@ onShow(() => {
 .merchant-arrow {
   font-size: 36rpx;
   color: $text-weak;
+}
+
+// ============ 商品评价区块（去AI化极简风格） ============
+.comment-section {
+  background: #FFFFFF;
+  padding: 24rpx;
+  margin-top: 16rpx;
+
+  .comment-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20rpx;
+
+    .comment-title {
+      font-size: 30rpx;
+      color: #333333;
+      font-weight: 500;
+    }
+
+    .comment-count {
+      font-size: 24rpx;
+      color: #999999;
+      margin-left: 8rpx;
+    }
+  }
+
+  .comment-filter-tabs {
+    display: flex;
+    gap: 32rpx;
+    margin-bottom: 20rpx;
+    padding-bottom: 16rpx;
+    border-bottom: 1rpx solid #F5F5F5;
+
+    .filter-tab {
+      position: relative;
+      padding: 8rpx 0;
+
+      .tab-text {
+        font-size: 26rpx;
+        color: #666666;
+        transition: color 200ms ease;
+      }
+
+      &.filter-tab-active {
+        .tab-text {
+          color: #FF9500;
+          font-weight: 500;
+        }
+
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -16rpx;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 32rpx;
+          height: 2rpx;
+          background: #FF9500;
+        }
+      }
+    }
+  }
+
+  .comment-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .comment-item {
+    padding: 20rpx 0;
+    border-bottom: 1rpx solid #F5F5F5;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .comment-user-row {
+    display: flex;
+    align-items: center;
+
+    .comment-user-avatar {
+      width: 56rpx;
+      height: 56rpx;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: #F5F5F5;
+    }
+
+    .comment-user-info {
+      flex: 1;
+      margin-left: 16rpx;
+
+      .comment-user-name {
+        font-size: 26rpx;
+        color: #333333;
+      }
+
+      .comment-score-row {
+        display: flex;
+        margin-top: 4rpx;
+
+        .comment-star {
+          font-size: 20rpx;
+          color: #DDDDDD;
+          margin-right: 2rpx;
+        }
+
+        .comment-star-active {
+          color: #FF9500;
+        }
+      }
+    }
+
+    .comment-time {
+      font-size: 22rpx;
+      color: #999999;
+    }
+  }
+
+  .comment-content-text {
+    display: block;
+    font-size: 28rpx;
+    color: #333333;
+    line-height: 1.6;
+    margin-top: 12rpx;
+  }
+
+  .comment-images-scroll {
+    margin-top: 12rpx;
+    white-space: nowrap;
+
+    .comment-images-row {
+      display: inline-flex;
+      gap: 12rpx;
+
+      .comment-thumb {
+        width: 160rpx;
+        height: 160rpx;
+        border-radius: 6rpx;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .comment-spec-row {
+    margin-top: 12rpx;
+
+    .comment-spec {
+      font-size: 22rpx;
+      color: #999999;
+    }
+  }
+
+  .comment-empty {
+    padding: 60rpx 0;
+    text-align: center;
+
+    .comment-empty-text {
+      font-size: 26rpx;
+      color: #999999;
+    }
+  }
 }
 
 .detail-images-section {

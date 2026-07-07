@@ -63,7 +63,10 @@ export const useOrder = () => {
       const errorCodeMap = {
         40911: '秒杀活动已结束',
         40912: '库存不足',
-        40913: '优惠券不满足使用条件'
+        40913: '平台优惠券不可用或不满足使用条件',
+        40914: '商家优惠券不可用或不满足使用条件',
+        40952: '积分抵扣超过本单可用上限',
+        50301: '订单预览状态保存失败，请稍后重试'
       }
 
       // 仅在 base.js 未处理时弹 toast（非200状态码的错误）
@@ -161,7 +164,9 @@ export const useOrder = () => {
     loading.value = true
 
     try {
-      const res = await orderStore.submitOrder({ previewToken })
+      // 携带缓存的推广码（用于分销归因和佣金计算）
+      const promotionCode = uni.getStorageSync('promotionCode') || null
+      const res = await orderStore.submitOrder({ previewToken, promotionCode })
 
       if (res) {
         uni.showToast({ title: '订单创建成功', icon: 'success' })
@@ -426,7 +431,8 @@ export const useOrder = () => {
     } catch (error) {
       console.error('模拟支付成功失败:', error)
       const errorCodeMap = {
-        40925: '支付金额与订单应付金额不一致'
+        40925: '支付金额与订单应付金额不一致',
+        40931: '自提点不可用或不属于当前商家'
       }
       if (errorCodeMap[error?.code]) {
         uni.showToast({ title: errorCodeMap[error.code], icon: 'none' })

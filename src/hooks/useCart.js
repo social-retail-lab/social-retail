@@ -69,7 +69,7 @@ export const useCart = () => {
     }
   }
 
-  const loadAddToCart = async (skuId, quantity = 1) => {
+  const loadAddToCart = async (skuId, quantity = 1, promotionCode = null) => {
     if (!checkLogin()) {
       return false
     }
@@ -82,7 +82,12 @@ export const useCart = () => {
     addLoading.value = true
 
     try {
-      const res = await cartStore.addCartItem({ skuId, quantity })
+      // 携带推广码（可选）：同一 SKU 携带新推广码再次加入时，使用最后一次有效推广
+      const params = { skuId, quantity }
+      if (promotionCode) {
+        params.promotionCode = promotionCode
+      }
+      const res = await cartStore.addCartItem(params)
       if (res) {
         showToast('已加入购物车')
         loadCartData()
@@ -96,7 +101,8 @@ export const useCart = () => {
 
       const errorCodeMap = {
         40911: '库存不足，无法加入',
-        40101: '登录已过期，请重新登录'
+        40101: '登录已过期，请重新登录',
+        40464: '推广码不存在、已失效或与当前商品不匹配'
       }
 
       if (errorCodeMap[error?.code]) {

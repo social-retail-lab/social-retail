@@ -17,7 +17,7 @@
         @click="handleSort(item)"
       >
         <text class="filter-text">{{ item.label }}</text>
-        <text v-if="activeSort === item.value && item.value !== 'createTime'" class="sort-arrow">{{ sortOrder === 'asc' ? '↑' : '↓' }}</text>
+        <text v-if="activeSort === item.value && item.value !== 'createTime' && item.value !== 'productId'" class="sort-arrow">{{ sortOrder === 'asc' ? '↑' : '↓' }}</text>
       </view>
       <view class="filter-item" @click="showFilterDrawer = true">
         <text class="filter-text">筛选</text>
@@ -149,7 +149,7 @@ const sortOptions = [
   { label: '综合', value: 'createTime' },
   { label: '销量', value: 'soldCount' },
   { label: '价格', value: 'price' },
-  { label: '新品', value: 'createTime' }
+  { label: '新品', value: 'productId' }
 ]
 
 const pageTitle = computed(() => {
@@ -164,22 +164,29 @@ const goBack = () => {
 
 const handleSort = (item) => {
   activeSort.value = item.value
-  
+
   if (item.value === 'soldCount') {
+    // 销量：默认降序（从高到低）
     sortField.value = 'soldCount'
     sortOrder.value = 'desc'
   } else if (item.value === 'price') {
+    // 价格：切换升序/降序
     if (sortField.value === 'price') {
       sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc'
     } else {
       sortField.value = 'price'
       sortOrder.value = 'asc'
     }
+  } else if (item.value === 'productId') {
+    // 新品：按 productId 降序（数值越大越新）
+    sortField.value = 'productId'
+    sortOrder.value = 'desc'
   } else {
+    // 综合：默认按创建时间降序
     sortField.value = 'createTime'
     sortOrder.value = 'desc'
   }
-  
+
   page.value = 1
   finished.value = false
   loadGoods()

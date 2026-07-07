@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useTabBarStore } from '@/store/tabBar'
 import { useCartStore } from '@/store/cart'
 
@@ -33,19 +33,17 @@ let clickTimer = null
 const isClicking = ref(false)
 
 const updateTabIndex = () => {
-  setTimeout(() => {
-    tabBarStore.updateCurrentIndex()
-  }, 100)
+  tabBarStore.updateCurrentIndex()
 }
 
 const handleTabClick = (index) => {
   if (isClicking.value) return
-  
+
   isClicking.value = true
   clickIndex.value = index
-  
+
   tabBarStore.switchTab(index)
-  
+
   setTimeout(() => {
     clickIndex.value = -1
     isClicking.value = false
@@ -53,10 +51,6 @@ const handleTabClick = (index) => {
 }
 
 onMounted(() => {
-  updateTabIndex()
-})
-
-watch(() => tabBarStore.currentIndex, () => {
   updateTabIndex()
 })
 

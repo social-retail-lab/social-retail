@@ -82,12 +82,13 @@ const validateOrderPreviewParams = (data) => {
   }
   
   // 活动上下文：不传活动 ID 后端自动匹配最优；传入指定 ID 则固定使用
+  // 字段名与后端 API 文档一致：seckillProductId / bargainRecordId / groupId / promotionIds
   const activityContext = {}
-  if (data?.activityContext?.seckillId) {
-    activityContext.seckillId = data.activityContext.seckillId
+  if (data?.activityContext?.seckillProductId) {
+    activityContext.seckillProductId = data.activityContext.seckillProductId
   }
-  if (data?.activityContext?.bargainId) {
-    activityContext.bargainId = data.activityContext.bargainId
+  if (data?.activityContext?.bargainRecordId) {
+    activityContext.bargainRecordId = data.activityContext.bargainRecordId
   }
   if (data?.activityContext?.groupId) {
     activityContext.groupId = data.activityContext.groupId
@@ -187,6 +188,8 @@ const normalizeItemList = (itemList) => {
     productName: item.productName || '',
     productImage: item.productImage || '',
     skuSpecs: item.skuSpecs || '',
+    merchantId: item.merchantId || null,
+    merchantName: item.merchantName || '',
     originPrice: Number(item.originPrice) || 0,
     finalPrice: Number(item.finalPrice) || 0,
     quantity: Number(item.quantity) || 0,
@@ -244,12 +247,19 @@ const normalizePromotionDetail = (promotionDetail) => {
 
 const normalizeAddressInfo = (addressInfo) => {
   if (!addressInfo) return null
-  
+
+  // API 返回 consignee/phone/province/city/district/detailedAddress
+  // 前端统一使用 receiverName/receiverPhone/fullAddress
+  const province = addressInfo.province || ''
+  const city = addressInfo.city || ''
+  const district = addressInfo.district || ''
+  const detail = addressInfo.detailedAddress || addressInfo.detailAddress || addressInfo.fullAddress || ''
+
   return {
     addressId: addressInfo.addressId || null,
-    receiverName: addressInfo.receiverName || '',
-    receiverPhone: addressInfo.receiverPhone || '',
-    fullAddress: addressInfo.fullAddress || ''
+    receiverName: addressInfo.receiverName || addressInfo.consignee || '',
+    receiverPhone: addressInfo.receiverPhone || addressInfo.phone || '',
+    fullAddress: addressInfo.fullAddress || `${province}${city}${district}${detail}`
   }
 }
 
@@ -462,6 +472,9 @@ const normalizeOrderListItem = (order) => {
     createTime: order.createTime || '',
     totalQuantity: Number(order.totalQuantity) || 0,
     itemList: Array.isArray(order.itemList) ? order.itemList.map(item => ({
+      orderItemId: item.orderItemId || null,
+      productId: item.productId || null,
+      skuId: item.skuId || null,
       productName: item.productName || '',
       productImage: item.productImage || '',
       skuSpecs: item.skuSpecs || '',
@@ -513,19 +526,21 @@ const normalizeOrderDetailData = (data) => {
     discountAmount: Number(data.discountAmount) || 0,
     deliveryFee: Number(data.deliveryFee) || 0,
     payAmount: Number(data.payAmount) || 0,
-    deliveryType: data.deliveryType || 1,
+    deliveryType: typeof data.deliveryType === 'string'
+      ? (data.deliveryType === 'PICKUP' || data.deliveryType === 'SELF_PICKUP' ? 2 : 1)
+      : (Number(data.deliveryType) || 1),
     deliveryTypeText: data.deliveryTypeText || '',
     remark: data.remark || '',
     receiverInfo: data.receiverInfo ? {
-      receiverName: data.receiverInfo.receiverName || '',
-      receiverPhone: data.receiverInfo.receiverPhone || '',
+      receiverName: data.receiverInfo.receiverName || data.receiverInfo.consignee || '',
+      receiverPhone: data.receiverInfo.receiverPhone || data.receiverInfo.phone || '',
       fullAddress: data.receiverInfo.fullAddress || ''
     } : null,
     pickupPointInfo: data.pickupPointInfo ? {
       pickupPointId: data.pickupPointInfo.pickupPointId || null,
       name: data.pickupPointInfo.name || '',
       address: data.pickupPointInfo.address || '',
-      phone: data.pickupPointInfo.phone || '',
+      contactPhone: data.pickupPointInfo.contactPhone || data.pickupPointInfo.phone || '',
       businessHours: data.pickupPointInfo.businessHours || ''
     } : null,
     paymentInfo: data.paymentInfo ? {

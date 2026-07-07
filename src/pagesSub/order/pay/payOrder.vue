@@ -110,6 +110,27 @@
         <text>{{ buttonText }}</text>
       </view>
     </view>
+
+    <!-- 自提码弹窗（自提订单支付成功后展示） -->
+    <view v-if="showPickupCode" class="pickup-code-mask" @click="dismissPickupCode">
+      <view class="pickup-code-popup" @click.stop>
+        <view class="pickup-code-header">
+          <text class="pickup-code-title">支付成功</text>
+        </view>
+        <view class="pickup-code-body">
+          <text class="pickup-code-tip">请保存自提码，到店自提时出示</text>
+          <view class="pickup-code-value-wrap">
+            <text class="pickup-code-value">{{ pickupCode }}</text>
+          </view>
+          <text class="pickup-code-desc">自提码为6位数字</text>
+        </view>
+        <view class="pickup-code-footer">
+          <view class="pickup-code-btn" @click="dismissPickupCode">
+            <text>查看订单</text>
+          </view>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -133,6 +154,10 @@ const remainSeconds = ref(0)
 
 const orderItems = ref([])
 const paymentId = ref(null)
+
+// 自提码相关（自提订单支付成功后展示）
+const showPickupCode = ref(false)
+const pickupCode = ref('')
 
 // 标记是否已跳转到支付宝，用于检测返回
 const hasRedirectedToAlipay = ref(false)
@@ -262,6 +287,12 @@ const redirectToDetail = () => {
   uni.redirectTo({ url: '/pagesSub/order/orderDetail?orderId=' + orderId.value })
 }
 
+// 关闭自提码弹窗并跳转订单详情
+const dismissPickupCode = () => {
+  showPickupCode.value = false
+  redirectToDetail()
+}
+
 // 轮询支付状态（使用支付状态查询接口）
 const pollPayStatus = async () => {
   if (!orderId.value) return
@@ -383,8 +414,16 @@ const handlePay = async () => {
 
       if (result && result.payStatus === 'PAID') {
         stopAllTimers()
-        showToast('支付成功')
-        setTimeout(redirectToDetail, 1500)
+        // 自提订单支付成功后展示自提码
+        if (Number(result.deliveryType) === 2 && result.pickupCode) {
+          pickupCode.value = result.pickupCode
+          showPickupCode.value = true
+          isPaying.value = false
+        } else {
+          // 配送订单直接跳转
+          showToast('支付成功')
+          setTimeout(redirectToDetail, 1500)
+        }
       } else {
         isPaying.value = false
       }
@@ -881,6 +920,92 @@ onUnmounted(() => {
     &.btn-expired {
       background: #CCCCCC;
       opacity: 0.7;
+    }
+  }
+}
+
+// 自提码弹窗
+.pickup-code-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pickup-code-popup {
+  width: 600rpx;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  overflow: hidden;
+
+  .pickup-code-header {
+    padding: 40rpx 32rpx 24rpx;
+    text-align: center;
+
+    .pickup-code-title {
+      font-size: 36rpx;
+      font-weight: 600;
+      color: #333;
+    }
+  }
+
+  .pickup-code-body {
+    padding: 0 32rpx 32rpx;
+    text-align: center;
+
+    .pickup-code-tip {
+      display: block;
+      font-size: 26rpx;
+      color: #999;
+      margin-bottom: 32rpx;
+    }
+
+    .pickup-code-value-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32rpx;
+      background: #FFF8F0;
+      border-radius: 16rpx;
+      margin-bottom: 16rpx;
+
+      .pickup-code-value {
+        font-size: 72rpx;
+        font-weight: 700;
+        color: #FF6A00;
+        letter-spacing: 16rpx;
+      }
+    }
+
+    .pickup-code-desc {
+      display: block;
+      font-size: 24rpx;
+      color: #999;
+    }
+  }
+
+  .pickup-code-footer {
+    padding: 0 32rpx 40rpx;
+
+    .pickup-code-btn {
+      height: 88rpx;
+      background: #FF6A00;
+      border-radius: 44rpx;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      text {
+        color: #FFFFFF;
+        font-size: 30rpx;
+        font-weight: 500;
+      }
     }
   }
 }

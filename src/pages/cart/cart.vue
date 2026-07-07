@@ -115,6 +115,8 @@
           </view>
         </view>
       </view>
+      <!-- 底部占位：避免 fixed footer 遮挡最后商品 -->
+      <view class="cart-bottom-spacer"></view>
     </scroll-view>
 
     <view v-if="cartStore.validCartList.length > 0" class="cart-footer">
@@ -350,7 +352,12 @@ onShow(() => {
 .page-content {
   flex: 1;
   margin-top: calc(88rpx + env(safe-area-inset-top));
-  padding-bottom: calc(120rpx + 120rpx + env(safe-area-inset-bottom));
+}
+
+// 底部占位：fixed footer 高度(120rpx) + tab bar 高度(120rpx) + safe-area
+.cart-bottom-spacer {
+  width: 100%;
+  height: calc(120rpx + 120rpx + env(safe-area-inset-bottom));
 }
 
 .empty-cart {
