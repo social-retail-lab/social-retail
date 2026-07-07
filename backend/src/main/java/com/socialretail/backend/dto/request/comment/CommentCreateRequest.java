@@ -40,4 +40,8 @@ public class CommentCreateRequest {
     private List<
             @NotBlank(message = "评价图片URL不能为空")
             @Size(max = 200, message = "评价图片URL不能超过200个字符") String> imageUrls;
+
+    @Min(value = 0, message = "匿名标识只能为0或1")
+    @Max(value = 1, message = "匿名标识只能为0或1")
+    private Integer anonymous = 0;
 }

@@ -17,6 +17,7 @@ public final class CommentResponses {
             Long productId,
             Integer score,
             String status,
+            Integer anonymous,
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime createTime) {
     }
 
@@ -42,6 +43,7 @@ public final class CommentResponses {
             String content,
             List<String> imageUrls,
             String skuSpecs,
+            Integer anonymous,
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime createTime) {
     }
 
@@ -54,6 +56,7 @@ public final class CommentResponses {
             Integer score,
             String content,
             List<String> imageUrls,
+            Integer anonymous,
             String status,
             @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime createTime) {
     }

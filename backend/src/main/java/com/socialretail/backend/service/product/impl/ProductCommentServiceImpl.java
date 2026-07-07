@@ -98,7 +98,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         comment.setScore(request.getScore());
         comment.setContent(request.getContent());
         comment.setImages(serializeImages(request.getImageUrls()));
-        comment.setAnonymous(0);
+        comment.setAnonymous(request.getAnonymous() == null ? 0 : request.getAnonymous());
         comment.setStatus(STATUS_SHOW);
         comment.setCreateTime(now);
         comment.setUpdateTime(now);
@@ -112,7 +112,7 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         return new CommentResponses.CreateResponse(
                 comment.getId(), comment.getOrderId(), comment.getOrderItemId(),
                 comment.getProductId(), comment.getScore(), statusName(comment.getStatus()),
-                comment.getCreateTime());
+                comment.getAnonymous(), comment.getCreateTime());
     }
 
     @Override
@@ -137,8 +137,9 @@ public class ProductCommentServiceImpl implements ProductCommentService {
                 new Page<>(request.getPage(), request.getPageSize()), productId, request.getScore());
         List<CommentResponses.ProductCommentItem> list = result.getRecords().stream()
                 .map(row -> new CommentResponses.ProductCommentItem(
-                        row.getCommentId(), userInfo(row, false), row.getScore(), row.getContent(),
-                        deserializeImages(row.getImages()), row.getSkuSpecs(), row.getCreateTime()))
+                        row.getCommentId(), userInfo(row), row.getScore(), row.getContent(),
+                        deserializeImages(row.getImages()), row.getSkuSpecs(),
+                        anonymousValue(row.getAnonymous()), row.getCreateTime()))
                 .toList();
         return pageResponse(result, list);
     }
@@ -155,8 +156,9 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         }
         return new CommentResponses.DetailResponse(
                 row.getCommentId(), row.getProductId(), row.getProductName(), row.getSkuSpecs(),
-                userInfo(row, owner), row.getScore(), row.getContent(),
-                deserializeImages(row.getImages()), statusName(row.getStatus()), row.getCreateTime());
+                userInfo(row), row.getScore(), row.getContent(),
+                deserializeImages(row.getImages()), anonymousValue(row.getAnonymous()),
+                statusName(row.getStatus()), row.getCreateTime());
     }
 
     @Override
@@ -216,11 +218,15 @@ public class ProductCommentServiceImpl implements ProductCommentService {
         }
     }
 
-    private CommentResponses.UserInfo userInfo(CommentViewRow row, boolean revealAnonymousOwner) {
-        if (Objects.equals(row.getAnonymous(), 1) && !revealAnonymousOwner) {
-            return new CommentResponses.UserInfo(null, "匿名用户", null);
+    private CommentResponses.UserInfo userInfo(CommentViewRow row) {
+        if (Objects.equals(row.getAnonymous(), 1)) {
+            return new CommentResponses.UserInfo(null, "匿名用户", "");
         }
         return new CommentResponses.UserInfo(row.getUserId(), row.getNickname(), row.getAvatar());
+    }
+
+    private int anonymousValue(Integer anonymous) {
+        return Objects.equals(anonymous, 1) ? 1 : 0;
     }
 
     private <T> CommentResponses.PageResponse<T> pageResponse(IPage<?> page, List<T> list) {

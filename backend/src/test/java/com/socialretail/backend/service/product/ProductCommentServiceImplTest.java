@@ -68,7 +68,30 @@ class ProductCommentServiceImplTest {
         assertEquals(9001L, response.commentId());
         assertEquals("SHOW", response.status());
         assertEquals(5, response.score());
+        assertEquals(0, response.anonymous());
         verify(commentMapper).insert(any(ProductComment.class));
+    }
+
+    @Test
+    void createPersistsAnonymousFlag() {
+        CommentCreateRequest request = request();
+        request.setAnonymous(1);
+        when(orderMapper.selectByIdAndUserId(5001L, 10001L))
+                .thenReturn(order(5001L, 10001L, OrderStatus.COMPLETED));
+        when(orderItemMapper.selectById(7001L))
+                .thenReturn(orderItem(7001L, 5001L, 3001L, 2001L));
+        when(commentMapper.selectCount(any())).thenReturn(0L);
+        when(commentMapper.insert(any())).thenAnswer(invocation -> {
+            ProductComment comment = invocation.getArgument(0);
+            comment.setId(9001L);
+            return 1;
+        });
+
+        CommentResponses.CreateResponse response = service.create(10001L, request);
+
+        assertEquals(1, response.anonymous());
+        verify(commentMapper).insert(org.mockito.ArgumentMatchers.argThat(
+                comment -> Integer.valueOf(1).equals(comment.getAnonymous())));
     }
 
     @Test
@@ -106,6 +129,33 @@ class ProductCommentServiceImplTest {
 
         assertEquals("HIDE", response.status());
         assertEquals(10001L, response.userInfo().userId());
+    }
+
+    @Test
+    void detailMasksAnonymousUserForOtherUsers() {
+        CommentViewRow row = detailRow(9001L, 10001L, 1);
+        row.setAnonymous(1);
+        when(commentMapper.selectCommentDetail(9001L)).thenReturn(row);
+
+        CommentResponses.DetailResponse response = service.detail(9001L, 20002L);
+
+        assertEquals(1, response.anonymous());
+        assertEquals(null, response.userInfo().userId());
+        assertEquals("匿名用户", response.userInfo().nickname());
+        assertEquals("", response.userInfo().avatar());
+    }
+
+    @Test
+    void detailAlsoMasksAnonymousUserForOwner() {
+        CommentViewRow row = detailRow(9001L, 10001L, 1);
+        row.setAnonymous(1);
+        when(commentMapper.selectCommentDetail(9001L)).thenReturn(row);
+
+        CommentResponses.DetailResponse response = service.detail(9001L, 10001L);
+
+        assertEquals(null, response.userInfo().userId());
+        assertEquals("匿名用户", response.userInfo().nickname());
+        assertEquals("", response.userInfo().avatar());
     }
 
     @Test
