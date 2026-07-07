@@ -55,6 +55,21 @@ public class Order {
     /** 更新时间 */
     private LocalDateTime updateTime;
 
+    /** 平台佣金 */
+    private BigDecimal commission;
+
+    /** 佣金费率 */
+    private BigDecimal commissionRate;
+
+    /** 商家层级 */
+    private String merchantTier;
+
+    /** 平台补贴 */
+    private BigDecimal platformSubsidy;
+
+    /** 净收入 */
+    private BigDecimal netIncome;
+
     public Long getId() {
         return id;
     }
@@ -173,6 +188,46 @@ public class Order {
 
     public void setUpdateTime(LocalDateTime updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public BigDecimal getCommission() {
+        return commission;
+    }
+
+    public void setCommission(BigDecimal commission) {
+        this.commission = commission;
+    }
+
+    public BigDecimal getCommissionRate() {
+        return commissionRate;
+    }
+
+    public void setCommissionRate(BigDecimal commissionRate) {
+        this.commissionRate = commissionRate;
+    }
+
+    public String getMerchantTier() {
+        return merchantTier;
+    }
+
+    public void setMerchantTier(String merchantTier) {
+        this.merchantTier = merchantTier;
+    }
+
+    public BigDecimal getPlatformSubsidy() {
+        return platformSubsidy;
+    }
+
+    public void setPlatformSubsidy(BigDecimal platformSubsidy) {
+        this.platformSubsidy = platformSubsidy;
+    }
+
+    public BigDecimal getNetIncome() {
+        return netIncome;
+    }
+
+    public void setNetIncome(BigDecimal netIncome) {
+        this.netIncome = netIncome;
     }
 
     @Override

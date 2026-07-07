@@ -1,63 +1,56 @@
 package com.socialretail.backend.controller.admin;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.Result;
-import com.socialretail.backend.entity.order.AfterSale;
-import com.socialretail.backend.mapper.order.AfterSaleMapper;
-import jakarta.servlet.http.HttpServletRequest;
+import com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/admin/after-sales")
+@RequestMapping("/api/admin")
 public class AdminAfterSaleController {
 
-    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AdminAfterSaleController.class);
+    private static final Logger log = LoggerFactory.getLogger(AdminAfterSaleController.class);
 
-    private final AfterSaleMapper afterSaleMapper;
+    @Autowired
+    private AfterSaleServiceImpl afterSaleService;
 
-    public AdminAfterSaleController(AfterSaleMapper afterSaleMapper) {
-        this.afterSaleMapper = afterSaleMapper;
+    /** 申诉列表（平台介入） */
+    @GetMapping("/after-sales/appealed")
+    public Result<PageResult<Map<String, Object>>> getAppealedList(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        log.info("[管理员售后-申诉列表] keyword={}, pageNum={}, pageSize={}", keyword, pageNum, pageSize);
+        try {
+            PageResult<Map<String, Object>> pageResult = afterSaleService.getAppealedList(keyword, pageNum, pageSize);
+            log.info("[管理员售后-申诉列表] 成功, total={}", pageResult.getTotal());
+            return Result.success(pageResult);
+        } catch (RuntimeException e) {
+            log.warn("[管理员售后-申诉列表] 失败, 原因: {}", e.getMessage());
+            throw e;
+        }
     }
 
-    @GetMapping("/appealed")
-    public Result listAppealed(@RequestParam(required = false) String keyword,
-                                @RequestParam(defaultValue = "1") int pageNum,
-                                @RequestParam(defaultValue = "10") int pageSize) {
-        LambdaQueryWrapper<AfterSale> wrapper = new LambdaQueryWrapper<>();
-        // appealStatus > 0 表示商家已申诉
-        wrapper.eq(AfterSale::getAppealStatus, 1);
-        if (keyword != null && !keyword.isBlank()) {
-            wrapper.like(AfterSale::getOrderSn, keyword);
+    /** 管理员介入处理 */
+    @PostMapping("/after-sales/{afterSaleId}/intervene")
+    public Result<Map<String, Object>> intervene(
+            @PathVariable Long afterSaleId,
+            @RequestBody Map<String, Object> body) {
+        Integer action = body.get("action") != null ? ((Number) body.get("action")).intValue() : null;
+        String remark = (String) body.get("remark");
+        log.info("[管理员售后-介入] afterSaleId={}, action={}, remark={}", afterSaleId, action, remark);
+        try {
+            Map<String, Object> result = afterSaleService.adminIntervene(afterSaleId, action, remark);
+            log.info("[管理员售后-介入] 成功, afterSaleId={}, newStatus={}", afterSaleId, result.get("newStatus"));
+            return Result.success(result);
+        } catch (RuntimeException e) {
+            log.warn("[管理员售后-介入] 失败, afterSaleId={}, 原因: {}", afterSaleId, e.getMessage());
+            throw e;
         }
-        wrapper.orderByDesc(AfterSale::getAppealTime);
-
-        Page<AfterSale> page = new Page<>(pageNum, pageSize);
-        Page<AfterSale> result = afterSaleMapper.selectPage(page, wrapper);
-
-        return Result.ok(PageResult.of(result.getRecords(), result.getTotal(), pageNum, pageSize));
-    }
-
-    @PostMapping("/{afterSaleId}/intervene")
-    public Result intervene(@PathVariable Long afterSaleId, @RequestBody Map<String, Object> body) {
-        int action = ((Number) body.get("action")).intValue();
-        String remark = (String) body.getOrDefault("remark", "");
-
-        AfterSale afterSale = afterSaleMapper.selectById(afterSaleId);
-        if (afterSale == null) {
-            return Result.fail("售后记录不存在");
-        }
-
-        afterSale.setInterveneResult(action);
-        afterSale.setInterveneRemark(remark);
-        afterSale.setInterveneTime(LocalDateTime.now());
-        afterSaleMapper.updateById(afterSale);
-
-        log.info("[平台介入售后] afterSaleId={}, action={}", afterSaleId, action);
-        return Result.success(null);
     }
 }

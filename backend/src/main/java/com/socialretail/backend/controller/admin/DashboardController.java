@@ -4,12 +4,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.socialretail.backend.common.Result;
 import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.order.Order;
+import com.socialretail.backend.entity.order.OrderItem;
 import com.socialretail.backend.entity.order.PlatformAccountSummary;
 import com.socialretail.backend.entity.order.PlatformRevenueDetail;
+import com.socialretail.backend.entity.product.Category;
+import com.socialretail.backend.entity.product.ProductCategoryRelation;
 import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.order.OrderItemMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.order.PlatformAccountSummaryMapper;
 import com.socialretail.backend.mapper.order.PlatformRevenueDetailMapper;
+import com.socialretail.backend.mapper.product.CategoryMapper;
+import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +43,15 @@ public class DashboardController {
 
     @Resource
     private PlatformRevenueDetailMapper platformRevenueDetailMapper;
+
+    @Resource
+    private OrderItemMapper orderItemMapper;
+
+    @Resource
+    private ProductCategoryRelationMapper productCategoryRelationMapper;
+
+    @Resource
+    private CategoryMapper categoryMapper;
 
     private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("yyyy-MM");
 
@@ -243,17 +258,25 @@ public class DashboardController {
             merchantSales.merge(o.getMerchantId(), amount, BigDecimal::add);
         }
 
-        long head = 0, waist = 0, tail = 0;
+        long micro = 0, tail = 0, waist = 0, head = 0;
         for (BigDecimal sales : merchantSales.values()) {
-            if (sales.compareTo(BigDecimal.valueOf(10000)) > 0) head++;
-            else if (sales.compareTo(BigDecimal.valueOf(1000)) >= 0) waist++;
-            else tail++;
+            if (sales.compareTo(BigDecimal.valueOf(100000)) > 0) head++;
+            else if (sales.compareTo(BigDecimal.valueOf(10000)) >= 0) waist++;
+            else if (sales.compareTo(BigDecimal.valueOf(1000)) >= 0) tail++;
+            else micro++;
         }
 
+        // 统计小微商家（包含无销售额的商家）
+        List<Merchant> allMerchants = merchantMapper.selectList(new LambdaQueryWrapper<Merchant>().eq(Merchant::getStatus, 1));
+        long merchantsWithSales = micro + tail + waist + head;
+        long merchantsWithoutSales = allMerchants.size() - merchantsWithSales;
+        micro += merchantsWithoutSales;
+
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("head", head);
-        result.put("waist", waist);
+        result.put("micro", micro);
         result.put("tail", tail);
+        result.put("waist", waist);
+        result.put("head", head);
         return Result.ok(result);
     }
 
@@ -261,20 +284,18 @@ public class DashboardController {
     @GetMapping("/commission")
     public Result<Map<String, Object>> commission() {
         log.info("[运营看板] 平台抽成");
-        PlatformAccountSummary summary = platformAccountSummaryMapper.selectById(1);
-        List<PlatformRevenueDetail> details = platformRevenueDetailMapper.selectList(null);
+        List<Order> allOrders = orderMapper.selectList(null);
 
-        BigDecimal commissionTotal = details.stream()
-                .filter(d -> "COMMISSION".equals(d.getType()))
-                .map(d -> d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal commissionTotal = BigDecimal.ZERO;
+        BigDecimal subsidyTotal = BigDecimal.ZERO;
+        BigDecimal netIncome = BigDecimal.ZERO;
 
-        BigDecimal subsidyTotal = details.stream()
-                .filter(d -> "SUBSIDY".equals(d.getType()))
-                .map(d -> d.getAmount() != null ? d.getAmount().abs() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        BigDecimal netIncome = commissionTotal.subtract(subsidyTotal);
+        for (Order o : allOrders) {
+            if (o.getStatus() == null || o.getStatus() < 2 || o.getStatus() == 5) continue;
+            if (o.getCommission() != null) commissionTotal = commissionTotal.add(o.getCommission());
+            if (o.getPlatformSubsidy() != null) subsidyTotal = subsidyTotal.add(o.getPlatformSubsidy());
+            if (o.getNetIncome() != null) netIncome = netIncome.add(o.getNetIncome());
+        }
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("commission", commissionTotal.toString());
@@ -288,19 +309,37 @@ public class DashboardController {
     public Result<List<Map<String, Object>>> categoryProportion() {
         log.info("[运营看板] 类目占比");
 
-        // 从PlatformRevenueDetail按类目聚合（简化：使用description字段或type）
-        List<PlatformRevenueDetail> details = platformRevenueDetailMapper.selectList(
-                new LambdaQueryWrapper<PlatformRevenueDetail>()
-                        .eq(PlatformRevenueDetail::getType, "COMMISSION"));
+        // Get all orders with items
+        List<Order> orders = orderMapper.selectList(null);
 
-        // 按description聚合
+        // Build first-level category sales map
         Map<String, BigDecimal> catSales = new LinkedHashMap<>();
-        for (PlatformRevenueDetail d : details) {
-            String desc = d.getDescription() != null ? d.getDescription() : "其他";
-            // 简化类目名
-            String cat = extractCategory(desc);
-            BigDecimal amt = d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO;
-            catSales.merge(cat, amt, BigDecimal::add);
+
+        for (Order order : orders) {
+            if (order.getStatus() == null || order.getStatus() < 2 || order.getStatus() == 5) continue;
+            List<OrderItem> items = orderItemMapper.selectList(
+                    new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, order.getId()));
+
+            for (OrderItem item : items) {
+                if (item.getProductId() == null) continue;
+                // Find category for this product through product_category_relation
+                List<ProductCategoryRelation> rels = productCategoryRelationMapper.selectList(
+                        new LambdaQueryWrapper<ProductCategoryRelation>().eq(ProductCategoryRelation::getProductId, item.getProductId()));
+
+                for (ProductCategoryRelation rel : rels) {
+                    Category cat = categoryMapper.selectById(rel.getCategoryId());
+                    if (cat == null) continue;
+                    // Find first-level category
+                    Category parentCat = (cat.getParentId() != null && cat.getParentId() > 0)
+                            ? categoryMapper.selectById(cat.getParentId()) : cat;
+                    if (parentCat == null) continue;
+                    String catName = parentCat.getName() != null ? parentCat.getName() : "其他";
+                    BigDecimal amount = item.getPrice() != null
+                            ? item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity() != null ? item.getQuantity() : 1))
+                            : BigDecimal.ZERO;
+                    catSales.merge(catName, amount, BigDecimal::add);
+                }
+            }
         }
 
         List<Map<String, Object>> result = catSales.entrySet().stream()
@@ -320,16 +359,6 @@ public class DashboardController {
         if (o.getCreateTime() != null) return o.getCreateTime().format(MONTH_FMT);
         if (o.getPayTime() != null) return o.getPayTime().format(MONTH_FMT);
         return null;
-    }
-
-    private String extractCategory(String desc) {
-        if (desc == null) return "其他";
-        if (desc.contains("坚果") || desc.contains("零食")) return "坚果零食";
-        if (desc.contains("水果") || desc.contains("生鲜") || desc.contains("脐橙") || desc.contains("苹果") || desc.contains("奇异果")) return "生鲜水果";
-        if (desc.contains("饮料") || desc.contains("气泡") || desc.contains("酸奶") || desc.contains("果汁") || desc.contains("水")) return "饮料饮品";
-        if (desc.contains("榨菜") || desc.contains("粉") || desc.contains("面") || desc.contains("米") || desc.contains("调味") || desc.contains("酱油")) return "粮油调味";
-        if (desc.contains("鸭脖") || desc.contains("鸡爪") || desc.contains("凤爪") || desc.contains("卤") || desc.contains("牛肉")) return "卤味熟食";
-        return "其他";
     }
 }
 

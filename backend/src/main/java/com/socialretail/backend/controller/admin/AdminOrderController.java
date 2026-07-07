@@ -4,9 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.Result;
+import com.socialretail.backend.entity.member.Merchant;
+import com.socialretail.backend.entity.member.User;
 import com.socialretail.backend.entity.order.Order;
 import com.socialretail.backend.entity.order.OrderItem;
 import com.socialretail.backend.entity.product.Product;
+import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.member.UserMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.order.OrderItemMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
@@ -26,12 +30,17 @@ public class AdminOrderController {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final ProductMapper productMapper;
+    private final UserMapper userMapper;
+    private final MerchantMapper merchantMapper;
 
     public AdminOrderController(OrderMapper orderMapper, OrderItemMapper orderItemMapper,
-                                 ProductMapper productMapper) {
+                                 ProductMapper productMapper, UserMapper userMapper,
+                                 MerchantMapper merchantMapper) {
         this.orderMapper = orderMapper;
         this.orderItemMapper = orderItemMapper;
         this.productMapper = productMapper;
+        this.userMapper = userMapper;
+        this.merchantMapper = merchantMapper;
     }
 
     @GetMapping("/orders")
@@ -53,7 +62,7 @@ public class AdminOrderController {
         Page<Order> mpPage = new Page<>(page, pageSize);
         Page<Order> result = orderMapper.selectPage(mpPage, wrapper);
 
-        // 为每个订单加载商品
+        // 为每个订单加载商品和用户/商家信息
         List<Map<String, Object>> list = new ArrayList<>();
         for (Order order : result.getRecords()) {
             Map<String, Object> vo = new LinkedHashMap<>();
@@ -66,6 +75,22 @@ public class AdminOrderController {
             vo.put("deliveryType", order.getDeliveryType());
             vo.put("status", order.getStatus());
             vo.put("createTime", order.getCreateTime());
+
+            // 用户信息
+            if (order.getUserId() != null) {
+                User user = userMapper.selectById(order.getUserId());
+                if (user != null) {
+                    vo.put("userName", user.getNickname());
+                    vo.put("userPhone", user.getPhone());
+                }
+            }
+            // 商家信息
+            if (order.getMerchantId() != null) {
+                Merchant merchant = merchantMapper.selectById(order.getMerchantId());
+                if (merchant != null) {
+                    vo.put("merchantName", merchant.getMerchantName());
+                }
+            }
 
             LambdaQueryWrapper<OrderItem> itemWrapper = new LambdaQueryWrapper<>();
             itemWrapper.eq(OrderItem::getOrderId, order.getId());
@@ -89,7 +114,7 @@ public class AdminOrderController {
                 }
             }
             vo.put("orderItems", items);
-            vo.put("itemCount", items.size());
+            vo.put("totalQuantity", items.size());
             list.add(vo);
         }
 
