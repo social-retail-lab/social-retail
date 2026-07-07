@@ -13,7 +13,7 @@
         <h2 class="section-title">跨店满减活动</h2>
         <div v-if="platformLoading" class="empty-state"><div class="empty-text">加载中...</div></div>
         <div v-else-if="platformActivities.length === 0" class="empty-state">
-          <div class="empty-icon">📢</div><div class="empty-text">暂无跨店满减活动</div>
+          <div class="empty-text">暂无跨店满减活动</div>
         </div>
         <div v-else class="activity-cards">
           <div v-for="item in platformActivities" :key="item.id" class="activity-card">
@@ -80,7 +80,7 @@
                 </tr>
               </tbody>
             </table>
-            <div v-else class="empty-state"><div class="empty-icon">⚡</div><div class="empty-text">暂无秒杀商品，点击"添加商品"参与</div></div>
+            <div v-else class="empty-state"><div class="empty-text">暂无秒杀商品，点击"添加商品"参与</div></div>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@
               </tr>
             </tbody>
           </table>
-          <div v-else class="empty-state"><div class="empty-icon">🎫</div><div class="empty-text">暂无优惠券，点击"新建优惠券"创建</div></div>
+          <div v-else class="empty-state"><div class="empty-text">暂无优惠券，点击"新建优惠券"创建</div></div>
         </div>
       </div>
     </template>
@@ -368,7 +368,7 @@ onMounted(() => { loadPlatformPromotions(); loadCoupons(); loadSeckillActivities
 .table-container { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #F2F3F5; font-size: 13px; }
-.data-table th { background: #F7F8FA; color: #4E5969; font-weight: 600; }
+.data-table th { background: #EAEBED; color: #4E5969; font-weight: 600; font-size: 15px; }
 .data-table td { color: #1D2129; }
 .type-tag { font-size: 12px; padding: 2px 8px; border-radius: 4px; }
 .type-fixed { background: #E6F7FF; color: #1890FF; }

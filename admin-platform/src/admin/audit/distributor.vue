@@ -69,7 +69,6 @@
         </tbody>
       </table>
       <div v-else class="empty-state">
-        <span class="empty-icon">📋</span>
         <span class="empty-text">暂无分销员申请</span>
       </div>
     </div>
@@ -212,7 +211,7 @@ h1 { font-size: 20px; color: #2D2D2D; margin-bottom: 4px; }
 .table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden; white-space: nowrap; min-width: 1400px; }
 .data-table th, .data-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: middle; }
-.data-table th { background: #fafafa; color: #555; font-weight: 600; }
+.data-table th { background: #EDEDED; color: #555; font-weight: 600; font-size: 15px; }
 .data-table td { color: #333; }
 
 .id-img { width: 64px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid #e8e8e8; cursor: pointer; }

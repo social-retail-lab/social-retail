@@ -71,7 +71,6 @@
     </div>
 
     <div v-if="userList.length === 0" class="empty-state">
-      <div class="empty-icon">👥</div>
       <div class="empty-text">暂无用户</div>
     </div>
 
@@ -275,8 +274,8 @@ onMounted(() => {
 }
 
 .data-table th {
-  background: #F2F3F5;
-  font-size: 14px;
+  background: #E5E6EB;
+  font-size: 15px;
   color: #4E5969;
   font-weight: 600;
 }

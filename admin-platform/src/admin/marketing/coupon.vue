@@ -75,7 +75,6 @@
       </div>
 
       <div v-if="couponList.length === 0" class="empty-state">
-        <div class="empty-icon">🎫</div>
         <div class="empty-text">暂无优惠券</div>
       </div>
 
@@ -149,7 +148,6 @@
       </div>
 
       <div v-if="promotionList.length === 0" class="empty-state">
-        <div class="empty-icon">📢</div>
         <div class="empty-text">暂无大促活动</div>
       </div>
     </div>
@@ -773,8 +771,8 @@ onMounted(() => {
 }
 
 .data-table th {
-  background: #F2F3F5;
-  font-size: 14px;
+  background: #E5E6EB;
+  font-size: 15px;
   color: #4E5969;
   font-weight: 600;
 }

@@ -66,7 +66,6 @@
           </tbody>
         </table>
         <div v-else class="empty-state">
-          <span class="empty-icon">📋</span>
           <span class="empty-text">暂无分销员数据</span>
         </div>
       </div>
@@ -81,7 +80,6 @@
 
     <!-- ========== 推广模版管理（占位） ========== -->
     <div v-if="activeTab === 'template'" class="placeholder-card">
-      <span class="placeholder-icon">🔧</span>
       <span class="placeholder-text">推广物料模版与链接模版管理功能开发中，敬请期待</span>
     </div>
 
@@ -260,7 +258,7 @@ h1 { font-size: 20px; color: #2D2D2D; margin-bottom: 4px; }
 .table-wrap { background: #fff; border-radius: 6px; overflow: hidden; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { padding: 10px 14px; text-align: center; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-.data-table th { background: #fafafa; color: #555; font-weight: 600; }
+.data-table th { background: #EDEDED; color: #555; font-weight: 600; font-size: 15px; }
 .data-table td { color: #333; }
 
 .status-tag { padding: 2px 8px; border-radius: 4px; font-size: 12px; }

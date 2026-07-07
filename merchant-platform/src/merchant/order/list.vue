@@ -21,47 +21,50 @@
 
     <div class="order-list">
       <div v-for="order in orderList" :key="order.orderId" class="order-card">
-        <div class="order-header">
-          <div class="order-info">
-            <span class="order-sn">订单号: {{ order.orderSn }}</span>
-            <span :class="['status-tag', getStatusClass(order.status)]">{{ order.statusText || getStatusText(order.status, order.deliveryType) }}</span>
-          </div>
-          <span class="order-time">{{ order.createTime }}</span>
+        <!-- 收缩状态：一行显示 -->
+        <div class="order-collapsed" @click="toggleExpand(order.orderId)">
+          <span class="col-sn">{{ order.orderSn }}</span>
+          <span :class="['col-status', 'status-tag', getStatusClass(order.status)]">{{ order.statusText || getStatusText(order.status, order.deliveryType) }}</span>
+          <span class="col-amount">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
+          <span class="col-time">{{ order.createTime }}</span>
+          <span class="col-expand">{{ expandedOrders[order.orderId] ? '▲' : '▼' }}</span>
         </div>
 
-        <div class="order-items">
-          <div v-for="item in order.orderItems" :key="item.id" class="order-item">
-            <img :src="item.productImage || 'https://via.placeholder.com/80'" class="product-image" />
-            <div class="product-info">
-              <div class="product-name">{{ item.productName }}</div>
-              <div class="product-spec">{{ item.skuSpecs }}</div>
-              <div class="product-price">
-                <span class="price">¥{{ (item.price || 0).toFixed(2) }}</span>
-                <span class="quantity">x{{ item.quantity }}</span>
+        <!-- 展开状态：完整卡片 -->
+        <div v-if="expandedOrders[order.orderId]" class="order-expanded">
+          <div class="order-items">
+            <div v-for="item in order.orderItems" :key="item.id" class="order-item">
+              <img :src="item.productImage || 'https://via.placeholder.com/80'" class="product-image" />
+              <div class="product-info">
+                <div class="product-name">{{ item.productName }}</div>
+                <div class="product-spec">{{ item.skuSpecs }}</div>
+                <div class="product-price">
+                  <span class="price">¥{{ (item.price || 0).toFixed(2) }}</span>
+                  <span class="quantity">x{{ item.quantity }}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="order-footer">
-          <div class="order-total">
-            共{{ order.itemCount || 0 }}件商品，合计: <span class="total-price">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
-            <span class="delivery-type">{{ order.deliveryTypeText }}</span>
-          </div>
-          <div class="order-actions">
-            <button v-if="order.status === 1" class="action-btn primary" @click="handleAcceptOrder(order)">接单</button>
-            <button v-if="order.status === 2" class="action-btn primary" @click="handlePrepareOrder(order)">备货</button>
-            <button v-if="order.status === 3 && order.deliveryType === 1" class="action-btn info" @click="viewDelivery(order)">查看配送</button>
-            <button v-if="order.status === 3 && order.deliveryType === 2" class="action-btn primary" @click="handleConfirmPickup(order)">确认自提</button>
-            <button v-if="order.status === 1" class="action-btn cancel" @click="handleCancelOrder(order)">取消订单</button>
-            <button class="action-btn detail" @click="openDetail(order)">查看详情</button>
+          <div class="order-footer">
+            <div class="order-total">
+              共{{ order.itemCount || 0 }}件商品，合计: <span class="total-price">¥{{ (order.payAmount || 0).toFixed(2) }}</span>
+              <span class="delivery-type">{{ order.deliveryTypeText }}</span>
+            </div>
+            <div class="order-actions">
+              <button v-if="order.status === 1" class="action-btn primary" @click="handleAcceptOrder(order)">接单</button>
+              <button v-if="order.status === 2" class="action-btn primary" @click="handlePrepareOrder(order)">备货</button>
+              <button v-if="order.status === 3 && order.deliveryType === 1" class="action-btn info" @click="viewDelivery(order)">查看配送</button>
+              <button v-if="order.status === 3 && order.deliveryType === 2" class="action-btn primary" @click="handleConfirmPickup(order)">确认自提</button>
+              <button v-if="order.status === 1" class="action-btn cancel" @click="handleCancelOrder(order)">取消订单</button>
+              <button class="action-btn detail" @click="openDetail(order)">查看详情</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div v-if="orderList.length === 0 && !loading" class="empty-state">
-      <div class="empty-icon">📦</div>
       <div class="empty-text">暂无订单</div>
     </div>
 
@@ -115,7 +118,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { getOrderList, getOrderDetail, acceptOrder, prepareOrder, cancelOrder as cancelOrderApi, confirmPickupCode } from '@/api/order'
 
 interface OrderItem {
@@ -164,6 +167,11 @@ const tabs = [
 
 const orderList = ref<Order[]>([])
 const loading = ref(false)
+const expandedOrders = reactive<Record<number, boolean>>({})
+
+const toggleExpand = (orderId: number) => {
+  expandedOrders[orderId] = !expandedOrders[orderId]
+}
 
 const getStatusClass = (status: number) => {
   if (status === 0) return 'WAIT_PAY'
@@ -202,26 +210,17 @@ const loadData = async () => {
     pageNum: currentPage.value,
     pageSize: pageSize.value
   }
-  if (tab && tab.status !== undefined) {
-    params.status = tab.status
-  }
-  if (tab && tab.deliveryType !== undefined) {
-    params.deliveryType = tab.deliveryType
-  }
-  if (searchKeyword.value) {
-    params.orderSn = searchKeyword.value
-  }
+  if (tab && tab.status !== undefined) params.status = tab.status
+  if (tab && tab.deliveryType !== undefined) params.deliveryType = tab.deliveryType
+  if (searchKeyword.value) params.orderSn = searchKeyword.value
   try {
     const res = await getOrderList(params)
-    console.log('[订单列表] 原始响应:', JSON.stringify(res))
     if (res.code === 0) {
       const list = res.data?.list || res.data?.records || (Array.isArray(res.data) ? res.data : [])
-      console.log('[订单列表] 解析后 list count=', list.length, 'total=', res.data?.total)
       orderList.value = list
       totalCount.value = res.data?.total || list.length
       totalPages.value = Math.max(1, Math.ceil(totalCount.value / pageSize.value))
     } else {
-      console.error('[订单列表] 接口错误:', res.code, res.message)
       alert('获取订单列表失败: ' + (res.message || '未知错误'))
     }
   } catch (e: any) {
@@ -268,15 +267,6 @@ const viewDelivery = async (order: Order) => {
   }
 }
 
-const viewDetail = async (order: Order) => {
-  const res = await getOrderDetail(order.orderId)
-  if (res.code === 0) {
-    const data = res.data
-    alert(`订单详情：\n订单号：${data.orderSn}\n金额：¥${data.payAmount}\n状态：${data.statusText}`)
-  }
-}
-
-// 详情弹窗
 const showDetail = ref(false)
 const detailLoading = ref(false)
 const detailData = ref<any>(null)
@@ -328,7 +318,6 @@ onMounted(() => {
   loadData()
 })
 
-// Tab 切换时自动刷新
 watch(activeTab, () => {
   currentPage.value = 1
   loadData()
@@ -391,9 +380,6 @@ watch(activeTab, () => {
   cursor: pointer;
   font-size: 14px;
   color: #595959;
-  display: flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .tab-btn.active {
@@ -402,45 +388,68 @@ watch(activeTab, () => {
   border-color: #E66100;
 }
 
-.badge {
-  background: #FF4D4F;
-  color: white;
-  font-size: 12px;
-  padding: 1px 6px;
-  border-radius: 10px;
-}
-
 .order-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .order-card {
   background: white;
   border-radius: 8px;
-  padding: 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  overflow: hidden;
 }
 
-.order-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.order-info {
+/* 收缩行 */
+.order-collapsed {
   display: flex;
   align-items: center;
-  gap: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  gap: 24px;
 }
 
-.order-sn {
+.order-collapsed:hover {
+  background: #fafafa;
+}
+
+.col-sn {
+  flex: 0 0 200px;
   font-size: 14px;
   color: #2D2D2D;
+  font-family: monospace;
+}
+
+.col-status {
+  flex: 0 0 100px;
+}
+
+.col-amount {
+  flex: 0 0 120px;
+  font-size: 15px;
+  color: #E66100;
+  font-weight: 600;
+}
+
+.col-time {
+  flex: 1;
+  font-size: 13px;
+  color: #8C8C8C;
+}
+
+.col-expand {
+  flex: 0 0 30px;
+  text-align: center;
+  font-size: 12px;
+  color: #999;
+}
+
+/* 展开区域 */
+.order-expanded {
+  border-top: 1px solid #f0f0f0;
+  padding: 16px 20px;
 }
 
 .status-tag {
@@ -456,11 +465,6 @@ watch(activeTab, () => {
 .status-tag.COMPLETED { background: #F6FFED; color: #52C41A; }
 .status-tag.CANCELLED { background: #F5F5F5; color: #999; }
 .status-tag.CLOSED { background: #F5F5F5; color: #999; }
-
-.order-time {
-  font-size: 12px;
-  color: #8C8C8C;
-}
 
 .order-items {
   display: flex;
@@ -594,11 +598,6 @@ watch(activeTab, () => {
   align-items: center;
   justify-content: center;
   padding: 60px 0;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
 }
 
 .empty-text {

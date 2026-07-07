@@ -464,9 +464,10 @@ h2 {
 }
 
 .data-table th {
-  background: #FAFBFC;
+  background: #EDEEEF;
   font-weight: 600;
   color: #1D2129;
+  font-size: 15px;
 }
 
 .empty-cell {

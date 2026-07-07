@@ -1,7 +1,6 @@
 <template>
   <div class="pickup-verify">
     <div class="verify-card">
-      <div class="verify-icon">📱</div>
       <h2>门店核销</h2>
       <p class="verify-desc">输入顾客提供的自提核销码，完成订单核销</p>
 
@@ -16,7 +15,6 @@
       </div>
 
       <div v-if="result" class="result-box">
-        <div class="result-icon">✅</div>
         <h3>核销成功</h3>
         <div class="result-grid">
           <div class="result-item">

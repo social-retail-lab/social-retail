@@ -72,7 +72,6 @@
         </tbody>
       </table>
       <div v-else class="empty-state">
-        <div class="empty-icon">📦</div>
         <div class="empty-text">暂无分销商品，请在上方添加</div>
       </div>
     </div>
@@ -221,7 +220,7 @@ onMounted(loadList)
 
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { padding: 10px 14px; text-align: center; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-.data-table th { background: #fafafa; color: #555; font-weight: 600; }
+.data-table th { background: #EDEDED; color: #555; font-weight: 600; font-size: 15px; }
 .data-table td { color: #333; }
 
 .ratio-cell { display: flex; align-items: center; justify-content: center; gap: 8px; }

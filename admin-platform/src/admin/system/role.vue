@@ -95,11 +95,11 @@ const form = reactive({
 const roleList = ref<any[]>([])
 
 const permissionMenus = ref<any[]>([
-  { path: '/dashboard', label: '运营看板', icon: '📊' },
+  { path: '/dashboard', label: '运营看板', icon: '' },
   { 
     path: '/merchant-audit', 
     label: '审核管理', 
-    icon: '✅',
+    icon: '',
     children: [
       { path: '/merchant-audit', label: '商家审核' },
       { path: '/product-audit', label: '商品审核' }
@@ -108,7 +108,7 @@ const permissionMenus = ref<any[]>([
   { 
     path: '/users', 
     label: '系统管理', 
-    icon: '⚙️',
+    icon: '',
     children: [
       { path: '/users', label: '用户管理' },
       { path: '/orders', label: '订单管理' },
@@ -118,7 +118,7 @@ const permissionMenus = ref<any[]>([
   { 
     path: '/seckill', 
     label: '营销管理', 
-    icon: '🎯',
+    icon: '',
     children: [
       { path: '/seckill', label: '秒杀活动' },
       { path: '/coupon', label: '优惠券管理' },

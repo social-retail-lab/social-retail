@@ -41,6 +41,11 @@ table th, table td {
   border: 1px solid #eee;
   color: #595959;
 }
+table th {
+  background: #E5E6EB;
+  font-weight: 600;
+  font-size: 15px;
+}
 .page-wrap {
   display: flex;
   gap: 12px;

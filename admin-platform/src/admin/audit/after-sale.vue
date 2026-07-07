@@ -201,7 +201,7 @@ loadData()
 .table-wrap { overflow-x: auto; }
 .data-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 6px; overflow: hidden; table-layout: auto; white-space: nowrap; }
 .data-table th, .data-table td { padding: 10px 12px; text-align: center; border-bottom: 1px solid #f0f0f0; font-size: 13px; vertical-align: middle; }
-.data-table th { background: #fafafa; color: #555; font-weight: 600; }
+.data-table th { background: #EDEDED; color: #555; font-weight: 600; font-size: 15px; }
 .data-table td { color: #333; }
 .text-left { text-align: left !important; }
 .reason-cell { white-space: normal; max-width: 200px; line-height: 1.5; }

@@ -5,16 +5,17 @@
         <h1>社交新零售管理后台</h1>
       </div>
       <nav class="sidebar-nav">
-        <div v-for="menu in menus" :key="menu.path">
+        <div v-for="menu in menus" :key="menu.label">
           <div 
-            :class="['nav-item', { active: currentPath === menu.path }]"
-            @click="menu.children && menu.children.length ? '' : $router.push(menu.path)"
+            :class="['nav-item', { active: isMenuActive(menu) }]"
+            @click="handleMenuClick(menu)"
           >
             <span class="nav-label">{{ menu.label }}</span>
+            <span v-if="menu.children && menu.children.length" class="nav-arrow">{{ expandedMenus[menu.label] ? '▲' : '▼' }}</span>
             <span v-if="menu.badge && badge[menu.badge]" class="nav-badge">{{ badge[menu.badge] }}</span>
             <span v-if="menu.dot && hasDot(menu.dot)" class="nav-dot"></span>
           </div>
-          <div v-if="menu.children" class="sub-menu">
+          <div v-if="menu.children && menu.children.length && expandedMenus[menu.label]" class="sub-menu">
             <div 
               v-for="child in menu.children" 
               :key="child.path"
@@ -49,9 +50,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
 
 const router = useRouter()
 const route = useRoute()
@@ -66,6 +66,25 @@ const adminInfo = ref({
 const currentTime = ref('')
 const badge = ref<Record<string, number>>({})
 const dot = ref<Record<string, boolean>>({})
+
+const expandedMenus = reactive<Record<string, boolean>>({})
+
+const isMenuActive = (menu: any) => {
+  if (currentPath.value === menu.path) return true
+  if (menu.children) {
+    return menu.children.some((c: any) => c.path === currentPath.value)
+  }
+  return false
+}
+
+const handleMenuClick = (menu: any) => {
+  if (menu.children && menu.children.length) {
+    // Toggle expand/collapse
+    expandedMenus[menu.label] = !expandedMenus[menu.label]
+  } else if (menu.path) {
+    router.push(menu.path)
+  }
+}
 
 const updateTime = () => {
   const now = new Date()
@@ -117,7 +136,6 @@ onUnmounted(() => {
 
 const systemMenus = [
   { 
-    path: '/users', 
     label: '系统管理',
     children: [
       { path: '/users', label: '用户管理' },
@@ -129,23 +147,18 @@ const systemMenus = [
 const operationMenus = [
   { path: '/dashboard', label: '运营看板' },
   { 
-    path: '/merchant-audit', 
     label: '审核管理',
     dot: 'audit',
     children: [
       { path: '/merchant-audit', label: '商家入驻审核' },
       { path: '/product-audit', label: '商品审核', badge: 'audit' },
       { path: '/info-change', label: '信息审核' },
-      { path: '/after-sale-appeal', label: '售后处理' },
       { path: '/distributor-audit', label: '分销员审核' }
     ]
   },
+  { path: '/after-sale-appeal', label: '售后处理' },
+  { path: '/orders', label: '订单管理' },
   { 
-    path: '/orders', 
-    label: '订单管理'
-  },
-  { 
-    path: '/seckill', 
     label: '营销管理',
     children: [
       { path: '/seckill', label: '秒杀活动' },
@@ -219,49 +232,10 @@ const logout = () => {
   font-size: 14px;
 }
 
-/* 滚动条美化 */
-.sidebar-nav::-webkit-scrollbar {
-  width: 4px;
-}
-.sidebar-nav::-webkit-scrollbar-track {
-  background: transparent;
-}
-.sidebar-nav::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 2px;
-  transition: background 0.3s;
-}
-.sidebar-nav:hover::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.15);
-}
-.sidebar-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.3);
-}
-.sidebar-nav {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-}
-
-.content-area::-webkit-scrollbar {
-  width: 4px;
-}
-.content-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-.content-area::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 2px;
-  transition: background 0.3s;
-}
-.content-area:hover::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.12);
-}
-.content-area::-webkit-scrollbar-thumb:hover {
-  background: rgba(0,0,0,0.25);
-}
-.content-area {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
+.nav-arrow {
+  margin-left: 6px;
+  font-size: 10px;
+  opacity: 0.7;
 }
 
 .sub-menu {

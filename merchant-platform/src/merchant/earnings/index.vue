@@ -6,14 +6,12 @@
 
     <div class="balance-section">
       <div class="balance-card available">
-        <div class="balance-icon">💰</div>
         <div class="balance-info">
           <div class="balance-label">可提现金额</div>
           <div class="balance-amount">¥{{ totalAvailable.toFixed(2) }}</div>
         </div>
       </div>
       <div class="balance-card frozen">
-        <div class="balance-icon">⏳</div>
         <div class="balance-info">
           <div class="balance-label">待确认收货</div>
           <div class="balance-amount">¥{{ totalFrozen.toFixed(2) }}</div>
@@ -28,7 +26,7 @@
         :class="['withdraw-btn', { disabled: totalAvailable <= 0 }]"
         @click="handleWithdrawClick"
       >
-        💸 立即提现
+        立即提现
       </button>
       <div class="commission-rule-link" @click="showCommissionModal = true">
         平台阶梯式佣金收费细则？
@@ -57,7 +55,7 @@
           </tbody>
         </table>
         <div v-if="earningsList.length === 0" class="empty-state">
-          <div class="empty-icon">📭</div><div class="empty-text">暂无收益记录</div>
+          <div class="empty-text">暂无收益记录</div>
         </div>
       </div>
 
@@ -79,7 +77,7 @@
           </tbody>
         </table>
         <div v-if="withdrawRecords.length === 0" class="empty-state">
-          <div class="empty-icon">📭</div><div class="empty-text">暂无提现记录</div>
+          <div class="empty-text">暂无提现记录</div>
         </div>
       </div>
     </div>
@@ -454,7 +452,7 @@ onMounted(() => {
 .table-container { padding: 16px; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th, .data-table td { padding: 12px; text-align: left; border-bottom: 1px solid #F2F3F5; font-size: 13px; }
-.data-table th { background: #F7F8FA; color: #4E5969; font-weight: 600; }
+.data-table th { background: #EAEBED; color: #4E5969; font-weight: 600; font-size: 15px; }
 .data-table td { color: #1D2129; }
 .status-tag { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
 .status-tag.frozen { background: #FFF7E6; color: #FA8C16; }
@@ -518,6 +516,6 @@ onMounted(() => {
 .rule-section .formula { margin-top: 8px; padding: 8px 12px; background: #F7F8FA; border-radius: 4px; font-weight: 600; color: #165DFF; }
 .commission-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 12px; }
 .commission-table th, .commission-table td { padding: 8px 10px; border: 1px solid #E2E8F0; text-align: left; }
-.commission-table th { background: #F7F8FA; font-weight: 600; color: #4E5969; }
+.commission-table th { background: #EAEBED; font-weight: 600; color: #4E5969; font-size: 14px; }
 .commission-table td { color: #1D2129; }
 </style>

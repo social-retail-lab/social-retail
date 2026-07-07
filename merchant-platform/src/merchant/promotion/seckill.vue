@@ -55,7 +55,6 @@
           </tbody>
         </table>
         <div v-else class="empty-state">
-          <div class="empty-icon">⚡</div>
           <div class="empty-text">暂无秒杀商品，点击"添加商品"参与</div>
         </div>
       </div>
@@ -372,9 +371,10 @@ onMounted(() => {
 }
 
 .data-table th {
-  background: #F7F8FA;
+  background: #EAEBED;
   color: #4E5969;
   font-weight: 600;
+  font-size: 15px;
 }
 
 .data-table td {

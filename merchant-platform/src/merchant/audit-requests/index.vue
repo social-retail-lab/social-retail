@@ -43,7 +43,6 @@
       </el-table>
 
       <div v-if="list.length === 0 && !loading" class="empty-state">
-        <div class="empty-icon">📭</div>
         <div class="empty-text">暂无审核请求</div>
       </div>
 

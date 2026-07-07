@@ -177,6 +177,11 @@ table th, table td {
   border: 1px solid #eee;
   color: #4E5969;
 }
+table th {
+  background: #E5E6EB;
+  font-weight: 600;
+  font-size: 15px;
+}
 .page {
   display: flex;
   gap: 12px;

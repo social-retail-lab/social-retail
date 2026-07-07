@@ -30,7 +30,6 @@
       </div>
 
       <div v-if="list.length === 0" class="empty-state">
-        <div class="empty-icon">📭</div>
         <div class="empty-text">暂无售后请求</div>
       </div>
     </div>

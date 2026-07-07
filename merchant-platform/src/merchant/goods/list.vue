@@ -186,7 +186,7 @@ const categoryId2 = ref('')
 const filterStatus = ref('')
 const filterAuditStatus = ref('')
 const currentPage = ref(1)
-const pageSize = 10
+const pageSize = 15
 const totalCount = ref(0)
 const totalPages = computed(() => Math.max(1, Math.ceil(totalCount.value / pageSize)))
 
@@ -582,26 +582,26 @@ onMounted(() => {
 
 .goods-list {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
 }
 
 .goods-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .goods-id {
-  padding: 6px 12px 0;
-  font-size: 11px;
+  padding: 4px 8px 0;
+  font-size: 10px;
   color: #C9CDD4;
 }
 
 .goods-image {
   width: 100%;
-  height: 180px;
+  height: 130px;
   overflow: hidden;
 }
 
@@ -612,14 +612,14 @@ onMounted(() => {
 }
 
 .goods-info {
-  padding: 16px;
+  padding: 12px;
 }
 
 .goods-title {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
   color: #1D2129;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -635,11 +635,11 @@ onMounted(() => {
 }
 
 .goods-price {
-  margin-bottom: 10px;
+  margin-bottom: 6px;
 }
 
 .price {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
   color: #FF4D4F;
 }
