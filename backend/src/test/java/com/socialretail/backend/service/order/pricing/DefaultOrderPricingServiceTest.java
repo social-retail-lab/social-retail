@@ -32,7 +32,8 @@ class DefaultOrderPricingServiceTest {
         item.setCartId(24L);
         item.setSkuId(8002L);
         item.setProductId(6001L);
-        item.setPrice(new BigDecimal("69.90"));
+        item.setPrice(new BigDecimal("59.90"));
+        item.setOriginalPrice(new BigDecimal("69.90"));
         item.setQuantity(2);
         List<CartItemVO> items = List.of(item);
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Validated
@@ -35,8 +36,9 @@ public class ProductController {
 
     @GetMapping("/{productId}")
     public Result<ProductDetailVO> getProductDetail(
-            @Positive(message = "商品ID必须大于0") @PathVariable Long productId) {
-        return Result.success(productService.getProductDetail(productId));
+            @Positive(message = "商品ID必须大于0") @PathVariable Long productId,
+            @RequestParam(required = false) String promotionCode) {
+        return Result.success(productService.getProductDetail(productId, promotionCode));
     }
 
     @GetMapping("/{productId}/skus")

@@ -466,6 +466,9 @@ public class OrderServiceImpl implements OrderService {
         item.setItemOriginAmount(price.originAmount());
         item.setItemFinalAmount(price.finalAmount());
         item.setPromotionType(price.promotionType());
+        item.setDistributorProductId(cartItem.getDistributorProductId());
+        item.setCommissionRate(cartItem.getCommissionRate());
+        item.setAttributionExpiresAt(cartItem.getPromotionExpiresAt());
         return item;
     }
 

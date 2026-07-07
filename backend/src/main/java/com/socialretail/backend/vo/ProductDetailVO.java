@@ -5,7 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
 @NoArgsConstructor
@@ -32,6 +34,10 @@ public class ProductDetailVO {
     private Integer stock;
     private String status;
     private ProductMerchantInfoVO merchantInfo;
+    private Long distributorProductId;
+    private String promotionCode;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime promotionExpiresAt;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<SkuVO> skuList;

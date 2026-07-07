@@ -24,6 +24,12 @@ public interface CartMapper {
                        @Param("userId") Long userId,
                        @Param("quantity") Integer quantity);
 
+    int updateQuantityAndAttribution(@Param("id") Long id,
+                                     @Param("userId") Long userId,
+                                     @Param("quantity") Integer quantity,
+                                     @Param("distributorProductId") Long distributorProductId,
+                                     @Param("attributionExpiresAt") java.time.LocalDateTime attributionExpiresAt);
+
     int deleteByIdAndUserId(@Param("id") Long id, @Param("userId") Long userId);
 
     int deleteByIdsAndUserId(@Param("userId") Long userId,

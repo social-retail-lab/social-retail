@@ -26,6 +26,7 @@ import com.socialretail.backend.service.order.impl.OrderServiceImpl;
 import com.socialretail.backend.service.order.OrderPointsService;
 import com.socialretail.backend.service.order.OrderRewardService;
 import com.socialretail.backend.service.pay.PayService;
+import com.socialretail.backend.service.social.CommissionService;
 import com.socialretail.backend.vo.payment.AlipayCreatePayVO;
 import com.socialretail.backend.vo.payment.MockPayResultVO;
 import com.socialretail.backend.vo.payment.PayOrderStatusVO;
@@ -73,6 +74,7 @@ public class PayServiceImpl implements PayService {
     private final ObjectMapper objectMapper;
     private final OrderPointsService orderPointsService;
     private final OrderRewardService orderRewardService;
+    private final CommissionService commissionService;
 
     public PayServiceImpl(PaymentMapper paymentMapper,
                           OrderMapper orderMapper,
@@ -81,7 +83,8 @@ public class PayServiceImpl implements PayService {
                           AlipayProperties alipayProperties,
                           ObjectMapper objectMapper,
                           OrderPointsService orderPointsService,
-                          OrderRewardService orderRewardService) {
+                          OrderRewardService orderRewardService,
+                          CommissionService commissionService) {
         this.paymentMapper = paymentMapper;
         this.orderMapper = orderMapper;
         this.productMapper = productMapper;
@@ -90,6 +93,7 @@ public class PayServiceImpl implements PayService {
         this.objectMapper = objectMapper;
         this.orderPointsService = orderPointsService;
         this.orderRewardService = orderRewardService;
+        this.commissionService = commissionService;
     }
 
     @Override
@@ -314,7 +318,9 @@ public class PayServiceImpl implements PayService {
         }
         orderPointsService.consume(order);
         orderRewardService.rewardPaidOrder(order, payTime);
-        for (OrderItem item : orderMapper.selectItemsByOrderId(order.getId())) {
+        java.util.List<OrderItem> orderItems = orderMapper.selectItemsByOrderId(order.getId());
+        commissionService.createForPaidOrder(order, orderItems, payTime);
+        for (OrderItem item : orderItems) {
             if (item.getProductId() == null || item.getQuantity() == null || item.getQuantity() <= 0) {
                 continue;
             }

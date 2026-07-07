@@ -3,6 +3,15 @@
 ### 商品列表（分页、分类、排序）
 GET {{baseUrl}}/api/products?categoryId=1&page=1&size=10&sort=price_asc
 
+### Homepage products - sales descending
+GET {{baseUrl}}/api/products?page=1&size=10&sortField=soldCount&sortOrder=desc
+
+### Homepage products - price ascending
+GET {{baseUrl}}/api/products?page=1&size=10&sortField=price&sortOrder=asc
+
+### Homepage products - newest first
+GET {{baseUrl}}/api/products?page=1&size=10&sortField=createTime&sortOrder=desc
+
 ### 商品详情
 GET {{baseUrl}}/api/products/1001
 

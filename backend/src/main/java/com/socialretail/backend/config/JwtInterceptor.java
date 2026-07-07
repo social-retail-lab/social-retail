@@ -55,8 +55,15 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        // 商品评价列表无需登录，评价详情支持可选登录。若携带 token，仍继续解析，
+        // 以便详情接口判断当前用户是否为评价发布者。
+        boolean optionalAuthPath = isOptionalCommentRead(request.getMethod(), path);
+
         // Get Authorization header
         String header = request.getHeader("Authorization");
+        if (optionalAuthPath && (header == null || header.isBlank())) {
+            return true;
+        }
         if (header == null || header.isEmpty() || !header.startsWith(BEARER_PREFIX)) {
             sendErrorResponse(response, 40100, "用户未登录或登录已过期");
             return false;
@@ -82,6 +89,14 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
 
         return true;
+    }
+
+    private boolean isOptionalCommentRead(String method, String path) {
+        if (!HttpMethod.GET.matches(method)) {
+            return false;
+        }
+        return path.matches("/api/products/\\d+/comments")
+                || path.matches("/api/comments/\\d+");
     }
 
     private void sendErrorResponse(HttpServletResponse response, int code, String message) throws IOException {

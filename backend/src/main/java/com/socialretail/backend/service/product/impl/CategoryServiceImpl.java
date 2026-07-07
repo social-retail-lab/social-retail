@@ -13,6 +13,7 @@ import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.service.product.CategoryService;
+import com.socialretail.backend.service.product.CurrentProductPriceService;
 import com.socialretail.backend.vo.CatalogProductVO;
 import com.socialretail.backend.vo.CategoryProductPageVO;
 import com.socialretail.backend.vo.CategoryTreeResultVO;
@@ -43,17 +44,20 @@ public class CategoryServiceImpl implements CategoryService {
     private final ProductMapper productMapper;
     private final SkuMapper skuMapper;
     private final ImageUrlResolver imageUrlResolver;
+    private final CurrentProductPriceService currentProductPriceService;
 
     public CategoryServiceImpl(CategoryMapper categoryMapper,
                                ProductCategoryRelationMapper relationMapper,
                                ProductMapper productMapper,
                                SkuMapper skuMapper,
-                               ImageUrlResolver imageUrlResolver) {
+                               ImageUrlResolver imageUrlResolver,
+                               CurrentProductPriceService currentProductPriceService) {
         this.categoryMapper = categoryMapper;
         this.relationMapper = relationMapper;
         this.productMapper = productMapper;
         this.skuMapper = skuMapper;
         this.imageUrlResolver = imageUrlResolver;
+        this.currentProductPriceService = currentProductPriceService;
     }
 
     @Override
@@ -117,10 +121,12 @@ public class CategoryServiceImpl implements CategoryService {
                                              List<Product> products,
                                              CatalogProductQueryDTO query) {
         Map<Long, List<Sku>> skuMap = loadSkuMap(products);
+        Map<Long, CurrentProductPriceService.Price> prices = currentProductPriceService.resolve(
+                skuMap.values().stream().flatMap(List::stream).toList());
         Map<Long, Product> productMap = products.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         List<CatalogProductVO> items = products.stream()
-                .map(product -> toCatalogProduct(product, skuMap.getOrDefault(product.getId(), List.of())))
+                .map(product -> toCatalogProduct(product, skuMap.getOrDefault(product.getId(), List.of()), prices))
                 .filter(item -> priceMatches(item.getPrice(), query))
                 .collect(Collectors.toCollection(ArrayList::new));
         items.sort(productComparator(query, productMap));
@@ -148,15 +154,26 @@ public class CategoryServiceImpl implements CategoryService {
                 .collect(Collectors.groupingBy(Sku::getProductId));
     }
 
-    private CatalogProductVO toCatalogProduct(Product product, List<Sku> skus) {
-        BigDecimal price = skus.stream().map(Sku::getPrice).filter(value -> value != null)
-                .min(BigDecimal::compareTo).orElse(null);
+    private CatalogProductVO toCatalogProduct(Product product, List<Sku> skus,
+                                               Map<Long, CurrentProductPriceService.Price> prices) {
+        CurrentProductPriceService.Price price = lowestPrice(skus, prices);
         int stock = skus.stream().map(Sku::getStock).filter(value -> value != null)
                 .mapToInt(Integer::intValue).sum();
         return new CatalogProductVO(
-                product.getId(), product.getTitle(), imageUrlResolver.resolve(product.getMainImage()), price, price,
+                product.getId(), product.getTitle(), imageUrlResolver.resolve(product.getMainImage()),
+                price == null ? null : price.finalPrice(), price == null ? null : price.originalPrice(),
                 product.getSoldCount() == null ? 0L : product.getSoldCount(), stock, List.of()
         );
+    }
+
+    private CurrentProductPriceService.Price lowestPrice(
+            List<Sku> skus, Map<Long, CurrentProductPriceService.Price> prices) {
+        return skus.stream()
+                .map(sku -> prices.getOrDefault(sku.getId(),
+                        new CurrentProductPriceService.Price(sku.getPrice(), sku.getPrice(), null)))
+                .filter(price -> price.finalPrice() != null)
+                .min(Comparator.comparing(CurrentProductPriceService.Price::finalPrice))
+                .orElse(null);
     }
 
     private Comparator<CatalogProductVO> productComparator(CatalogProductQueryDTO query,

@@ -24,4 +24,10 @@ public class ProductQueryDTO {
 
     @Size(max = 30, message = "排序参数不能超过30位")
     private String sort;
+
+    @Size(max = 20, message = "排序字段不能超过20位")
+    private String sortField;
+
+    @Size(max = 4, message = "排序方式不能超过4位")
+    private String sortOrder;
 }

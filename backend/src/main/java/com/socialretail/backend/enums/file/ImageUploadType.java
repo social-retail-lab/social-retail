@@ -7,6 +7,8 @@ public enum ImageUploadType {
     BRAND_LOGO("brand/logo", Ownership.MERCHANT_OR_ADMIN, true),
     MERCHANT_IDCARD_FRONT("merchant/idcard/front", Ownership.USER, true),
     MERCHANT_IDCARD_BACK("merchant/idcard/back", Ownership.USER, true),
+    DISTRIBUTOR_IDCARD_FRONT("front", Ownership.USER, true),
+    DISTRIBUTOR_IDCARD_BACK("back", Ownership.USER, true),
     MERCHANT_LICENSE("merchant/license", Ownership.USER),
     QUALIFICATION("merchant/license", Ownership.USER),
     PRODUCT("product/main", Ownership.MERCHANT, true),
@@ -49,6 +51,10 @@ public enum ImageUploadType {
 
     public boolean isSingleImageOnly() {
         return singleImageOnly;
+    }
+
+    public boolean isDistributorIdCard() {
+        return this == DISTRIBUTOR_IDCARD_FRONT || this == DISTRIBUTOR_IDCARD_BACK;
     }
 
     public enum Ownership {

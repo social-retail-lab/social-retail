@@ -40,7 +40,8 @@ public class DefaultOrderPricingService implements OrderPricingService {
         Map<Long, OrderItemPrice> itemPrices = new LinkedHashMap<>();
         BigDecimal originalAmount = ZERO;
         for (CartItemVO item : command.items()) {
-            BigDecimal price = item.getPrice() == null ? ZERO : item.getPrice();
+            BigDecimal price = item.getOriginalPrice() != null
+                    ? item.getOriginalPrice() : item.getPrice() == null ? ZERO : item.getPrice();
             int quantity = item.getQuantity() == null ? 0 : item.getQuantity();
             BigDecimal amount = price.multiply(BigDecimal.valueOf(quantity));
             originalAmount = originalAmount.add(amount);

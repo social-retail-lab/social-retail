@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @TableName("order_item")
 public class OrderItem {
@@ -23,6 +24,9 @@ public class OrderItem {
     private BigDecimal itemOriginAmount;
     private BigDecimal itemFinalAmount;
     private String promotionType;
+    private Long distributorProductId;
+    private BigDecimal commissionRate;
+    private LocalDateTime attributionExpiresAt;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -52,4 +56,10 @@ public class OrderItem {
     public void setItemFinalAmount(BigDecimal itemFinalAmount) { this.itemFinalAmount = itemFinalAmount; }
     public String getPromotionType() { return promotionType; }
     public void setPromotionType(String promotionType) { this.promotionType = promotionType; }
+    public Long getDistributorProductId() { return distributorProductId; }
+    public void setDistributorProductId(Long distributorProductId) { this.distributorProductId = distributorProductId; }
+    public BigDecimal getCommissionRate() { return commissionRate; }
+    public void setCommissionRate(BigDecimal commissionRate) { this.commissionRate = commissionRate; }
+    public LocalDateTime getAttributionExpiresAt() { return attributionExpiresAt; }
+    public void setAttributionExpiresAt(LocalDateTime attributionExpiresAt) { this.attributionExpiresAt = attributionExpiresAt; }
 }

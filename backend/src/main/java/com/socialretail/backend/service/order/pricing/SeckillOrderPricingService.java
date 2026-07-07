@@ -55,7 +55,8 @@ public class SeckillOrderPricingService {
         if (bought + quantity > limit) {
             throw unavailable(seckillProductId, "已超过秒杀限购数量");
         }
-        BigDecimal originPrice = money(item.getPrice());
+        BigDecimal originPrice = money(item.getOriginalPrice() == null
+                ? item.getPrice() : item.getOriginalPrice());
         BigDecimal finalPrice = money(view.getSeckillPrice());
         if (finalPrice.compareTo(originPrice) > 0) {
             throw unavailable(seckillProductId, "秒杀价格配置无效");

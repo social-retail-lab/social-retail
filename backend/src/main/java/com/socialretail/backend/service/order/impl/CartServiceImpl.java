@@ -20,6 +20,8 @@ import com.socialretail.backend.service.order.pricing.OrderPricingService;
 import com.socialretail.backend.service.order.pricing.OrderPricingCommand;
 import com.socialretail.backend.service.order.pricing.OrderPricingResult;
 import com.socialretail.backend.service.order.pricing.OrderItemPrice;
+import com.socialretail.backend.service.social.DistributionAttributionService;
+import com.socialretail.backend.service.product.CurrentProductPriceService;
 import com.socialretail.backend.vo.CartAddVO;
 import com.socialretail.backend.vo.CartBatchDeleteVO;
 import com.socialretail.backend.vo.CartItemVO;
@@ -48,6 +50,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.time.LocalDateTime;
 
 @Service
 public class CartServiceImpl implements CartService {
@@ -65,13 +68,17 @@ public class CartServiceImpl implements CartService {
     private final PlatformCouponPricingService platformCouponPricingService;
     private final SeckillOrderPricingService seckillOrderPricingService;
     private final OrderPricingService orderPricingService;
+    private final DistributionAttributionService distributionAttributionService;
+    private final CurrentProductPriceService currentProductPriceService;
 
     public CartServiceImpl(CartMapper cartMapper, SkuMapper skuMapper, ProductMapper productMapper,
                            ImageUrlResolver imageUrlResolver,
                            PointsCalculationService pointsCalculationService,
                            PlatformCouponPricingService platformCouponPricingService,
                            SeckillOrderPricingService seckillOrderPricingService,
-                           OrderPricingService orderPricingService) {
+                           OrderPricingService orderPricingService,
+                           DistributionAttributionService distributionAttributionService,
+                           CurrentProductPriceService currentProductPriceService) {
         this.cartMapper = cartMapper;
         this.skuMapper = skuMapper;
         this.productMapper = productMapper;
@@ -80,12 +87,15 @@ public class CartServiceImpl implements CartService {
         this.platformCouponPricingService = platformCouponPricingService;
         this.seckillOrderPricingService = seckillOrderPricingService;
         this.orderPricingService = orderPricingService;
+        this.distributionAttributionService = distributionAttributionService;
+        this.currentProductPriceService = currentProductPriceService;
     }
 
     @Override
     @Transactional(readOnly = true)
     public CartListVO list(Long userId) {
         List<CartItemVO> items = cartMapper.selectCartItemsByUserId(userId);
+        applyCurrentPrices(items);
         BigDecimal totalAmount = ZERO_AMOUNT;
         int totalQuantity = 0;
         for (CartItemVO item : items) {
@@ -101,7 +111,9 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional(readOnly = true)
     public CartInvalidItemListVO listInvalidItems(Long userId) {
-        List<CartInvalidItemVO> invalidItems = cartMapper.selectCartItemsByUserId(userId).stream()
+        List<CartItemVO> cartItems = cartMapper.selectCartItemsByUserId(userId);
+        applyCurrentPrices(cartItems);
+        List<CartInvalidItemVO> invalidItems = cartItems.stream()
                 .peek(this::prepareItem)
                 .filter(item -> !Boolean.TRUE.equals(item.getIsValid()))
                 .map(item -> new CartInvalidItemVO(
@@ -123,6 +135,10 @@ public class CartServiceImpl implements CartService {
         Sku sku = requireSku(dto.getSkuId());
         Product product = productMapper.selectById(sku.getProductId());
         requireProductAvailable(product);
+        DistributionAttributionService.Attribution attribution =
+                distributionAttributionService.resolve(dto.getPromotionCode(), product.getId());
+        LocalDateTime attributionExpiresAt = attribution == null ? null
+                : LocalDateTime.now().plusDays(DistributionAttributionService.ATTRIBUTION_DAYS);
 
         Cart existing = cartMapper.selectByUserIdAndSkuId(userId, dto.getSkuId());
         int quantity = dto.getQuantity() + (existing == null ? 0 : safeQuantity(existing.getQuantity()));
@@ -136,11 +152,18 @@ public class CartServiceImpl implements CartService {
             cart.setUserId(userId);
             cart.setSkuId(dto.getSkuId());
             cart.setQuantity(quantity);
+            if (attribution != null) {
+                cart.setDistributorProductId(attribution.distributorProductId());
+                cart.setAttributionExpiresAt(attributionExpiresAt);
+            }
             cartMapper.insert(cart);
             return new CartAddVO(cart.getId(), cart.getSkuId(), cart.getQuantity());
         }
 
-        int updated = cartMapper.updateQuantity(existing.getId(), userId, quantity);
+        int updated = attribution == null
+                ? cartMapper.updateQuantity(existing.getId(), userId, quantity)
+                : cartMapper.updateQuantityAndAttribution(existing.getId(), userId, quantity,
+                        attribution.distributorProductId(), attributionExpiresAt);
         if (updated == 0) {
             throw cartItemNotFound();
         }
@@ -163,7 +186,8 @@ public class CartServiceImpl implements CartService {
         if (updated == 0) {
             throw cartItemNotFound();
         }
-        BigDecimal price = sku.getPrice() == null ? ZERO_AMOUNT : sku.getPrice();
+        CurrentProductPriceService.Price currentPrice = currentProductPriceService.resolve(sku);
+        BigDecimal price = currentPrice.finalPrice() == null ? ZERO_AMOUNT : currentPrice.finalPrice();
         return new CartUpdateVO(
                 cartItemId, sku.getId(), dto.getQuantity(), price,
                 price.multiply(BigDecimal.valueOf(dto.getQuantity()))
@@ -192,6 +216,7 @@ public class CartServiceImpl implements CartService {
         if (items.size() != ids.size()) {
             throw cartItemNotFound();
         }
+        applyCurrentPrices(items);
 
         BigDecimal totalAmount = ZERO_AMOUNT;
         Long merchantId = null;
@@ -341,6 +366,11 @@ public class CartServiceImpl implements CartService {
     }
 
     private void prepareItem(CartItemVO item) {
+        if (item.getDistributorProductId() == null) {
+            item.setPromotionCode(null);
+            item.setCommissionRate(null);
+            item.setPromotionExpiresAt(null);
+        }
         item.setProductImage(imageUrlResolver.resolve(item.getProductImage()));
         int quantity = safeQuantity(item.getQuantity());
         BigDecimal price = item.getPrice() == null ? ZERO_AMOUNT : item.getPrice();
@@ -356,6 +386,24 @@ public class CartServiceImpl implements CartService {
         } else {
             item.setIsValid(true);
             item.setInvalidReason(null);
+        }
+    }
+
+    private void applyCurrentPrices(List<CartItemVO> items) {
+        Map<Long, BigDecimal> originalPrices = new java.util.LinkedHashMap<>();
+        for (CartItemVO item : items) {
+            if (item.getSkuId() != null) {
+                originalPrices.putIfAbsent(item.getSkuId(),
+                        item.getOriginalPrice() == null ? item.getPrice() : item.getOriginalPrice());
+            }
+        }
+        Map<Long, CurrentProductPriceService.Price> prices = currentProductPriceService.resolve(originalPrices);
+        for (CartItemVO item : items) {
+            CurrentProductPriceService.Price price = prices.get(item.getSkuId());
+            if (price != null) {
+                item.setOriginalPrice(price.originalPrice());
+                item.setPrice(price.finalPrice());
+            }
         }
     }
 

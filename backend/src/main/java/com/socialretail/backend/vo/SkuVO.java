@@ -15,6 +15,8 @@ public class SkuVO {
     private Long skuId;
     private Map<String, Object> spec;
     private BigDecimal price;
+    private BigDecimal originalPrice;
+    private Long seckillProductId;
     private Integer stock;
 
     // 以下字段保留给现有商家端使用。
