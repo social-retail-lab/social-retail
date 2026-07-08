@@ -100,6 +100,9 @@ public class AdminCouponController {
         if (body.get("exchangePoints") != null) {
             coupon.setExchangePoints(((Number) body.get("exchangePoints")).intValue());
         }
+        if (body.get("memberLevelRequired") != null) {
+            coupon.setMemberLevelRequired(((Number) body.get("memberLevelRequired")).intValue());
+        }
         if (body.get("validityType") != null) {
             coupon.setValidityType(((Number) body.get("validityType")).intValue());
         }

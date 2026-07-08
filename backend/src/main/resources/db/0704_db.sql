@@ -1,4 +1,4 @@
-﻿SET FOREIGN_KEY_CHECKS=0;
+SET FOREIGN_KEY_CHECKS=0;
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -126,12 +126,16 @@ CREATE TABLE `cart` (
   `user_id` bigint DEFAULT NULL COMMENT '用户ID',
   `sku_id` bigint DEFAULT NULL COMMENT 'SkuID',
   `quantity` int DEFAULT NULL COMMENT '购买数量',
+  `distributor_product_id` bigint DEFAULT NULL,
+  `attribution_expires_at` datetime DEFAULT NULL,
+  `promotion_code` varchar(50) DEFAULT NULL COMMENT '分销推广码',
   PRIMARY KEY (`id`) USING BTREE,
   KEY `fk_cart_user` (`user_id`) USING BTREE,
   KEY `fk_cart_sku` (`sku_id`) USING BTREE,
+  KEY `idx_cart_distribution` (`distributor_product_id`,`attribution_expires_at`),
   CONSTRAINT `fk_cart_sku` FOREIGN KEY (`sku_id`) REFERENCES `sku` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='购物车表';
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='购物车表';
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;

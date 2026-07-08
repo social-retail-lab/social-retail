@@ -68,7 +68,7 @@ public class MerchantPromotionController {
         Long merchantId = getMerchantId(request);
         MerchantCoupon coupon = buildCoupon(body);
         List<Map<String, BigDecimal>> tiers = parseTiers(body.get("tiers"));
-        return Result.success(merchantCouponService.updateCoupon(merchantId, id, coupon));
+        return Result.success(merchantCouponService.updateCoupon(merchantId, id, coupon, tiers));
     }
 
     @PostMapping("/coupons/{id}/disable")
