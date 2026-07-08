@@ -26,6 +26,7 @@ public class Coupon {
     private Integer status;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private Integer memberLevelRequired;
     // getters/setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -61,4 +62,6 @@ public class Coupon {
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }
     public LocalDateTime getUpdateTime() { return updateTime; }
     public void setUpdateTime(LocalDateTime updateTime) { this.updateTime = updateTime; }
+    public Integer getMemberLevelRequired() { return memberLevelRequired; }
+    public void setMemberLevelRequired(Integer memberLevelRequired) { this.memberLevelRequired = memberLevelRequired; }
 }

@@ -1,0 +1,3 @@
+ALTER TABLE seckill_product 
+  ADD COLUMN create_time DATETIME DEFAULT NULL COMMENT '创建时间',
+  ADD COLUMN update_time DATETIME DEFAULT NULL COMMENT '更新时间';

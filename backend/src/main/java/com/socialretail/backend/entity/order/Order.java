@@ -55,6 +55,21 @@ public class Order {
     private LocalDateTime prepareTime;
     private LocalDateTime completeTime;
 
+    /** 平台佣金 */
+    private BigDecimal commission;
+
+    /** 佣金费率 */
+    private BigDecimal commissionRate;
+
+    /** 商家层级 */
+    private String merchantTier;
+
+    /** 平台补贴 */
+    private BigDecimal platformSubsidy;
+
+    /** 净收入 */
+    private BigDecimal netIncome;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getOrderSn() { return orderSn; }
@@ -139,4 +154,64 @@ public class Order {
     public void setPrepareTime(LocalDateTime prepareTime) { this.prepareTime = prepareTime; }
     public LocalDateTime getCompleteTime() { return completeTime; }
     public void setCompleteTime(LocalDateTime completeTime) { this.completeTime = completeTime; }
+
+    public BigDecimal getCommission() { return commission; }
+    public void setCommission(BigDecimal commission) { this.commission = commission; }
+    public BigDecimal getCommissionRate() { return commissionRate; }
+    public void setCommissionRate(BigDecimal commissionRate) { this.commissionRate = commissionRate; }
+    public String getMerchantTier() { return merchantTier; }
+    public void setMerchantTier(String merchantTier) { this.merchantTier = merchantTier; }
+    public BigDecimal getPlatformSubsidy() { return platformSubsidy; }
+    public void setPlatformSubsidy(BigDecimal platformSubsidy) { this.platformSubsidy = platformSubsidy; }
+    public BigDecimal getNetIncome() { return netIncome; }
+    public void setNetIncome(BigDecimal netIncome) { this.netIncome = netIncome; }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+            ", id=" + id +
+            ", orderSn=" + orderSn +
+            ", userId=" + userId +
+            ", merchantId=" + merchantId +
+            ", pickupPointId=" + pickupPointId +
+            ", totalAmount=" + totalAmount +
+            ", payAmount=" + payAmount +
+            ", couponDiscount=" + couponDiscount +
+            ", deliveryType=" + deliveryType +
+            ", deliveryFee=" + deliveryFee +
+            ", status=" + status +
+            ", commission=" + commission +
+            ", platformSubsidy=" + platformSubsidy +
+            ", netIncome=" + netIncome +
+            ", payTime=" + payTime +
+            ", createTime=" + createTime +
+            ", updateTime=" + updateTime +
+            '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Order that = (Order) o;
+        return java.util.Objects.equals(id, that.id)
+                && java.util.Objects.equals(orderSn, that.orderSn)
+                && java.util.Objects.equals(userId, that.userId)
+                && java.util.Objects.equals(merchantId, that.merchantId)
+                && java.util.Objects.equals(pickupPointId, that.pickupPointId)
+                && java.util.Objects.equals(totalAmount, that.totalAmount)
+                && java.util.Objects.equals(payAmount, that.payAmount)
+                && java.util.Objects.equals(couponDiscount, that.couponDiscount)
+                && java.util.Objects.equals(deliveryType, that.deliveryType)
+                && java.util.Objects.equals(deliveryFee, that.deliveryFee)
+                && java.util.Objects.equals(status, that.status)
+                && java.util.Objects.equals(payTime, that.payTime)
+                && java.util.Objects.equals(createTime, that.createTime)
+                && java.util.Objects.equals(updateTime, that.updateTime);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(id, orderSn, userId, merchantId, pickupPointId, totalAmount, payAmount, couponDiscount, deliveryType, deliveryFee, status, payTime, createTime, updateTime);
+    }
 }

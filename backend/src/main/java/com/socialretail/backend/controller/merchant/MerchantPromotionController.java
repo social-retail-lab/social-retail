@@ -1,6 +1,6 @@
 package com.socialretail.backend.controller.merchant;
 
-import com.socialretail.backend.common.result.Result;
+import com.socialretail.backend.common.Result;
 import com.socialretail.backend.entity.promotion.MerchantCoupon;
 import com.socialretail.backend.service.merchant.MerchantCouponService;
 import com.socialretail.backend.service.promotion.PromotionService;
@@ -69,7 +69,7 @@ public class MerchantPromotionController {
         Long merchantId = getMerchantId(request);
         MerchantCoupon coupon = buildCoupon(body);
         List<Map<String, BigDecimal>> tiers = parseTiers(body.get("tiers"));
-        return Result.success(merchantCouponService.updateCoupon(merchantId, id, coupon));
+        return Result.success(merchantCouponService.updateCoupon(merchantId, id, coupon, tiers));
     }
 
     @PostMapping("/coupons/{id}/disable")

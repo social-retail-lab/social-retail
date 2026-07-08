@@ -72,11 +72,28 @@ public class MerchantCouponServiceImpl implements MerchantCouponService {
 
     @Override
     @Transactional
-    public MerchantCoupon updateCoupon(Long merchantId, Long couponId, MerchantCoupon coupon) {
+    public MerchantCoupon updateCoupon(Long merchantId, Long couponId, MerchantCoupon coupon, List<Map<String, BigDecimal>> tiers) {
         coupon.setId(couponId);
         coupon.setMerchantId(merchantId);
         coupon.setUpdateTime(LocalDateTime.now());
         merchantCouponMapper.updateById(coupon);
+
+        // 更新梯度：先删旧，再插新（仅满减券 type=2）
+        LambdaQueryWrapper<MerchantCouponTier> delWrapper = new LambdaQueryWrapper<>();
+        delWrapper.eq(MerchantCouponTier::getCouponId, couponId);
+        merchantCouponTierMapper.delete(delWrapper);
+
+        if (coupon.getType() != null && coupon.getType() == 2 && tiers != null && !tiers.isEmpty()) {
+            int sort = 1;
+            for (Map<String, BigDecimal> tier : tiers) {
+                MerchantCouponTier t = new MerchantCouponTier();
+                t.setCouponId(couponId);
+                t.setMinAmount(tier.get("minAmount"));
+                t.setDiscountAmount(tier.get("discountAmount"));
+                t.setSortOrder(sort++);
+                merchantCouponTierMapper.insert(t);
+            }
+        }
         return merchantCouponMapper.selectById(couponId);
     }
 
