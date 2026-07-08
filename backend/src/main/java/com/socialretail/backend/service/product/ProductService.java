@@ -10,7 +10,7 @@ public interface ProductService {
 
     PageResult<ProductCardVO> listProducts(ProductQueryDTO dto);
 
-    ProductDetailVO getProductDetail(Long productId);
+    ProductDetailVO getProductDetail(Long productId, String promotionCode);
 
     ProductSkuListVO listProductSkus(Long productId);
 

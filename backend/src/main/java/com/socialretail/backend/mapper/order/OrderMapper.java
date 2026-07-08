@@ -58,6 +58,10 @@ public interface OrderMapper extends BaseMapper<Order> {
                              @Param("payTime") java.time.LocalDateTime payTime,
                              @Param("updateTime") java.time.LocalDateTime updateTime);
 
+    int updatePickupCodeIfAbsent(@Param("orderId") Long orderId,
+                                 @Param("pickupCode") String pickupCode,
+                                 @Param("updateTime") java.time.LocalDateTime updateTime);
+
     int updateStatus(@Param("orderId") Long orderId,
                      @Param("status") Integer status,
                      @Param("updateTime") java.time.LocalDateTime updateTime);

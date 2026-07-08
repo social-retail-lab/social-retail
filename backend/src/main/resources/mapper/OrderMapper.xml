@@ -64,6 +64,9 @@
         <result property="itemOriginAmount" column="item_origin_amount"/>
         <result property="itemFinalAmount" column="item_final_amount"/>
         <result property="promotionType" column="promotion_type"/>
+        <result property="distributorProductId" column="distributor_product_id"/>
+        <result property="commissionRate" column="commission_rate"/>
+        <result property="attributionExpiresAt" column="attribution_expires_at"/>
     </resultMap>
 
     <sql id="OrderColumns">
@@ -103,11 +106,13 @@
         INSERT INTO order_item (
             order_id, product_id, sku_id, product_name, product_image, sku_specs,
             origin_price, final_price, price, quantity,
-            item_origin_amount, item_final_amount, promotion_type
+            item_origin_amount, item_final_amount, promotion_type,
+            distributor_product_id, commission_rate, attribution_expires_at
         ) VALUES (
             #{orderId}, #{productId}, #{skuId}, #{productName}, #{productImage}, #{skuSpecs},
             #{originPrice}, #{finalPrice}, #{price}, #{quantity},
-            #{itemOriginAmount}, #{itemFinalAmount}, #{promotionType}
+            #{itemOriginAmount}, #{itemFinalAmount}, #{promotionType},
+            #{distributorProductId}, #{commissionRate}, #{attributionExpiresAt}
         )
     </insert>
 
@@ -162,7 +167,8 @@
     <select id="selectItemsByOrderId" resultMap="OrderItemResultMap">
         SELECT id, order_id, product_id, sku_id, product_name, product_image,
                sku_specs, origin_price, final_price, price, quantity,
-               item_origin_amount, item_final_amount, promotion_type
+               item_origin_amount, item_final_amount, promotion_type,
+               distributor_product_id, commission_rate, attribution_expires_at
         FROM order_item
         WHERE order_id = #{orderId}
         ORDER BY id ASC
@@ -213,7 +219,8 @@
     </update>
 
     <select id="selectPickupPointById" resultType="com.socialretail.backend.entity.order.PickupPoint">
-        SELECT id, merchant_id, name, address, contact_phone, business_hours, status
+        SELECT id, merchant_id, name, address, contact_phone, business_hours,
+               status, audit_status, image, create_time, update_time
         FROM pickup_point
         WHERE id = #{pickupPointId}
         LIMIT 1
@@ -248,6 +255,13 @@
         UPDATE `order`
         SET status = #{status}, update_time = #{updateTime}
         WHERE id = #{orderId}
+    </update>
+
+    <update id="updatePickupCodeIfAbsent">
+        UPDATE `order`
+        SET pickup_code = #{pickupCode}, update_time = #{updateTime}
+        WHERE id = #{orderId}
+          AND (pickup_code IS NULL OR pickup_code = '')
     </update>
 
     <update id="updatePointsStatus">

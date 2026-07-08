@@ -13,6 +13,9 @@ public class MockPayResultVO {
     private String paySn;
     private String payStatus;
     private String orderStatus;
+    private Integer deliveryType;
+    private Long pickupPointId;
+    private String pickupCode;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private LocalDateTime payTime;
     private String failReason;

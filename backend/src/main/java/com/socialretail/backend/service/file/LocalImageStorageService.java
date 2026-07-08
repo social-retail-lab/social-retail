@@ -25,25 +25,34 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class LocalImageStorageService {
     private static final DateTimeFormatter DATE_DIRECTORY = DateTimeFormatter.BASIC_ISO_DATE;
+    private static final Pattern PRIVATE_IMAGE_URL = Pattern.compile(
+            ".*/api/files/images/(\\d+)/content(?:[?#].*)?$");
 
     private final FileRecordMapper fileRecordMapper;
     private final ImageUrlResolver imageUrlResolver;
     private final Path uploadRoot;
+    private final Path distributorIdCardRoot;
     private final int maxCount;
     private final long maxFileSize;
 
     public LocalImageStorageService(FileRecordMapper fileRecordMapper,
                                     ImageUrlResolver imageUrlResolver,
                                     @Value("${upload.path:./uploads}") String uploadPath,
+                                    @Value("${distributor.id-card-storage-path:./distributor/id}")
+                                    String distributorIdCardStoragePath,
                                     @Value("${file.upload.max-count:9}") int maxCount,
                                     @Value("${file.upload.max-size-bytes:10485760}") long maxFileSize) {
         this.fileRecordMapper = fileRecordMapper;
         this.imageUrlResolver = imageUrlResolver;
         this.uploadRoot = Paths.get(uploadPath).toAbsolutePath().normalize();
+        this.distributorIdCardRoot = Paths.get(distributorIdCardStoragePath)
+                .toAbsolutePath().normalize();
         this.maxCount = maxCount;
         this.maxFileSize = maxFileSize;
     }
@@ -87,10 +96,13 @@ public class LocalImageStorageService {
         }
         ImageType imageType = detectImageType(file);
         String storedName = UUID.randomUUID().toString().replace("-", "") + "." + imageType.extension();
-        String relativeDirectory = uploadType.getDirectory() + "/" + LocalDate.now().format(DATE_DIRECTORY);
+        Path storageRoot = uploadType.isDistributorIdCard() ? distributorIdCardRoot : uploadRoot;
+        String relativeDirectory = uploadType.isDistributorIdCard()
+                ? uploadType.getDirectory()
+                : uploadType.getDirectory() + "/" + LocalDate.now().format(DATE_DIRECTORY);
         String relativePath = relativeDirectory + "/" + storedName;
-        Path target = uploadRoot.resolve(relativePath).normalize();
-        if (!target.startsWith(uploadRoot)) {
+        Path target = storageRoot.resolve(relativePath).normalize();
+        if (!target.startsWith(storageRoot)) {
             throw new IllegalArgumentException("非法文件路径");
         }
 
@@ -117,8 +129,47 @@ public class LocalImageStorageService {
             Files.deleteIfExists(target);
             throw exception;
         }
-        return new UploadedImageResponse(record.getId(), originalName,
-                imageUrlResolver.resolve(relativePath), file.getSize());
+        String fileUrl = uploadType.isDistributorIdCard()
+                ? "/api/files/images/" + record.getId() + "/content"
+                : imageUrlResolver.resolve(relativePath);
+        return new UploadedImageResponse(record.getId(), originalName, fileUrl, file.getSize());
+    }
+
+    public PrivateImage loadPrivateImage(Long userId, Long adminId, Long fileId) {
+        FileRecord record = fileRecordMapper.selectById(fileId);
+        if (record == null || record.getIsDeleted() == null || record.getIsDeleted() != 0
+                || !isDistributorIdCard(record.getUploadType())) {
+            throw new BusinessException(40441, HttpStatus.NOT_FOUND, "身份证图片不存在");
+        }
+        if (adminId == null && (userId == null || !userId.equals(record.getOwnerUserId()))) {
+            throw new BusinessException(40341, HttpStatus.FORBIDDEN, "无权访问该身份证图片");
+        }
+        Path target = distributorIdCardRoot.resolve(record.getStoredPath()).normalize();
+        if (!target.startsWith(distributorIdCardRoot) || !Files.isRegularFile(target)) {
+            throw new BusinessException(40441, HttpStatus.NOT_FOUND, "身份证图片不存在");
+        }
+        return new PrivateImage(target, record.getContentType());
+    }
+
+    public String validateDistributorIdCard(Long userId, String fileUrl, ImageUploadType expectedType) {
+        Matcher matcher = PRIVATE_IMAGE_URL.matcher(fileUrl == null ? "" : fileUrl.trim());
+        if (!matcher.matches()) {
+            throw new BusinessException(40065, HttpStatus.BAD_REQUEST,
+                    "身份证图片地址无效，请先通过图片上传接口上传");
+        }
+        FileRecord record = fileRecordMapper.selectById(Long.parseLong(matcher.group(1)));
+        if (record == null || record.getIsDeleted() == null || record.getIsDeleted() != 0
+                || !userId.equals(record.getOwnerUserId())
+                || !expectedType.name().equals(record.getUploadType())) {
+            throw new BusinessException(40065, HttpStatus.BAD_REQUEST,
+                    "身份证图片不存在、类型不匹配或不属于当前用户");
+        }
+        return "/api/files/images/" + record.getId() + "/content";
+    }
+
+    private boolean isDistributorIdCard(String uploadType) {
+        return ImageUploadType.DISTRIBUTOR_IDCARD_FRONT.name().equals(uploadType)
+                || ImageUploadType.DISTRIBUTOR_IDCARD_BACK.name().equals(uploadType);
     }
 
     private ImageType detectImageType(MultipartFile file) throws IOException {
@@ -166,5 +217,8 @@ public class LocalImageStorageService {
     }
 
     private record ImageType(String extension, String contentType) {
+    }
+
+    public record PrivateImage(Path path, String contentType) {
     }
 }

@@ -54,6 +54,18 @@ public interface SeckillProductMapper extends BaseMapper<SeckillProduct> {
     SeckillProductView selectCurrentViewBySku(@Param("skuId") Long skuId,
                                                @Param("now") java.time.LocalDateTime now);
 
+    @Select("<script>SELECT " + VIEW_COLUMNS + " FROM seckill_product sp " +
+            "JOIN seckill_activity a ON a.id=sp.seckill_activity_id " +
+            "JOIN product p ON p.id=sp.product_id JOIN sku s ON s.sku_code=sp.sku_id " +
+            "WHERE s.id IN <foreach collection='skuIds' item='skuId' open='(' separator=',' close=')'>#{skuId}</foreach> " +
+            "AND COALESCE(sp.status,1)=1 AND a.status=1 " +
+            "AND a.start_time&lt;=#{now} AND a.end_time&gt;#{now} " +
+            "AND p.status=1 AND p.audit_status=1 " +
+            "AND COALESCE(sp.sold_count,0)&lt;sp.seckill_stock " +
+            "ORDER BY sp.seckill_price,sp.id</script>")
+    List<SeckillProductView> selectCurrentViewsBySkuIds(@Param("skuIds") List<Long> skuIds,
+                                                         @Param("now") java.time.LocalDateTime now);
+
     @Select("SELECT COALESCE(SUM(oi.quantity),0) FROM `order` o " +
             "JOIN order_item oi ON oi.order_id=o.id " +
             "WHERE o.user_id=#{userId} AND o.seckill_id=#{seckillProductId} " +

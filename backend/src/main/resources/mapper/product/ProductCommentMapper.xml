@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.socialretail.backend.mapper.product.ProductCommentMapper">
+
+    <sql id="commentViewColumns">
+        pc.id AS comment_id,
+        pc.order_id,
+        pc.order_item_id,
+        pc.product_id,
+        pc.sku_id,
+        pc.user_id,
+        pc.score,
+        pc.content,
+        pc.images,
+        pc.anonymous,
+        pc.status,
+        pc.create_time,
+        oi.product_name,
+        oi.product_image,
+        oi.sku_specs,
+        u.nickname,
+        u.avatar
+    </sql>
+
+    <sql id="commentViewJoins">
+        FROM product_comment pc
+        LEFT JOIN order_item oi ON oi.id = pc.order_item_id
+        LEFT JOIN `user` u ON u.id = pc.user_id
+    </sql>
+
+    <select id="selectMyComments" resultType="com.socialretail.backend.mapper.product.CommentViewRow">
+        SELECT <include refid="commentViewColumns"/>
+        <include refid="commentViewJoins"/>
+        WHERE pc.user_id = #{userId}
+          AND pc.status != 2
+          AND pc.delete_time IS NULL
+        ORDER BY pc.create_time DESC, pc.id DESC
+    </select>
+
+    <select id="selectProductComments" resultType="com.socialretail.backend.mapper.product.CommentViewRow">
+        SELECT <include refid="commentViewColumns"/>
+        <include refid="commentViewJoins"/>
+        WHERE pc.product_id = #{productId}
+          AND pc.status = 1
+          AND pc.delete_time IS NULL
+        <if test="score != null">
+            AND pc.score = #{score}
+        </if>
+        ORDER BY pc.create_time DESC, pc.id DESC
+    </select>
+
+    <select id="selectCommentDetail" resultType="com.socialretail.backend.mapper.product.CommentViewRow">
+        SELECT <include refid="commentViewColumns"/>
+        <include refid="commentViewJoins"/>
+        WHERE pc.id = #{commentId}
+          AND pc.status != 2
+          AND pc.delete_time IS NULL
+        LIMIT 1
+    </select>
+
+    <select id="selectProductCommentStatistics"
+            resultType="com.socialretail.backend.mapper.product.ProductCommentStatisticsRow">
+        SELECT ROUND(COALESCE(AVG(pc.score), 0), 1) AS rating_score,
+               COUNT(*) AS comment_count
+        FROM product_comment pc
+        WHERE pc.product_id = #{productId}
+          AND pc.status = 1
+          AND pc.delete_time IS NULL
+    </select>
+
+    <select id="selectLatestProductComments"
+            resultType="com.socialretail.backend.mapper.product.CommentViewRow">
+        SELECT <include refid="commentViewColumns"/>
+        <include refid="commentViewJoins"/>
+        WHERE pc.product_id = #{productId}
+          AND pc.status = 1
+          AND pc.delete_time IS NULL
+        ORDER BY pc.create_time DESC, pc.id DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

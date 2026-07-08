@@ -46,7 +46,8 @@ public class BargainOrderPricingService {
             if (strict) throw unavailable(record.getBargainRecordId());
             return Quote.none();
         }
-        BigDecimal origin = money(item.getPrice());
+        BigDecimal origin = money(item.getOriginalPrice() == null
+                ? item.getPrice() : item.getOriginalPrice());
         BigDecimal current = money(record.getCurrentPrice());
         if (current.compareTo(origin) > 0) {
             if (strict) throw unavailable(record.getBargainRecordId());

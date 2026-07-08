@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -16,4 +17,7 @@ public class CartAddDTO {
     @Min(value = 1, message = "购买数量必须大于0")
     @Max(value = 999, message = "购买数量不能超过999")
     private Integer quantity;
+
+    @Size(max = 50, message = "推广码不能超过50个字符")
+    private String promotionCode;
 }

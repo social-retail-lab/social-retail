@@ -8,6 +8,12 @@ import java.util.Map;
 
 public class SkuVO {
 
+    private Long skuId;
+    private Map<String, Object> spec;
+    private BigDecimal price;
+    private BigDecimal originalPrice;
+    private Long seckillProductId;
+    private Integer stock;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private Long skuId;

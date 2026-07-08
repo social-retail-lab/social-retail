@@ -9,9 +9,15 @@ import com.socialretail.backend.enums.file.ImageUploadType;
 import com.socialretail.backend.service.file.LocalImageStorageService;
 import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -69,6 +75,19 @@ public class FileController {
         return Result.success(message, response);
     }
 
+    @GetMapping("/images/{fileId}/content")
+    public ResponseEntity<Resource> privateImage(
+            @RequestAttribute(value = JwtInterceptor.USER_ID_ATTRIBUTE, required = false) Long userId,
+            @RequestAttribute(value = JwtInterceptor.ADMIN_ID_ATTRIBUTE, required = false) Long adminId,
+            @PathVariable @Positive Long fileId) {
+        LocalImageStorageService.PrivateImage image =
+                imageStorageService.loadPrivateImage(userId, adminId, fileId);
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .contentType(MediaType.parseMediaType(image.contentType()))
+                .body(new FileSystemResource(image.path()));
+    }
+
     private Long effectiveBusinessId(Long userId, Long merchantId, Long adminId,
                                      ImageUploadType uploadType, Long requestedBusinessId) {
         if (uploadType.getOwnership() == ImageUploadType.Ownership.MERCHANT) {
@@ -92,6 +111,8 @@ public class FileController {
                 && (uploadType == ImageUploadType.USER_AVATAR
                 || uploadType == ImageUploadType.MERCHANT_IDCARD_FRONT
                 || uploadType == ImageUploadType.MERCHANT_IDCARD_BACK
+                || uploadType == ImageUploadType.DISTRIBUTOR_IDCARD_FRONT
+                || uploadType == ImageUploadType.DISTRIBUTOR_IDCARD_BACK
                 || uploadType == ImageUploadType.MERCHANT_LICENSE)) {
             return userId;
         }

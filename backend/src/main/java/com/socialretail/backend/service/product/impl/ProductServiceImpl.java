@@ -18,13 +18,19 @@ import com.socialretail.backend.mapper.product.BrandMapper;
 import com.socialretail.backend.mapper.product.CategoryMapper;
 import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
+import com.socialretail.backend.mapper.product.ProductCommentMapper;
+import com.socialretail.backend.mapper.product.ProductCommentStatisticsRow;
+import com.socialretail.backend.mapper.product.CommentViewRow;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.service.product.ProductService;
+import com.socialretail.backend.service.product.CurrentProductPriceService;
+import com.socialretail.backend.service.social.DistributionAttributionService;
 import com.socialretail.backend.vo.ProductDetailVO;
 import com.socialretail.backend.vo.ProductCardVO;
 import com.socialretail.backend.vo.ProductSkuListVO;
 import com.socialretail.backend.vo.ProductSkuVO;
 import com.socialretail.backend.vo.ProductMerchantInfoVO;
+import com.socialretail.backend.vo.ProductLatestCommentVO;
 import com.socialretail.backend.vo.SkuVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -55,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
     };
 
     private final ProductMapper productMapper;
+    private final ProductCommentMapper productCommentMapper;
     private final SkuMapper skuMapper;
     private final ProductCategoryRelationMapper productCategoryRelationMapper;
     private final BrandMapper brandMapper;
@@ -62,16 +69,22 @@ public class ProductServiceImpl implements ProductService {
     private final MerchantMapper merchantMapper;
     private final ObjectMapper objectMapper;
     private final ImageUrlResolver imageUrlResolver;
+    private final DistributionAttributionService distributionAttributionService;
+    private final CurrentProductPriceService currentProductPriceService;
 
     public ProductServiceImpl(ProductMapper productMapper,
+                              ProductCommentMapper productCommentMapper,
                               SkuMapper skuMapper,
                               ProductCategoryRelationMapper productCategoryRelationMapper,
                               BrandMapper brandMapper,
                               CategoryMapper categoryMapper,
                               MerchantMapper merchantMapper,
                               ObjectMapper objectMapper,
-                              ImageUrlResolver imageUrlResolver) {
+                              ImageUrlResolver imageUrlResolver,
+                              DistributionAttributionService distributionAttributionService,
+                              CurrentProductPriceService currentProductPriceService) {
         this.productMapper = productMapper;
+        this.productCommentMapper = productCommentMapper;
         this.skuMapper = skuMapper;
         this.productCategoryRelationMapper = productCategoryRelationMapper;
         this.brandMapper = brandMapper;
@@ -79,6 +92,8 @@ public class ProductServiceImpl implements ProductService {
         this.merchantMapper = merchantMapper;
         this.objectMapper = objectMapper;
         this.imageUrlResolver = imageUrlResolver;
+        this.distributionAttributionService = distributionAttributionService;
+        this.currentProductPriceService = currentProductPriceService;
     }
 
     @Override
@@ -113,16 +128,19 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Map<Long, List<Sku>> skusByProduct = findSkusByProduct(products);
+        Map<Long, CurrentProductPriceService.Price> prices = currentProductPriceService.resolve(
+                skusByProduct.values().stream().flatMap(List::stream).toList());
         Map<Long, Product> productsById = products.stream()
                 .collect(Collectors.toMap(Product::getId, Function.identity()));
         Map<Long, Merchant> merchantsById = findMerchantsByProduct(products);
         List<ProductCardVO> result = products.stream()
                 .map(product -> toListVO(product,
                         skusByProduct.getOrDefault(product.getId(), List.of()),
+                        prices,
                         merchantsById.get(product.getMerchantId())))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        result.sort(resolveSort(dto.getSort(), productsById));
+        result.sort(resolveSort(resolveSortKey(dto), productsById));
         long total = result.size();
         int fromIndex = Math.min((page - 1) * size, result.size());
         int toIndex = Math.min(fromIndex + size, result.size());
@@ -130,7 +148,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDetailVO getProductDetail(Long productId) {
+    public ProductDetailVO getProductDetail(Long productId, String promotionCode) {
         Product product = requireAvailableProduct(productId);
 
         List<Sku> skus = skuMapper.selectList(
@@ -139,20 +157,32 @@ public class ProductServiceImpl implements ProductService {
                         .orderByAsc(Sku::getPrice)
                         .orderByAsc(Sku::getId)
         );
-        List<SkuVO> skuList = skus.stream().map(this::toSkuVO).toList();
+        Map<Long, CurrentProductPriceService.Price> prices = currentProductPriceService.resolve(skus);
+        List<SkuVO> skuList = skus.stream().map(sku -> toSkuVO(sku, prices.get(sku.getId()))).toList();
+        CurrentProductPriceService.Price lowestPrice = lowestPrice(skus, prices);
         ProductDetailVO detail = new ProductDetailVO();
         detail.setProductId(product.getId());
         detail.setProductName(product.getTitle());
         detail.setProductImage(imageUrlResolver.resolve(product.getMainImage()));
         detail.setDetailImages(parseDetailImages(product));
         detail.setDescription(product.getDetailDesc());
-        detail.setPrice(minimumPrice(skus));
+        detail.setPrice(lowestPrice == null ? null : lowestPrice.finalPrice());
+        detail.setOriginalPrice(lowestPrice == null ? null : lowestPrice.originalPrice());
         detail.setSoldCount(soldCount(product));
         detail.setStock(skus.stream().map(Sku::getStock).filter(value -> value != null)
                 .mapToInt(Integer::intValue).sum());
+        populateCommentSummary(detail, productId);
         detail.setStatus(product.getStatus() != null && product.getStatus() == ON_SALE
                 ? "ON_SALE" : "OFF_SALE");
         detail.setSkuList(skuList);
+        DistributionAttributionService.Attribution attribution =
+                distributionAttributionService.resolve(promotionCode, productId);
+        if (attribution != null) {
+            detail.setDistributorProductId(attribution.distributorProductId());
+            detail.setPromotionCode(attribution.promotionCode());
+            detail.setPromotionExpiresAt(LocalDateTime.now()
+                    .plusDays(DistributionAttributionService.ATTRIBUTION_DAYS));
+        }
 
         if (product.getBrandId() != null) {
             Brand brand = brandMapper.selectById(product.getBrandId());
@@ -185,16 +215,65 @@ public class ProductServiceImpl implements ProductService {
         return detail;
     }
 
+    private void populateCommentSummary(ProductDetailVO detail, Long productId) {
+        ProductCommentStatisticsRow statistics =
+                productCommentMapper.selectProductCommentStatistics(productId);
+        detail.setRatingScore(statistics == null || statistics.getRatingScore() == null
+                ? new BigDecimal("0.0")
+                : statistics.getRatingScore().setScale(1, java.math.RoundingMode.HALF_UP));
+        long count = statistics == null || statistics.getCommentCount() == null
+                ? 0L : statistics.getCommentCount();
+        detail.setCommentCount(count > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) count);
+        detail.setLatestComments(productCommentMapper.selectLatestProductComments(productId, 2)
+                .stream()
+                .map(this::toLatestComment)
+                .toList());
+    }
+
+    private ProductLatestCommentVO toLatestComment(CommentViewRow row) {
+        boolean anonymous = Objects.equals(row.getAnonymous(), 1);
+        return new ProductLatestCommentVO(
+                row.getCommentId(),
+                anonymous ? null : row.getUserId(),
+                anonymous ? "匿名用户" : row.getNickname(),
+                anonymous ? "" : imageUrlResolver.resolve(row.getAvatar()),
+                row.getScore(),
+                row.getContent(),
+                parseCommentImages(row.getImages()),
+                anonymous ? 1 : 0,
+                row.getCreateTime());
+    }
+
+    private List<String> parseCommentImages(String images) {
+        if (!StringUtils.hasText(images)) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(images, STRING_LIST_TYPE).stream()
+                    .filter(StringUtils::hasText)
+                    .map(imageUrlResolver::resolve)
+                    .toList();
+        } catch (Exception ignored) {
+            return java.util.Arrays.stream(images.split(","))
+                    .map(String::trim)
+                    .filter(StringUtils::hasText)
+                    .map(imageUrlResolver::resolve)
+                    .toList();
+        }
+    }
+
     @Override
     public ProductSkuListVO listProductSkus(Long productId) {
         requireAvailableProduct(productId);
-        List<ProductSkuVO> skuList = skuMapper.selectList(
+        List<Sku> skus = skuMapper.selectList(
                         Wrappers.<Sku>lambdaQuery()
                                 .eq(Sku::getProductId, productId)
                                 .orderByAsc(Sku::getPrice)
                                 .orderByAsc(Sku::getId)
-                ).stream()
-                .map(this::toProductSkuVO)
+                );
+        Map<Long, CurrentProductPriceService.Price> prices = currentProductPriceService.resolve(skus);
+        List<ProductSkuVO> skuList = skus.stream()
+                .map(sku -> toProductSkuVO(sku, prices.get(sku.getId())))
                 .toList();
         return new ProductSkuListVO(productId, skuList);
     }
@@ -227,16 +306,18 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.groupingBy(Sku::getProductId));
     }
 
-    private ProductCardVO toListVO(Product product, List<Sku> skus, Merchant merchant) {
-        BigDecimal price = minimumPrice(skus);
+    private ProductCardVO toListVO(Product product, List<Sku> skus,
+                                   Map<Long, CurrentProductPriceService.Price> prices,
+                                   Merchant merchant) {
+        CurrentProductPriceService.Price price = lowestPrice(skus, prices);
         int stock = skus.stream().map(Sku::getStock).filter(value -> value != null)
                 .mapToInt(Integer::intValue).sum();
         return new ProductCardVO(
                 product.getId(),
                 product.getTitle(),
                 imageUrlResolver.resolve(product.getMainImage()),
-                price,
-                price,
+                price == null ? null : price.finalPrice(),
+                price == null ? null : price.originalPrice(),
                 soldCount(product),
                 stock,
                 List.of(),
@@ -256,11 +337,15 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toMap(Merchant::getId, Function.identity()));
     }
 
-    private SkuVO toSkuVO(Sku sku) {
-        return new SkuVO(sku.getId(), parseSpec(sku.getSpecs()), sku.getPrice(), sku.getStock());
+    private SkuVO toSkuVO(Sku sku, CurrentProductPriceService.Price price) {
+        SkuVO result = new SkuVO(sku.getId(), parseSpec(sku.getSpecs()),
+                price == null ? sku.getPrice() : price.finalPrice(), sku.getStock());
+        result.setOriginalPrice(price == null ? sku.getPrice() : price.originalPrice());
+        result.setSeckillProductId(price == null ? null : price.seckillProductId());
+        return result;
     }
 
-    private ProductSkuVO toProductSkuVO(Sku sku) {
+    private ProductSkuVO toProductSkuVO(Sku sku, CurrentProductPriceService.Price price) {
         Map<String, Object> specs = parseSpec(sku.getSpecs());
         String skuName = specs.entrySet().stream()
                 .filter(entry -> entry.getValue() != null)
@@ -272,8 +357,8 @@ public class ProductServiceImpl implements ProductService {
                 sku.getId(),
                 skuName,
                 specs,
-                sku.getPrice(),
-                sku.getPrice(),
+                price == null ? sku.getPrice() : price.finalPrice(),
+                price == null ? sku.getPrice() : price.originalPrice(),
                 sku.getStock(),
                 0,
                 "ON_SALE"
@@ -299,6 +384,16 @@ public class ProductServiceImpl implements ProductService {
                 .map(Sku::getPrice)
                 .filter(price -> price != null)
                 .min(BigDecimal::compareTo)
+                .orElse(null);
+    }
+
+    private CurrentProductPriceService.Price lowestPrice(
+            List<Sku> skus, Map<Long, CurrentProductPriceService.Price> prices) {
+        return skus.stream()
+                .map(sku -> prices.getOrDefault(sku.getId(),
+                        new CurrentProductPriceService.Price(sku.getPrice(), sku.getPrice(), null)))
+                .filter(price -> price.finalPrice() != null)
+                .min(Comparator.comparing(CurrentProductPriceService.Price::finalPrice))
                 .orElse(null);
     }
 
@@ -352,6 +447,10 @@ public class ProductServiceImpl implements ProductService {
                     ProductCardVO::getSoldCount,
                     Comparator.nullsLast(Comparator.reverseOrder())
             ).thenComparing(byIdDesc);
+            case "sales_asc" -> Comparator.comparing(
+                    ProductCardVO::getSoldCount,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            ).thenComparing(byIdDesc);
             case "newest", "time_desc" -> Comparator.comparing(
                     (ProductCardVO vo) -> {
                         Product product = productsById.get(vo.getProductId());
@@ -361,7 +460,33 @@ public class ProductServiceImpl implements ProductService {
                     },
                     Comparator.reverseOrder()
             ).thenComparing(byIdDesc);
+            case "time_asc" -> Comparator.comparing(
+                    (ProductCardVO vo) -> {
+                        Product product = productsById.get(vo.getProductId());
+                        return product == null || product.getCreateTime() == null
+                                ? LocalDateTime.MAX
+                                : product.getCreateTime();
+                    }
+            ).thenComparing(byIdDesc);
             default -> byIdDesc;
+        };
+    }
+
+    static String resolveSortKey(ProductQueryDTO dto) {
+        if (StringUtils.hasText(dto.getSort())) {
+            return dto.getSort().trim().toLowerCase(Locale.ROOT);
+        }
+        if (!StringUtils.hasText(dto.getSortField())) {
+            return "default";
+        }
+
+        String field = dto.getSortField().trim().toLowerCase(Locale.ROOT);
+        boolean ascending = "asc".equalsIgnoreCase(dto.getSortOrder());
+        return switch (field) {
+            case "price" -> ascending ? "price_asc" : "price_desc";
+            case "sales", "soldcount" -> ascending ? "sales_asc" : "sales_desc";
+            case "new", "newest", "time", "createtime" -> ascending ? "time_asc" : "newest";
+            default -> "default";
         };
     }
 }

@@ -8,11 +8,13 @@ import com.socialretail.backend.entity.member.MerchantCoupon;
 import com.socialretail.backend.entity.member.MerchantCouponUser;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.product.Sku;
+import com.socialretail.backend.entity.order.PickupPoint;
 import com.socialretail.backend.mapper.member.MerchantCouponMapper;
 import com.socialretail.backend.mapper.member.MerchantCouponUserMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
+import com.socialretail.backend.mapper.order.PickupPointMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +40,7 @@ class CustomerMerchantHomeServiceTest {
     @Mock private SkuMapper skuMapper;
     @Mock private MerchantCouponMapper couponMapper;
     @Mock private MerchantCouponUserMapper couponUserMapper;
+    @Mock private PickupPointMapper pickupPointMapper;
     @Mock private ImageUrlResolver imageUrlResolver;
 
     private CustomerMerchantHomeService service;
@@ -45,7 +48,7 @@ class CustomerMerchantHomeServiceTest {
     @BeforeEach
     void setUp() {
         service = new CustomerMerchantHomeService(merchantMapper, productMapper, skuMapper, couponMapper,
-                couponUserMapper, imageUrlResolver);
+                couponUserMapper, pickupPointMapper, imageUrlResolver);
         lenient().when(imageUrlResolver.resolve(any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }
@@ -150,6 +153,30 @@ class CustomerMerchantHomeServiceTest {
         assertEquals(20, item.stock());
         assertTrue(item.tags().isEmpty());
         assertEquals("优选水果店", item.merchantName());
+    }
+
+    @Test
+    void pickupPointsReturnsAvailablePointsWithDocumentedFields() {
+        when(merchantMapper.selectById(2001L)).thenReturn(merchant(1));
+        PickupPoint point = new PickupPoint();
+        point.setId(3001L);
+        point.setMerchantId(2001L);
+        point.setName("重庆大学虎溪校区自提点");
+        point.setAddress("重庆市沙坪坝区大学城南路55号");
+        point.setContactPhone("13800000001");
+        point.setBusinessHours("09:00-21:00");
+        point.setImage("/uploads/pickup/point1.jpg");
+        point.setStatus(1);
+        point.setAuditStatus(1);
+        when(pickupPointMapper.selectList(any())).thenReturn(List.of(point));
+
+        var result = service.pickupPoints(2001L);
+
+        assertEquals(1, result.size());
+        assertEquals(3001L, result.get(0).pickupPointId());
+        assertEquals(2001L, result.get(0).merchantId());
+        assertEquals("09:00-21:00", result.get(0).businessHours());
+        assertEquals("/uploads/pickup/point1.jpg", result.get(0).image());
     }
 
     private Merchant merchant(int status) {

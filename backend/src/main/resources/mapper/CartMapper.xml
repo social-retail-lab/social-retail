@@ -9,6 +9,8 @@
         <result property="userId" column="user_id"/>
         <result property="skuId" column="sku_id"/>
         <result property="quantity" column="quantity"/>
+        <result property="distributorProductId" column="distributor_product_id"/>
+        <result property="attributionExpiresAt" column="attribution_expires_at"/>
     </resultMap>
 
     <resultMap id="CartItemResultMap" type="com.socialretail.backend.vo.CartItemVO">
@@ -19,12 +21,17 @@
         <result property="skuSpec" column="sku_spec"/>
         <result property="productImage" column="product_image"/>
         <result property="price" column="price"/>
+        <result property="originalPrice" column="original_price"/>
         <result property="quantity" column="quantity"/>
         <result property="stock" column="stock"/>
         <result property="merchantId" column="merchant_id"/>
         <result property="merchantName" column="merchant_name"/>
         <result property="productStatus" column="product_status"/>
         <result property="productAuditStatus" column="product_audit_status"/>
+        <result property="distributorProductId" column="distributor_product_id"/>
+        <result property="promotionCode" column="promotion_code"/>
+        <result property="commissionRate" column="commission_rate"/>
+        <result property="promotionExpiresAt" column="attribution_expires_at"/>
     </resultMap>
 
     <sql id="CartItemColumns">
@@ -35,23 +42,37 @@
         s.specs AS sku_spec,
         p.main_image AS product_image,
         s.price AS price,
+        s.price AS original_price,
         c.quantity AS quantity,
         s.stock AS stock,
         p.merchant_id AS merchant_id,
         m.merchant_name AS merchant_name,
         p.status AS product_status,
-        p.audit_status AS product_audit_status
+        p.audit_status AS product_audit_status,
+        CASE WHEN c.attribution_expires_at > NOW()
+               AND dp.status = 1 AND mdp.status = 1 AND d.status = 1
+               AND mdp.product_id = p.id
+             THEN c.distributor_product_id END AS distributor_product_id,
+        CASE WHEN c.attribution_expires_at > NOW()
+               AND dp.status = 1 AND mdp.status = 1 AND d.status = 1
+               AND mdp.product_id = p.id
+             THEN c.promotion_code END AS promotion_code,
+        CASE WHEN c.attribution_expires_at > NOW()
+               AND dp.status = 1 AND mdp.status = 1 AND d.status = 1
+               AND mdp.product_id = p.id
+             THEN mdp.commission_rate END AS commission_rate,
+        c.attribution_expires_at AS attribution_expires_at
     </sql>
 
     <select id="selectByIdAndUserId" resultMap="CartResultMap">
-        SELECT id, user_id, sku_id, quantity
+        SELECT id, user_id, sku_id, quantity, distributor_product_id, attribution_expires_at
         FROM cart
         WHERE id = #{id} AND user_id = #{userId}
         LIMIT 1
     </select>
 
     <select id="selectByUserIdAndSkuId" resultMap="CartResultMap">
-        SELECT id, user_id, sku_id, quantity
+        SELECT id, user_id, sku_id, quantity, distributor_product_id, attribution_expires_at
         FROM cart
         WHERE user_id = #{userId} AND sku_id = #{skuId}
         LIMIT 1
@@ -64,6 +85,9 @@
         JOIN sku s ON c.sku_id = s.id
         JOIN product p ON s.product_id = p.id
         LEFT JOIN merchant m ON p.merchant_id = m.id
+        LEFT JOIN distributor_product dp ON dp.id = c.distributor_product_id
+        LEFT JOIN merchant_distribution_product mdp ON mdp.id = dp.distribution_product_id
+        LEFT JOIN distributor d ON d.id = dp.distributor_id
         WHERE c.user_id = #{userId}
         ORDER BY c.id DESC
     </select>
@@ -74,6 +98,9 @@
         JOIN sku s ON c.sku_id = s.id
         JOIN product p ON s.product_id = p.id
         LEFT JOIN merchant m ON p.merchant_id = m.id
+        LEFT JOIN distributor_product dp ON dp.id = c.distributor_product_id
+        LEFT JOIN merchant_distribution_product mdp ON mdp.id = dp.distribution_product_id
+        LEFT JOIN distributor d ON d.id = dp.distributor_id
         WHERE c.user_id = #{userId}
           AND c.id IN
         <foreach collection="cartItemIds" item="cartItemId" open="(" separator="," close=")">
@@ -84,13 +111,28 @@
 
     <insert id="insert" parameterType="com.socialretail.backend.entity.order.Cart"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO cart (user_id, sku_id, quantity)
-        VALUES (#{userId}, #{skuId}, #{quantity})
+        INSERT INTO cart (user_id, sku_id, quantity, distributor_product_id, attribution_expires_at, promotion_code)
+        VALUES (#{userId}, #{skuId}, #{quantity}, #{distributorProductId}, #{attributionExpiresAt}, #{promotionCode})
     </insert>
 
     <update id="updateQuantity">
         UPDATE cart
-        SET quantity = #{quantity}
+        SET quantity = #{quantity},
+            distributor_product_id = CASE WHEN attribution_expires_at > NOW()
+                THEN distributor_product_id ELSE NULL END,
+            attribution_expires_at = CASE WHEN attribution_expires_at > NOW()
+                THEN attribution_expires_at ELSE NULL END,
+            promotion_code = CASE WHEN attribution_expires_at > NOW()
+                THEN promotion_code ELSE NULL END
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <update id="updateQuantityAndAttribution">
+        UPDATE cart
+        SET quantity = #{quantity},
+            distributor_product_id = #{distributorProductId},
+            attribution_expires_at = #{attributionExpiresAt},
+            promotion_code = #{promotionCode}
         WHERE id = #{id} AND user_id = #{userId}
     </update>
 
