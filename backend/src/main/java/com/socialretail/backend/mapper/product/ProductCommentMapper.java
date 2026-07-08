@@ -7,6 +7,8 @@ import com.socialretail.backend.entity.product.ProductComment;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface ProductCommentMapper extends BaseMapper<ProductComment> {
 
@@ -18,4 +20,11 @@ public interface ProductCommentMapper extends BaseMapper<ProductComment> {
                                                  @Param("score") Integer score);
 
     CommentViewRow selectCommentDetail(@Param("commentId") Long commentId);
+
+    ProductCommentStatisticsRow selectProductCommentStatistics(
+            @Param("productId") Long productId);
+
+    List<CommentViewRow> selectLatestProductComments(
+            @Param("productId") Long productId,
+            @Param("limit") int limit);
 }

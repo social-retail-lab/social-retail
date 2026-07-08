@@ -13,16 +13,19 @@ import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantProdu
 import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantProductSearchPage;
 import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantProductSummary;
 import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantStatistics;
+import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.PickupPointItem;
 import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.member.MerchantCoupon;
 import com.socialretail.backend.entity.member.MerchantCouponUser;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.product.Sku;
+import com.socialretail.backend.entity.order.PickupPoint;
 import com.socialretail.backend.mapper.member.MerchantCouponMapper;
 import com.socialretail.backend.mapper.member.MerchantCouponUserMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
+import com.socialretail.backend.mapper.order.PickupPointMapper;
 import com.socialretail.backend.utils.PhoneUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,7 @@ public class CustomerMerchantHomeService {
     private final SkuMapper skuMapper;
     private final MerchantCouponMapper couponMapper;
     private final MerchantCouponUserMapper couponUserMapper;
+    private final PickupPointMapper pickupPointMapper;
     private final ImageUrlResolver imageUrlResolver;
 
     public CustomerMerchantHomeService(MerchantMapper merchantMapper,
@@ -55,12 +59,14 @@ public class CustomerMerchantHomeService {
                                        SkuMapper skuMapper,
                                        MerchantCouponMapper couponMapper,
                                        MerchantCouponUserMapper couponUserMapper,
+                                       PickupPointMapper pickupPointMapper,
                                        ImageUrlResolver imageUrlResolver) {
         this.merchantMapper = merchantMapper;
         this.productMapper = productMapper;
         this.skuMapper = skuMapper;
         this.couponMapper = couponMapper;
         this.couponUserMapper = couponUserMapper;
+        this.pickupPointMapper = pickupPointMapper;
         this.imageUrlResolver = imageUrlResolver;
     }
 
@@ -127,6 +133,21 @@ public class CustomerMerchantHomeService {
                 .toList();
         return new MerchantProductSearchPage(merchantId, merchant.getMerchantName(),
                 normalizedKeyword, items, result.getTotal(), result.getPages(), page, pageSize);
+    }
+
+    public List<PickupPointItem> pickupPoints(Long merchantId) {
+        requireMerchant(merchantId);
+        return pickupPointMapper.selectList(Wrappers.<PickupPoint>lambdaQuery()
+                        .eq(PickupPoint::getMerchantId, merchantId)
+                        .eq(PickupPoint::getStatus, ENABLED)
+                        .eq(PickupPoint::getAuditStatus, AUDIT_APPROVED)
+                        .orderByAsc(PickupPoint::getId))
+                .stream()
+                .map(point -> new PickupPointItem(
+                        point.getId(), point.getMerchantId(), point.getName(), point.getAddress(),
+                        point.getContactPhone(), point.getBusinessHours(),
+                        imageUrlResolver.resolve(point.getImage())))
+                .toList();
     }
 
     private com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Product> productQuery(

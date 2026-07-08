@@ -219,7 +219,8 @@
     </update>
 
     <select id="selectPickupPointById" resultType="com.socialretail.backend.entity.order.PickupPoint">
-        SELECT id, merchant_id, name, address, contact_phone, business_hours, status
+        SELECT id, merchant_id, name, address, contact_phone, business_hours,
+               status, audit_status, image, create_time, update_time
         FROM pickup_point
         WHERE id = #{pickupPointId}
         LIMIT 1
@@ -254,6 +255,13 @@
         UPDATE `order`
         SET status = #{status}, update_time = #{updateTime}
         WHERE id = #{orderId}
+    </update>
+
+    <update id="updatePickupCodeIfAbsent">
+        UPDATE `order`
+        SET pickup_code = #{pickupCode}, update_time = #{updateTime}
+        WHERE id = #{orderId}
+          AND (pickup_code IS NULL OR pickup_code = '')
     </update>
 
     <update id="updatePointsStatus">

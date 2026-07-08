@@ -11,4 +11,5 @@ public class Cart {
     private Integer quantity;
     private Long distributorProductId;
     private LocalDateTime attributionExpiresAt;
+    private String promotionCode;
 }

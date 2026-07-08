@@ -19,6 +19,7 @@ import com.socialretail.backend.entity.order.Payment;
 import com.socialretail.backend.entity.order.Order;
 import com.socialretail.backend.entity.order.OrderItem;
 import com.socialretail.backend.entity.order.OrderStatusLog;
+import com.socialretail.backend.entity.order.PickupPoint;
 import com.socialretail.backend.mapper.order.PaymentMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
@@ -56,6 +57,8 @@ public class PayServiceImpl implements PayService {
     private static final Logger log = LoggerFactory.getLogger(PayServiceImpl.class);
     private static final int WAIT_PAY = OrderStatus.WAIT_PAY;
     private static final int WAIT_ACCEPT = OrderStatus.WAIT_ACCEPT;
+    private static final int DELIVERY = OrderStatus.DELIVERY;
+    private static final int PICKUP = OrderStatus.PICKUP;
     private static final int ALIPAY_SANDBOX = 1;
     private static final int MOCK = 2;
     private static final int UNPAID = 0;
@@ -172,8 +175,12 @@ public class PayServiceImpl implements PayService {
             return false;
         }
         if (Objects.equals(payment.getStatus(), PAID)) {
-            return !StringUtils.hasText(payment.getThirdTradeNo())
+            boolean sameTrade = !StringUtils.hasText(payment.getThirdTradeNo())
                     || Objects.equals(payment.getThirdTradeNo(), thirdTradeNo);
+            if (sameTrade) {
+                ensurePickupCode(order, LocalDateTime.now());
+            }
+            return sameTrade;
         }
         if (!Objects.equals(order.getStatus(), WAIT_PAY)) {
             log.warn("支付宝回调对应订单不可支付，orderId={}, status={}", order.getId(), order.getStatus());
@@ -211,13 +218,20 @@ public class PayServiceImpl implements PayService {
     @Override
     @Transactional
     public MockPayResultVO mockPaySuccess(Long userId, MockPaySuccessDTO dto) {
-        Order order = requirePayableOrder(userId, dto.getOrderId());
+        Order order = requireOrderForMockPayment(userId, dto.getOrderId());
         if (!sameMoney(order.getPayAmount(), dto.getPayAmount())) {
             throw amountMismatch(order.getPayAmount(), dto.getPayAmount());
         }
         Payment payment = paymentMapper.selectLatestByOrderIdForUpdate(order.getId());
         if (payment != null && Objects.equals(payment.getStatus(), PAID)) {
-            throw alreadyPaid();
+            LocalDateTime now = LocalDateTime.now();
+            ensurePickupCode(order, now);
+            LocalDateTime paidAt = payment.getPayTime() == null ? order.getPayTime() : payment.getPayTime();
+            return toMockResult(order, payment, PAID, paidAt, null);
+        }
+        if (!Objects.equals(order.getStatus(), WAIT_PAY)
+                || (order.getPayExpireTime() != null && !order.getPayExpireTime().isAfter(LocalDateTime.now()))) {
+            throw paymentNotAllowed(order);
         }
         if (payment == null) {
             payment = createPayment(order, MOCK, "MOCKPAY");
@@ -274,6 +288,14 @@ public class PayServiceImpl implements PayService {
         return order;
     }
 
+    private Order requireOrderForMockPayment(Long userId, Long orderId) {
+        Order order = orderMapper.selectByIdAndUserIdForUpdate(orderId, userId);
+        if (order == null) {
+            throw orderNotFound();
+        }
+        return order;
+    }
+
     private Order requireOrder(Long userId, Long orderId) {
         Order order = orderMapper.selectByIdAndUserId(orderId, userId);
         if (order == null) {
@@ -307,6 +329,7 @@ public class PayServiceImpl implements PayService {
                                LocalDateTime payTime,
                                LocalDateTime callbackTime,
                                String remark) {
+        ensurePickupCode(order, callbackTime);
         int nextStatus = OrderStatus.nextStatusAfterPay(order.getDeliveryType());
         if (paymentMapper.updatePlatformAndPaid(
                 payment.getId(), platform, thirdTradeNo, payTime, callbackTime
@@ -420,12 +443,54 @@ public class PayServiceImpl implements PayService {
         vo.setPaymentId(payment.getId());
         vo.setPaySn(payment.getPaySn());
         vo.setPayStatus(paymentStatusText(paymentStatus));
+        int responseOrderStatus = paymentStatus == PAID && Objects.equals(order.getStatus(), WAIT_PAY)
+                ? OrderStatus.nextStatusAfterPay(order.getDeliveryType()) : order.getStatus();
         vo.setOrderStatus(paymentStatus == PAID
-                ? OrderStatus.userStatusCode(OrderStatus.nextStatusAfterPay(order.getDeliveryType()))
-                : OrderStatus.userStatusText(order.getStatus(), order.getDeliveryType()));
+                ? OrderStatus.userStatusCode(responseOrderStatus)
+                : OrderStatus.userStatusText(responseOrderStatus, order.getDeliveryType()));
+        vo.setDeliveryType(order.getDeliveryType());
+        if (Objects.equals(order.getDeliveryType(), PICKUP)) {
+            vo.setPickupPointId(order.getPickupPointId());
+            vo.setPickupCode(order.getPickupCode());
+        } else {
+            vo.setPickupPointId(null);
+            vo.setPickupCode(null);
+        }
         vo.setPayTime(payTime);
         vo.setFailReason(failReason);
         return vo;
+    }
+
+    private String ensurePickupCode(Order order, LocalDateTime updateTime) {
+        if (Objects.equals(order.getDeliveryType(), DELIVERY)) {
+            return null;
+        }
+        if (!Objects.equals(order.getDeliveryType(), PICKUP)) {
+            throw new BusinessException(40931, HttpStatus.CONFLICT,
+                    "自提点不可用或不属于当前商家",
+                    new PickupPointUnavailableData(order.getId(), order.getPickupPointId()));
+        }
+
+        if (StringUtils.hasText(order.getPickupCode())) {
+            return order.getPickupCode();
+        }
+
+        PickupPoint pickupPoint = order.getPickupPointId() == null
+                ? null : orderMapper.selectPickupPointById(order.getPickupPointId());
+        if (pickupPoint == null
+                || !Objects.equals(pickupPoint.getMerchantId(), order.getMerchantId())
+                || !Objects.equals(pickupPoint.getStatus(), 1)
+                || !Objects.equals(pickupPoint.getAuditStatus(), 1)) {
+            throw new BusinessException(40931, HttpStatus.CONFLICT,
+                    "自提点不可用或不属于当前商家",
+                    new PickupPointUnavailableData(order.getId(), order.getPickupPointId()));
+        }
+        String pickupCode = String.format("%06d", RANDOM.nextInt(1_000_000));
+        if (orderMapper.updatePickupCodeIfAbsent(order.getId(), pickupCode, updateTime) != 1) {
+            throw new IllegalStateException("自提码生成失败，orderId=" + order.getId());
+        }
+        order.setPickupCode(pickupCode);
+        return pickupCode;
     }
 
     private String orderStatusText(Integer status) {
@@ -513,6 +578,9 @@ public class PayServiceImpl implements PayService {
                 40925, HttpStatus.CONFLICT, "支付金额与订单应付金额不一致",
                 Map.of("orderPayAmount", money(orderAmount), "requestPayAmount", money(requestAmount))
         );
+    }
+
+    private record PickupPointUnavailableData(Long orderId, Long pickupPointId) {
     }
 
     private BusinessException alipayCreateFailed() {

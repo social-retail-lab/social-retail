@@ -56,7 +56,7 @@
         CASE WHEN c.attribution_expires_at > NOW()
                AND dp.status = 1 AND mdp.status = 1 AND d.status = 1
                AND mdp.product_id = p.id
-             THEN dp.promotion_code END AS promotion_code,
+             THEN c.promotion_code END AS promotion_code,
         CASE WHEN c.attribution_expires_at > NOW()
                AND dp.status = 1 AND mdp.status = 1 AND d.status = 1
                AND mdp.product_id = p.id
@@ -111,8 +111,8 @@
 
     <insert id="insert" parameterType="com.socialretail.backend.entity.order.Cart"
             useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO cart (user_id, sku_id, quantity, distributor_product_id, attribution_expires_at)
-        VALUES (#{userId}, #{skuId}, #{quantity}, #{distributorProductId}, #{attributionExpiresAt})
+        INSERT INTO cart (user_id, sku_id, quantity, distributor_product_id, attribution_expires_at, promotion_code)
+        VALUES (#{userId}, #{skuId}, #{quantity}, #{distributorProductId}, #{attributionExpiresAt}, #{promotionCode})
     </insert>
 
     <update id="updateQuantity">
@@ -121,7 +121,9 @@
             distributor_product_id = CASE WHEN attribution_expires_at > NOW()
                 THEN distributor_product_id ELSE NULL END,
             attribution_expires_at = CASE WHEN attribution_expires_at > NOW()
-                THEN attribution_expires_at ELSE NULL END
+                THEN attribution_expires_at ELSE NULL END,
+            promotion_code = CASE WHEN attribution_expires_at > NOW()
+                THEN promotion_code ELSE NULL END
         WHERE id = #{id} AND user_id = #{userId}
     </update>
 
@@ -129,7 +131,8 @@
         UPDATE cart
         SET quantity = #{quantity},
             distributor_product_id = #{distributorProductId},
-            attribution_expires_at = #{attributionExpiresAt}
+            attribution_expires_at = #{attributionExpiresAt},
+            promotion_code = #{promotionCode}
         WHERE id = #{id} AND user_id = #{userId}
     </update>
 

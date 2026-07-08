@@ -32,6 +32,9 @@ public class ProductDetailVO {
     private BigDecimal originalPrice;
     private Long soldCount;
     private Integer stock;
+    private BigDecimal ratingScore;
+    private Integer commentCount;
+    private List<ProductLatestCommentVO> latestComments;
     private String status;
     private ProductMerchantInfoVO merchantInfo;
     private Long distributorProductId;

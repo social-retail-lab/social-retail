@@ -59,4 +59,25 @@
           AND pc.delete_time IS NULL
         LIMIT 1
     </select>
+
+    <select id="selectProductCommentStatistics"
+            resultType="com.socialretail.backend.mapper.product.ProductCommentStatisticsRow">
+        SELECT ROUND(COALESCE(AVG(pc.score), 0), 1) AS rating_score,
+               COUNT(*) AS comment_count
+        FROM product_comment pc
+        WHERE pc.product_id = #{productId}
+          AND pc.status = 1
+          AND pc.delete_time IS NULL
+    </select>
+
+    <select id="selectLatestProductComments"
+            resultType="com.socialretail.backend.mapper.product.CommentViewRow">
+        SELECT <include refid="commentViewColumns"/>
+        <include refid="commentViewJoins"/>
+        WHERE pc.product_id = #{productId}
+          AND pc.status = 1
+          AND pc.delete_time IS NULL
+        ORDER BY pc.create_time DESC, pc.id DESC
+        LIMIT #{limit}
+    </select>
 </mapper>

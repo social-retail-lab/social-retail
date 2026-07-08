@@ -155,6 +155,7 @@ public class CartServiceImpl implements CartService {
             if (attribution != null) {
                 cart.setDistributorProductId(attribution.distributorProductId());
                 cart.setAttributionExpiresAt(attributionExpiresAt);
+                cart.setPromotionCode(attribution.promotionCode());
             }
             cartMapper.insert(cart);
             return new CartAddVO(cart.getId(), cart.getSkuId(), cart.getQuantity());
@@ -163,7 +164,8 @@ public class CartServiceImpl implements CartService {
         int updated = attribution == null
                 ? cartMapper.updateQuantity(existing.getId(), userId, quantity)
                 : cartMapper.updateQuantityAndAttribution(existing.getId(), userId, quantity,
-                        attribution.distributorProductId(), attributionExpiresAt);
+                        attribution.distributorProductId(), attributionExpiresAt,
+                        attribution.promotionCode());
         if (updated == 0) {
             throw cartItemNotFound();
         }

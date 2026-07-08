@@ -6,6 +6,7 @@ import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantBasic
 import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantHome;
 import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantProductPage;
 import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.MerchantProductSearchPage;
+import com.socialretail.backend.dto.merchant.MerchantHomeApiModels.PickupPointItem;
 import com.socialretail.backend.service.merchant.CustomerMerchantHomeService;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Validated
 @RestController
@@ -68,6 +71,12 @@ public class MerchantHomeController {
             @Max(value = 100, message = "pageSize不能超过100")
             @RequestParam(defaultValue = "10") int pageSize) {
         return Result.success(merchantHomeService.search(merchantId, keyword, page, pageSize));
+    }
+
+    @GetMapping("/{merchantId}/pickup-points")
+    public Result<List<PickupPointItem>> pickupPoints(
+            @Positive(message = "merchantId必须大于0") @PathVariable Long merchantId) {
+        return Result.success(merchantHomeService.pickupPoints(merchantId));
     }
 
     private Long optionalUserId(String authorization) {

@@ -54,4 +54,9 @@ public final class MerchantHomeApiModels {
                                             List<MerchantProductItem> list, long total,
                                             long pages, int page, int pageSize) {
     }
+
+    public record PickupPointItem(Long pickupPointId, Long merchantId, String name,
+                                  String address, String contactPhone,
+                                  String businessHours, String image) {
+    }
 }

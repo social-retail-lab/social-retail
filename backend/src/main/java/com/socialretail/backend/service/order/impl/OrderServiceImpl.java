@@ -63,7 +63,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -90,7 +89,6 @@ public class OrderServiceImpl implements OrderService {
     private static final int ON_SALE = 1;
     private static final int AUDIT_APPROVED = 1;
     private static final BigDecimal ZERO = new BigDecimal("0.00");
-    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final OrderMapper orderMapper;
     private final CartMapper cartMapper;
@@ -387,6 +385,7 @@ public class OrderServiceImpl implements OrderService {
             }
             PickupPoint pickupPoint = orderMapper.selectPickupPointById(pickupPointId);
             if (pickupPoint == null || !Objects.equals(pickupPoint.getStatus(), 1)
+                    || !Objects.equals(pickupPoint.getAuditStatus(), 1)
                     || !Objects.equals(pickupPoint.getMerchantId(), merchantId)) {
                 throw new BusinessException(40431, HttpStatus.NOT_FOUND, "自提点不存在或不可用");
             }
@@ -433,7 +432,8 @@ public class OrderServiceImpl implements OrderService {
         order.setSeckillId(pricing.getAppliedSeckillId());
         order.setBargainId(pricing.getAppliedBargainId());
         order.setPromotionSnapshot(toPromotionSnapshotJson(pricing));
-        order.setPickupCode(fulfillment.pickupPoint() == null ? null : generatePickupCode());
+        // 自提码只在支付成功后生成，避免未支付订单提前暴露可核销凭证。
+        order.setPickupCode(null);
         order.setRemark(StringUtils.hasText(selection.getRemark()) ? selection.getRemark().trim() : null);
         return order;
     }
@@ -747,10 +747,6 @@ public class OrderServiceImpl implements OrderService {
 
     private List<Long> distinctIds(List<Long> ids) {
         return new ArrayList<>(new LinkedHashSet<>(ids));
-    }
-
-    private String generatePickupCode() {
-        return String.format("%06d", RANDOM.nextInt(1_000_000));
     }
 
     private OrderSubmitResponse toSubmitResponse(Order order, boolean idempotent) {

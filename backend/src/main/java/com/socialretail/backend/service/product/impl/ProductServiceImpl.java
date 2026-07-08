@@ -18,6 +18,9 @@ import com.socialretail.backend.mapper.product.BrandMapper;
 import com.socialretail.backend.mapper.product.CategoryMapper;
 import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
+import com.socialretail.backend.mapper.product.ProductCommentMapper;
+import com.socialretail.backend.mapper.product.ProductCommentStatisticsRow;
+import com.socialretail.backend.mapper.product.CommentViewRow;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.service.product.ProductService;
 import com.socialretail.backend.service.product.CurrentProductPriceService;
@@ -27,6 +30,7 @@ import com.socialretail.backend.vo.ProductCardVO;
 import com.socialretail.backend.vo.ProductSkuListVO;
 import com.socialretail.backend.vo.ProductSkuVO;
 import com.socialretail.backend.vo.ProductMerchantInfoVO;
+import com.socialretail.backend.vo.ProductLatestCommentVO;
 import com.socialretail.backend.vo.SkuVO;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -57,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
     };
 
     private final ProductMapper productMapper;
+    private final ProductCommentMapper productCommentMapper;
     private final SkuMapper skuMapper;
     private final ProductCategoryRelationMapper productCategoryRelationMapper;
     private final BrandMapper brandMapper;
@@ -68,6 +73,7 @@ public class ProductServiceImpl implements ProductService {
     private final CurrentProductPriceService currentProductPriceService;
 
     public ProductServiceImpl(ProductMapper productMapper,
+                              ProductCommentMapper productCommentMapper,
                               SkuMapper skuMapper,
                               ProductCategoryRelationMapper productCategoryRelationMapper,
                               BrandMapper brandMapper,
@@ -78,6 +84,7 @@ public class ProductServiceImpl implements ProductService {
                               DistributionAttributionService distributionAttributionService,
                               CurrentProductPriceService currentProductPriceService) {
         this.productMapper = productMapper;
+        this.productCommentMapper = productCommentMapper;
         this.skuMapper = skuMapper;
         this.productCategoryRelationMapper = productCategoryRelationMapper;
         this.brandMapper = brandMapper;
@@ -164,6 +171,7 @@ public class ProductServiceImpl implements ProductService {
         detail.setSoldCount(soldCount(product));
         detail.setStock(skus.stream().map(Sku::getStock).filter(value -> value != null)
                 .mapToInt(Integer::intValue).sum());
+        populateCommentSummary(detail, productId);
         detail.setStatus(product.getStatus() != null && product.getStatus() == ON_SALE
                 ? "ON_SALE" : "OFF_SALE");
         detail.setSkuList(skuList);
@@ -205,6 +213,53 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         return detail;
+    }
+
+    private void populateCommentSummary(ProductDetailVO detail, Long productId) {
+        ProductCommentStatisticsRow statistics =
+                productCommentMapper.selectProductCommentStatistics(productId);
+        detail.setRatingScore(statistics == null || statistics.getRatingScore() == null
+                ? new BigDecimal("0.0")
+                : statistics.getRatingScore().setScale(1, java.math.RoundingMode.HALF_UP));
+        long count = statistics == null || statistics.getCommentCount() == null
+                ? 0L : statistics.getCommentCount();
+        detail.setCommentCount(count > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) count);
+        detail.setLatestComments(productCommentMapper.selectLatestProductComments(productId, 2)
+                .stream()
+                .map(this::toLatestComment)
+                .toList());
+    }
+
+    private ProductLatestCommentVO toLatestComment(CommentViewRow row) {
+        boolean anonymous = Objects.equals(row.getAnonymous(), 1);
+        return new ProductLatestCommentVO(
+                row.getCommentId(),
+                anonymous ? null : row.getUserId(),
+                anonymous ? "匿名用户" : row.getNickname(),
+                anonymous ? "" : imageUrlResolver.resolve(row.getAvatar()),
+                row.getScore(),
+                row.getContent(),
+                parseCommentImages(row.getImages()),
+                anonymous ? 1 : 0,
+                row.getCreateTime());
+    }
+
+    private List<String> parseCommentImages(String images) {
+        if (!StringUtils.hasText(images)) {
+            return List.of();
+        }
+        try {
+            return objectMapper.readValue(images, STRING_LIST_TYPE).stream()
+                    .filter(StringUtils::hasText)
+                    .map(imageUrlResolver::resolve)
+                    .toList();
+        } catch (Exception ignored) {
+            return java.util.Arrays.stream(images.split(","))
+                    .map(String::trim)
+                    .filter(StringUtils::hasText)
+                    .map(imageUrlResolver::resolve)
+                    .toList();
+        }
     }
 
     @Override

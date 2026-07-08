@@ -40,20 +40,20 @@ public class DistributorServiceImpl implements DistributorService {
     private final ImageUrlResolver imageUrlResolver;
     private final Path uploadPath;
     private final String uploadBaseUrl;
-    private final String shareBaseUrl;
+    private final String frontendBaseUrl;
 
     public DistributorServiceImpl(JdbcTemplate jdbc,
                                   LocalImageStorageService imageStorageService,
                                   ImageUrlResolver imageUrlResolver,
                                   @Value("${upload.path}") String uploadPath,
                                   @Value("${upload.base-url:}") String uploadBaseUrl,
-                                  @Value("${distributor.share-base-url:http://localhost:8081}") String shareBaseUrl) {
+                                  @Value("${app.frontend-base-url}") String frontendBaseUrl) {
         this.jdbc = jdbc;
         this.imageStorageService = imageStorageService;
         this.imageUrlResolver = imageUrlResolver;
         this.uploadPath = Path.of(uploadPath);
         this.uploadBaseUrl = trimSlash(uploadBaseUrl);
-        this.shareBaseUrl = trimSlash(shareBaseUrl);
+        this.frontendBaseUrl = trimSlash(frontendBaseUrl);
     }
 
     @Override
@@ -162,7 +162,8 @@ public class DistributorServiceImpl implements DistributorService {
         if (!existing.isEmpty()) return promote(existing.get(0));
         String code = "PR" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss", Locale.ROOT))
                 + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase(Locale.ROOT);
-        String url = shareBaseUrl + "/product/" + number(product.get(0).get("product_id")).longValue() + "?promotionCode=" + code;
+        Long productId = number(product.get(0).get("product_id")).longValue();
+        String url = buildPromotionUrl(frontendBaseUrl, productId, code);
         KeyHolder keys = new GeneratedKeyHolder();
         try {
             jdbc.update(connection -> {
@@ -181,10 +182,19 @@ public class DistributorServiceImpl implements DistributorService {
     @Transactional
     public DistributorResponses.ShareLink shareLink(Long userId, Long distributorProductId) {
         Long distributorId = number(requireDistributor(userId).get("id")).longValue();
-        List<Map<String, Object>> rows = jdbc.queryForList("SELECT promotion_code,promotion_url,qr_code FROM distributor_product WHERE id=? AND distributor_id=? AND status=1", distributorProductId, distributorId);
+        List<Map<String, Object>> rows = jdbc.queryForList("SELECT promotion_code,promotion_url,qr_code,distribution_product_id FROM distributor_product WHERE id=? AND distributor_id=? AND status=1", distributorProductId, distributorId);
         if (rows.isEmpty()) throw error(40462, HttpStatus.NOT_FOUND, "推广商品不存在");
         Map<String, Object> row = rows.get(0); String code = string(row.get("promotion_code"));
         String url = string(row.get("promotion_url")); String qr = string(row.get("qr_code"));
+        Long distributionProductId = number(row.get("distribution_product_id")).longValue();
+        if (url == null || url.isBlank()) {
+            List<Map<String, Object>> product = jdbc.queryForList("SELECT product_id FROM merchant_distribution_product WHERE id=?", distributionProductId);
+            if (!product.isEmpty()) {
+                Long productId = number(product.get(0).get("product_id")).longValue();
+                url = buildPromotionUrl(frontendBaseUrl, productId, code);
+                jdbc.update("UPDATE distributor_product SET promotion_url=? WHERE id=?", url, distributorProductId);
+            }
+        }
         if (qr == null || qr.isBlank()) { qr = generateQr(code, url); jdbc.update("UPDATE distributor_product SET qr_code=? WHERE id=?", qr, distributorProductId); }
         return new DistributorResponses.ShareLink(code, url, imageUrlResolver.resolve(qr));
     }
@@ -302,8 +312,14 @@ public class DistributorServiceImpl implements DistributorService {
             throw error(40461, HttpStatus.NOT_FOUND, "推广商品不存在");
         }
         if (statuses.get(0) != targetStatus) {
-            jdbc.update("UPDATE distributor_product SET status=? WHERE id=? AND distributor_id=?",
-                    targetStatus, distributorProductId, distributorId);
+            if (targetStatus == 1) {
+                jdbc.update("UPDATE distributor_product SET status=1, promotion_url=NULL, qr_code=NULL " +
+                                "WHERE id=? AND distributor_id=?",
+                        distributorProductId, distributorId);
+            } else {
+                jdbc.update("UPDATE distributor_product SET status=? WHERE id=? AND distributor_id=?",
+                        targetStatus, distributorProductId, distributorId);
+            }
         }
         return new DistributorResponses.PromotionStatus(
                 distributorProductId, targetStatus, promotionStatusText(targetStatus));
@@ -315,12 +331,17 @@ public class DistributorServiceImpl implements DistributorService {
     }
     private List<Map<String, Object>> promotion(Long distributorId, Long productId) { return jdbc.queryForList("SELECT id,promotion_code FROM distributor_product WHERE distributor_id=? AND distribution_product_id=? LIMIT 1", distributorId, productId); }
     private boolean exists(String sql, Object... args) { return !jdbc.queryForList(sql, args).isEmpty(); }
-    private String generateQr(String code, String url) {
+    String generateQr(String code, String url) {
         try { Path directory = uploadPath.resolve("qrcode").normalize(); Files.createDirectories(directory); Path target = directory.resolve(code + ".png").normalize();
             if (!target.startsWith(directory)) throw new IllegalStateException("Invalid path");
             MatrixToImageWriter.writeToPath(new MultiFormatWriter().encode(url, BarcodeFormat.QR_CODE, 320, 320), "PNG", target);
             String relative = "/uploads/qrcode/" + code + ".png"; return uploadBaseUrl.isBlank() ? relative : uploadBaseUrl + relative;
         } catch (Exception exception) { throw error(50061, HttpStatus.INTERNAL_SERVER_ERROR, "二维码生成失败"); }
+    }
+    static String buildPromotionUrl(String frontendBaseUrl, Long productId, String promotionCode) {
+        return trimSlash(frontendBaseUrl)
+                + "/pages/product/detail?id=" + productId
+                + "&promotionCode=" + promotionCode;
     }
     private static DistributorResponses.Promote promote(Map<String, Object> row) { return new DistributorResponses.Promote(number(row.get("id")).longValue(), string(row.get("promotion_code"))); }
     private static String auditText(int status) { return switch (status) { case 0 -> "待审核"; case 1 -> "审核通过"; case 2 -> "审核拒绝"; default -> "未知状态"; }; }
