@@ -10,6 +10,8 @@ import com.socialretail.backend.entity.distribution.DistributorApply;
 import com.socialretail.backend.entity.distribution.DistributorProduct;
 import com.socialretail.backend.entity.distribution.MerchantDistributionProduct;
 import com.socialretail.backend.entity.product.Product;
+import com.socialretail.backend.entity.member.User;
+import com.socialretail.backend.mapper.member.UserMapper;
 import com.socialretail.backend.mapper.distribution.CommissionRecordMapper;
 import com.socialretail.backend.mapper.distribution.DistributorApplyMapper;
 import com.socialretail.backend.mapper.distribution.DistributorMapper;
@@ -37,19 +39,22 @@ public class AdminDistributorController {
     private final DistributorProductMapper distributorProductMapper;
     private final MerchantDistributionProductMapper merchantDistProductMapper;
     private final ProductMapper productMapper;
+    private final UserMapper userMapper;
 
     public AdminDistributorController(DistributorApplyMapper applyMapper,
                                        DistributorMapper distributorMapper,
                                        CommissionRecordMapper commissionRecordMapper,
                                        DistributorProductMapper distributorProductMapper,
                                        MerchantDistributionProductMapper merchantDistProductMapper,
-                                       ProductMapper productMapper) {
+                                       ProductMapper productMapper,
+                                       UserMapper userMapper) {
         this.applyMapper = applyMapper;
         this.distributorMapper = distributorMapper;
         this.commissionRecordMapper = commissionRecordMapper;
         this.distributorProductMapper = distributorProductMapper;
         this.merchantDistProductMapper = merchantDistProductMapper;
         this.productMapper = productMapper;
+        this.userMapper = userMapper;
     }
 
     /** 分销员申请列表 */
@@ -69,7 +74,32 @@ public class AdminDistributorController {
 
         Page<DistributorApply> page = new Page<>(pageNum, pageSize);
         Page<DistributorApply> result = applyMapper.selectPage(page, wrapper);
-        return Result.ok(PageResult.of(result.getRecords(), result.getTotal(), pageNum, pageSize));
+
+        // 封装为 Map，追加用户昵称
+        List<Map<String, Object>> enriched = new ArrayList<>();
+        for (DistributorApply a : result.getRecords()) {
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("id", a.getId());
+            item.put("userId", a.getUserId());
+            item.put("realName", a.getRealName());
+            item.put("idCardNo", a.getIdCardNo());
+            item.put("idCardFront", a.getIdCardFront());
+            item.put("idCardBack", a.getIdCardBack());
+            item.put("bankName", a.getBankName());
+            item.put("bankCardNo", a.getBankCardNo());
+            item.put("bankAccountName", a.getBankAccountName());
+            item.put("auditStatus", a.getAuditStatus());
+            item.put("auditRemark", a.getAuditRemark());
+            item.put("auditTime", a.getAuditTime());
+            item.put("applyTime", a.getApplyTime());
+
+            User user = userMapper.selectById(a.getUserId());
+            item.put("nickname", user != null ? user.getNickname() : "");
+            item.put("phone", user != null ? user.getPhone() : "");
+
+            enriched.add(item);
+        }
+        return Result.ok(PageResult.of(enriched, result.getTotal(), pageNum, pageSize));
     }
 
     /** 审核分销员申请 */

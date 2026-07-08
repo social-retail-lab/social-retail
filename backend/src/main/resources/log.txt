@@ -364,3 +364,998 @@
 2026-07-06 16:23:49.572 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
 2026-07-06 16:23:49.588 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
 2026-07-06 16:23:49.864 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 17:17:35.456 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 17:17:35.461 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 17:17:35.467 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 17:17:35.497 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 17:24:58.147 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-06 17:24:58.147 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-06 17:24:58.148 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-06 17:24:58.149 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-06 17:24:58.149 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-06 17:24:58.150 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-06 17:24:58.190 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=2538.10, totalOrders=39, totalUsers=16
+2026-07-06 17:25:01.056 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-06 17:25:01.070 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=6, pageSize=6
+2026-07-06 17:25:01.691 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-06 17:25:01.754 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-06 17:25:02.201 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-06 17:25:02.218 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-06 17:25:06.070 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-06 17:25:06.076 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-06 17:25:06.092 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-06 17:25:06.094 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-06 17:25:06.094 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-06 17:25:06.094 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-06 17:25:06.135 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=2538.10, totalOrders=39, totalUsers=16
+2026-07-06 23:24:21.791 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-06 23:24:22.023 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-06 23:24:22.590 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-06 23:24:22.645 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-06 23:24:22.645 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-06 23:24:22.645 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-06 23:24:23.029 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-06 23:24:23.029 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-06 23:24:23.029 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-06 23:24:23.031 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-06 23:24:23.032 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-06 23:24:23.041 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-06 23:24:23.093 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=2538.10, totalOrders=39, totalUsers=16
+2026-07-06 23:24:26.432 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-06 23:24:26.596 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-06 23:28:29.869 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-06 23:28:29.890 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-06 23:28:31.990 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-06 23:28:32.062 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-06 23:28:32.527 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-06 23:28:32.563 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=6, pageSize=6
+2026-07-06 23:31:03.406 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:31:03.413 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:31:05.921 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:31:05.924 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:31:05.928 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:31:05.959 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:31:14.226 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:31:14.226 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:31:14.240 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:31:14.243 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:31:17.876 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:31:17.878 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:31:17.883 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:31:17.899 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:31:18.938 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:31:18.954 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:31:19.729 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:22.350 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:31:22.358 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:31:22.358 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:31:22.370 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:31:24.644 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:31:24.648 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:31:25.672 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:31:25.685 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:31:25.731 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:27.732 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:28.123 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:31:28.123 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:31:28.130 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:31:28.144 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:31:33.385 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:31:33.392 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:31:33.394 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:31:33.402 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:31:34.605 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:31:34.607 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:31:34.612 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:31:34.618 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:31:50.549 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:31:50.550 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:31:50.554 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:31:50.568 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:31:51.560 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:31:51.571 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:31:51.728 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:53.730 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:55.726 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:55.792 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:31:55.795 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:31:57.546 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:31:57.556 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:31:57.725 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:31:57.950 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:31:57.952 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:31:57.956 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:31:57.969 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:32:43.531 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:32:43.534 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:32:43.538 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:32:43.548 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:32:50.622 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:32:50.623 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:32:50.626 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:32:50.639 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:32:51.219 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:32:51.227 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:32:51.728 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:32:52.002 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:32:52.004 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:32:55.584 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:32:55.589 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:32:55.589 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:32:55.598 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:32:56.949 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:32:56.949 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:32:56.954 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:32:56.964 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:32:57.307 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:32:57.311 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:32:57.856 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:32:57.860 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:32:57.864 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:32:57.874 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:34:55.303 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:34:55.308 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:34:57.395 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:34:57.406 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:34:57.726 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:34:59.741 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-06 23:35:01.661 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:35:01.664 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:35:01.667 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:35:01.676 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:36:20.465 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-06 23:36:20.472 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-06 23:36:34.637 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-06 23:36:34.657 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=5
+2026-07-06 23:36:35.541 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:36:35.544 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:36:35.550 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:36:35.593 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-06 23:37:06.306 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:37:06.306 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:37:06.317 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:37:06.321 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:37:09.710 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-06 23:37:09.720 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-06 23:37:09.725 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=0, pendingAmount=0
+2026-07-06 23:37:09.735 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=8
+2026-07-06 23:38:45.600 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-06 23:38:45.600 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=10
+2026-07-06 23:38:45.605 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-06 23:38:45.654 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-07 00:07:47.595 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 00:07:47.597 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 00:07:47.601 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 00:07:47.611 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=4, pageSize=4
+2026-07-07 00:07:51.935 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 00:07:51.939 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 00:08:07.696 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 00:08:07.712 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=6, pageSize=6
+2026-07-07 00:08:10.285 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 00:08:10.336 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-07 00:08:10.857 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 00:08:10.867 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 00:08:17.458 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 00:08:17.466 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 00:08:17.469 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 00:08:17.469 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 00:08:17.470 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 00:08:17.470 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 00:08:17.493 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=2538.10, totalOrders=39, totalUsers=16
+2026-07-07 00:08:38.316 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 00:08:38.324 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=6, pageSize=6
+2026-07-07 00:08:39.163 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 00:08:39.219 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-07 00:08:40.442 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 00:08:40.452 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 00:08:43.102 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 00:08:43.138 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=2
+2026-07-07 00:09:17.932 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 00:09:17.946 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=2
+2026-07-07 00:16:05.565 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 00:16:05.570 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 00:16:05.572 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 00:16:05.573 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 00:16:05.573 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 00:16:05.573 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 00:16:05.648 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=2538.10, totalOrders=39, totalUsers=16
+2026-07-07 00:16:06.046 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 00:16:06.120 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-07 00:16:06.910 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 00:16:06.923 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 00:16:07.607 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 00:16:07.621 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=6, pageSize=6
+2026-07-07 00:16:08.287 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 00:16:08.349 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=24, pageSize=10
+2026-07-07 00:16:08.799 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 00:16:08.808 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 10:27:07.762 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:27:07.763 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:27:07.763 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:27:07.763 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:27:07.764 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:27:07.775 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:27:12.192 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:27:12.194 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:27:12.194 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:27:12.194 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:27:12.197 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:27:12.197 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:27:19.723 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 10:27:19.852 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 10:27:20.570 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 10:27:20.657 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:22.543 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:27:22.564 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:27:22.566 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:27:22.570 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:27:22.570 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:27:22.570 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:27:23.225 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 10:27:23.331 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:24.916 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=2, pageSize=10
+2026-07-07 10:27:25.018 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:25.377 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=3, pageSize=10
+2026-07-07 10:27:25.491 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:25.900 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=4, pageSize=10
+2026-07-07 10:27:25.960 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:27.498 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=5, pageSize=10
+2026-07-07 10:27:27.572 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:27.832 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=6, pageSize=10
+2026-07-07 10:27:27.897 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:28.040 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=7, pageSize=10
+2026-07-07 10:27:28.090 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:28.275 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=8, pageSize=10
+2026-07-07 10:27:28.324 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:28.498 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=9, pageSize=10
+2026-07-07 10:27:28.567 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:28.740 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=10, pageSize=10
+2026-07-07 10:27:28.853 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:28.969 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=11, pageSize=10
+2026-07-07 10:27:29.056 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:29.201 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=12, pageSize=10
+2026-07-07 10:27:29.287 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:29.455 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=13, pageSize=10
+2026-07-07 10:27:29.511 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:29.674 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=14, pageSize=10
+2026-07-07 10:27:29.757 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:30.636 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=15, pageSize=10
+2026-07-07 10:27:30.702 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:30.808 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=16, pageSize=10
+2026-07-07 10:27:30.870 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:30.975 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=17, pageSize=10
+2026-07-07 10:27:31.036 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:31.148 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=18, pageSize=10
+2026-07-07 10:27:31.209 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:31.363 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=19, pageSize=10
+2026-07-07 10:27:31.426 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:27:31.662 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=20, pageSize=10
+2026-07-07 10:27:31.716 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=8
+2026-07-07 10:27:59.960 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:27:59.960 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:27:59.970 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:27:59.970 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:27:59.970 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:27:59.972 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:28:59.699 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:28:59.708 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:28:59.708 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:28:59.709 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:28:59.709 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:28:59.709 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:29:36.989 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-07 10:29:37.002 [http-nio-0.0.0.0-8080-exec-3] WARN  c.s.b.c.admin.AdminAuthController - [管理员登录] 失败, username=operator01, 原因: 账号不存在
+2026-07-07 10:55:41.626 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-07 10:55:41.755 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-07 10:55:42.102 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-07 10:55:42.112 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-07 10:55:43.897 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-07 10:55:43.898 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-07 10:55:43.907 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-07 10:55:43.912 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-07 10:55:43.914 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-07 10:55:43.923 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-07 10:55:43.960 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:55:43.960 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:55:43.973 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:55:43.973 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:55:43.974 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:55:43.977 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:55:44.105 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=214092.30, totalOrders=184, totalUsers=20
+2026-07-07 10:55:57.656 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:55:57.658 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:55:57.658 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:55:57.658 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:55:57.659 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:55:57.661 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:55:57.741 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=214092.30, totalOrders=184, totalUsers=20
+2026-07-07 10:56:04.858 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 10:56:04.961 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:56:07.107 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 10:56:07.180 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 10:56:38.054 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=17782224500, smsCode=123456
+2026-07-07 10:56:38.064 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=17782224500, merchantStatus=1
+2026-07-07 10:56:38.394 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 10:56:38.396 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 10:56:38.399 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 10:56:38.436 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 10:56:41.120 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 10:56:41.140 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 10:56:42.382 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 10:56:42.400 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 10:56:42.405 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 10:56:56.257 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 10:56:56.268 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 10:56:56.279 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 10:56:56.298 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 10:57:01.156 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 10:57:01.166 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 10:57:02.037 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 10:57:02.052 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 10:57:02.380 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 10:57:02.959 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 10:57:02.959 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 10:57:02.968 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 10:57:02.987 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 10:58:50.176 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 10:58:50.187 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 10:58:52.389 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 10:58:52.401 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 10:58:53.135 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:58:53.147 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:58:53.149 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:58:53.149 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:58:53.150 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:58:53.151 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:58:53.231 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=214092.30, totalOrders=184, totalUsers=20
+2026-07-07 10:59:21.345 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 10:59:21.352 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 10:59:36.261 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 10:59:36.278 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 10:59:36.282 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 10:59:36.284 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 10:59:36.284 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 10:59:36.284 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 10:59:36.367 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=214092.30, totalOrders=184, totalUsers=20
+2026-07-07 11:01:16.813 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 11:01:16.816 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 11:01:16.821 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 11:01:16.827 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 11:01:17.802 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 11:01:17.808 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 11:01:17.812 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 11:01:17.824 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 11:26:03.781 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 11:26:03.781 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 11:26:03.781 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 11:26:03.781 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 11:26:03.781 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 11:26:03.783 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 11:26:04.032 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 11:26:25.576 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 11:26:25.576 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 11:26:25.577 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 11:26:25.578 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 11:26:25.578 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 11:26:25.579 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 11:26:25.684 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 11:26:40.460 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:26:40.561 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:26:42.843 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=2, pageSize=10
+2026-07-07 11:26:42.907 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:26:44.374 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:26:44.420 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:26:56.431 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 11:26:56.437 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 11:26:56.442 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 11:26:56.443 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 11:26:56.443 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 11:26:56.443 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 11:26:56.547 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 11:29:32.133 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:29:32.183 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:29:43.781 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=2, pageSize=10
+2026-07-07 11:29:43.833 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:29:47.881 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:29:47.939 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:32:08.069 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:32:08.110 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:39:54.135 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:39:54.196 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:40:19.474 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=2, pageSize=10
+2026-07-07 11:40:19.522 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:41:23.478 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=3, pageSize=10
+2026-07-07 11:41:23.531 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:41:25.742 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=4, pageSize=10
+2026-07-07 11:41:25.798 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:41:28.003 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=3, pageSize=10
+2026-07-07 11:41:28.056 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:42:33.420 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=4, pageSize=10
+2026-07-07 11:42:33.461 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:42:37.019 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=3, pageSize=10
+2026-07-07 11:42:37.075 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:45:16.781 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=2, pageSize=10
+2026-07-07 11:45:16.845 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:45:17.185 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 11:45:17.225 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:45:24.477 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=2, pageSize=10
+2026-07-07 11:45:24.555 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:45:27.497 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=3, pageSize=10
+2026-07-07 11:45:27.535 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:45:29.034 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=4, pageSize=10
+2026-07-07 11:45:29.091 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 11:45:31.631 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 11:45:31.636 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 11:45:31.637 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 11:45:31.640 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 11:45:31.641 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 11:45:31.643 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 11:45:31.737 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 12:56:14.738 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 12:56:14.741 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 12:56:14.741 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 12:56:14.744 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 12:56:14.745 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 12:56:14.749 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 12:56:14.896 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 13:00:08.222 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 13:00:08.223 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 13:00:08.224 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 13:00:08.226 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 13:00:08.226 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 13:00:08.226 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 13:00:08.397 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 13:02:16.672 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 13:02:16.675 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 13:02:16.676 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 13:02:16.678 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 13:02:16.679 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 13:02:16.679 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 13:02:16.844 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 13:02:25.735 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 13:02:25.790 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 13:02:25.798 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 13:02:25.800 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 13:02:25.802 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 13:02:25.804 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 13:02:25.917 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 13:35:37.942 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 13:35:37.943 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 13:35:37.943 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 13:35:37.941 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 13:35:37.946 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 13:35:37.966 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 13:35:39.171 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 14:23:44.474 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 14:23:44.529 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 14:23:45.379 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 14:23:46.467 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 14:26:41.164 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 14:26:41.167 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 14:26:41.169 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 14:26:41.172 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 14:26:41.176 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc
+2026-07-07 14:26:41.176 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc
+2026-07-07 14:26:41.262 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 14:26:41.358 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 14:26:41.373 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 14:26:43.345 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 14:26:43.356 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 14:26:43.358 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 14:26:43.361 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 14:26:43.361 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 14:26:43.367 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 14:26:43.402 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc
+2026-07-07 14:26:43.484 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 14:26:43.485 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc
+2026-07-07 14:27:09.582 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 14:27:09.590 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 14:27:09.590 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 14:27:09.591 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 14:27:09.592 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=asc
+2026-07-07 14:27:09.592 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 14:27:09.662 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 14:27:09.762 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 14:27:09.762 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc
+2026-07-07 14:28:23.494 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 14:28:23.503 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 14:28:23.504 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 14:28:23.504 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 14:28:23.507 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 14:28:23.507 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 14:28:23.567 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc
+2026-07-07 14:28:23.698 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc
+2026-07-07 14:28:23.700 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 14:28:25.587 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 14:28:25.596 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 14:28:25.597 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 14:28:25.597 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc
+2026-07-07 14:28:25.598 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 14:28:25.598 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 14:28:25.642 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 14:28:25.746 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=379633.30, totalOrders=184, totalUsers=20
+2026-07-07 14:28:25.752 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc
+2026-07-07 14:29:07.836 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:29:07.846 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:29:12.569 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:29:12.579 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:29:13.713 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:29:13.725 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:34:12.704 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 14:34:12.711 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 14:34:13.523 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 14:34:13.545 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 14:34:14.222 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 14:34:14.227 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 14:34:14.229 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 14:34:14.258 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 14:42:23.634 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:42:23.688 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:42:30.735 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:42:30.748 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:43:06.233 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:43:06.241 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:43:14.499 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 14:43:14.507 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 14:48:47.505 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 14:48:47.526 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 14:48:47.583 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 14:48:47.602 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 14:49:10.699 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 14:49:10.701 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 14:49:10.704 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 14:49:10.736 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 14:49:11.238 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 14:49:11.245 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 14:49:19.718 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 14:49:19.732 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 14:49:20.041 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 14:49:20.043 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 14:49:20.045 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 14:49:20.067 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 15:17:55.289 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 15:17:55.304 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 15:17:55.305 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 15:17:55.325 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 15:17:58.180 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 15:17:58.184 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 15:17:58.191 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 15:17:58.220 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 15:18:00.894 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 15:18:00.918 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 15:18:01.421 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 15:18:01.616 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 15:18:01.621 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 15:18:06.262 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 15:18:06.263 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 15:18:06.303 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 15:18:06.304 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 15:18:06.322 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 15:18:06.322 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 15:18:06.371 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 15:18:06.471 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 15:18:06.474 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 15:18:15.030 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 15:18:15.030 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 15:18:15.030 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 15:18:15.031 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 15:18:15.031 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 15:18:15.031 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 15:18:15.077 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 15:18:15.173 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 15:18:15.176 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 15:18:17.905 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 15:18:17.907 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 15:18:17.907 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 15:18:17.908 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 15:18:17.908 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 15:18:17.909 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 15:18:17.959 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 15:18:18.065 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 15:18:18.069 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 15:18:21.838 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 15:18:21.851 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 15:18:22.425 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 15:18:22.471 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 15:18:23.181 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 15:18:23.192 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 15:18:30.150 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 15:18:30.159 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 15:18:30.815 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 15:18:31.174 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 15:18:31.802 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 15:18:31.809 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 15:18:32.434 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 15:18:32.900 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 15:18:32.908 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 15:20:25.687 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 15:20:25.700 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 15:20:25.702 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 15:20:25.702 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 15:20:25.704 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 15:20:25.704 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 15:20:25.746 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 15:20:25.821 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 15:20:25.836 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 15:20:26.710 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 15:20:26.736 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 15:20:27.413 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 15:20:27.481 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 15:20:28.444 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 15:20:28.453 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 15:20:37.061 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 15:20:37.064 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 15:20:37.703 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 15:20:37.714 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 15:20:38.900 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 15:20:38.909 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 15:20:39.627 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 15:20:39.634 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 15:20:39.637 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 15:20:39.649 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 15:20:43.700 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 15:20:43.701 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 15:20:43.710 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 15:20:43.717 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 15:24:52.073 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 15:24:52.082 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 15:24:52.458 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 15:24:52.504 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 15:24:55.834 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 15:24:55.834 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 15:24:55.842 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 15:24:55.847 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 15:24:59.593 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 15:24:59.604 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 15:24:59.693 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 15:25:01.691 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 15:25:02.189 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 15:25:02.192 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 15:25:02.962 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 15:25:02.962 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 15:25:02.966 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 15:25:02.982 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 15:25:12.400 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 15:25:12.401 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 15:25:12.410 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 15:25:12.415 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 15:26:10.706 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 15:26:10.747 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 15:26:11.778 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 15:26:11.791 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 15:26:11.792 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 15:26:11.792 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 15:26:11.792 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 15:26:11.792 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 15:26:11.836 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 15:26:11.923 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 15:26:11.931 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:03:36.254 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:03:36.281 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 16:03:37.364 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:03:37.978 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:03:37.991 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 16:03:39.720 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:03:43.122 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:03:49.861 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=2 pageSize=15
+2026-07-07 16:03:50.711 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:04:06.613 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 16:04:06.621 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 16:04:07.301 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 16:04:07.328 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 16:04:07.724 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 16:04:08.286 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 16:04:08.293 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 16:04:09.276 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 16:04:09.277 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 16:04:09.287 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 16:04:09.326 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 16:04:14.551 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 16:04:14.556 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 16:05:09.486 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:05:10.021 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 16:05:10.024 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 16:05:10.035 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 16:05:10.038 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 16:05:10.039 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 16:05:10.039 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 16:05:10.075 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 16:05:10.183 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:05:10.190 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 16:05:43.384 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 16:05:43.392 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 16:05:43.394 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 16:05:43.395 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 16:05:43.397 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 16:05:43.396 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 16:05:43.452 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 16:05:43.546 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 16:05:43.548 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:05:47.616 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 16:05:47.616 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 16:05:47.616 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 16:05:47.618 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 16:05:47.618 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 16:05:47.618 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 16:05:47.663 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 16:05:47.746 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:05:47.746 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 16:11:09.120 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:11:09.132 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 16:11:13.058 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:11:13.325 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:11:15.125 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:11:16.835 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:11:17.908 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:11:17.918 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 16:11:18.860 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:13:36.404 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:13:36.818 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:13:37.897 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:13:37.905 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 16:13:39.610 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:13:39.619 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 16:13:40.328 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 16:13:40.384 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 16:13:40.689 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 16:13:40.705 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 16:13:42.713 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 16:13:42.726 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 16:13:43.121 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 16:13:43.124 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 16:13:43.129 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 16:13:43.141 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 16:13:46.816 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 16:13:46.816 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 16:13:46.828 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 16:13:46.834 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 16:13:49.358 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 16:13:49.363 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 16:13:49.915 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 16:13:49.928 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 16:13:54.146 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 16:13:54.148 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 16:13:54.150 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 16:13:54.151 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 16:13:54.151 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 16:13:54.151 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 16:13:54.227 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:13:54.313 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 16:13:54.331 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 16:25:57.850 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 16:25:57.865 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 16:25:57.871 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 16:25:57.882 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 16:26:17.791 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=null, pageSize=null
+2026-07-07 16:26:17.801 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantEarningsController - [收益信息] merchantId=2001, availableCount=0, availableAmount=0, pendingCount=1, pendingAmount=0.00
+2026-07-07 16:26:17.802 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantEarningsController - [收益查询] merchantId=2001, page=1, pageSize=100
+2026-07-07 16:26:17.819 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantEarningsController - [收益列表] merchantId=2001, 记录数=12
+2026-07-07 16:26:19.481 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] userId=1001
+2026-07-07 16:26:19.490 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantAuthController - [获取商家信息] 成功, merchantId=2001, merchantName=润禾生活食铺
+2026-07-07 16:26:20.654 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] userId=1001, pageNum=1, pageSize=10
+2026-07-07 16:26:20.676 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantAuthController - [审核请求列表] 成功, userId=1001, total=7
+2026-07-07 16:26:20.864 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.m.MerchantNotificationController - [通知已读] type=AUDIT_RESULT
+2026-07-07 16:26:21.407 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-07 16:26:21.409 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2001, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-07 16:26:21.413 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-07 16:26:21.443 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2001, total=6, pageSize=6
+2026-07-07 16:26:26.318 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:26:28.155 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:26:29.666 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:26:29.675 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 16:33:21.542 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 16:33:22.556 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 16:33:23.736 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 16:33:23.746 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=0
+2026-07-07 16:34:19.572 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 16:34:19.578 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 16:34:19.584 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 16:34:19.586 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 16:34:19.587 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 16:34:19.587 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 16:34:19.622 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:34:19.727 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 16:34:19.732 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 16:48:31.125 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 16:48:31.130 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 16:48:31.140 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 16:48:31.140 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 16:48:31.140 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 16:48:31.141 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 16:48:31.191 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 16:48:31.286 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 16:48:31.298 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:05:10.164 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 17:05:10.194 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 17:05:18.905 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=2, pageSize=10
+2026-07-07 17:05:18.931 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 17:05:19.430 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 17:05:19.452 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 17:05:21.538 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:05:21.630 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:05:26.093 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 17:05:26.114 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 17:16:34.684 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 17:16:34.700 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 17:16:35.687 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:16:35.784 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:16:36.756 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 17:16:36.774 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 17:16:45.968 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:16:46.056 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:16:47.723 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:16:47.733 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:16:47.735 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:16:47.735 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:16:47.735 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:16:47.736 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:16:47.779 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:16:47.886 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:16:47.894 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:16:48.420 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:16:48.511 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:16:48.780 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 17:16:48.786 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 17:16:51.270 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:16:51.315 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:27:01.410 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:27:01.469 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:27:02.067 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 17:27:02.076 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 17:27:02.599 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] auditStatus=null, keyword=null, startDate=null, endDate=null, pageNum=1, pageSize=10
+2026-07-07 17:27:02.608 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.AuditController - [入驻申请列表] 成功, total=25, pageSize=10
+2026-07-07 17:27:03.400 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [信息变更列表] auditStatus=null, keyword=null, pageNum=1, pageSize=10
+2026-07-07 17:27:03.413 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [信息变更列表] 成功, total=1
+2026-07-07 17:27:19.862 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 17:27:19.896 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=7
+2026-07-07 17:27:20.611 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 17:27:21.026 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-07 17:27:22.389 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=1 pageSize=15
+2026-07-07 17:27:22.788 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-07 17:27:22.825 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=7
+2026-07-07 17:29:01.705 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:29:01.718 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:29:01.718 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:29:01.719 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:29:01.721 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:29:01.721 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:29:01.767 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:29:01.856 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:29:01.862 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:29:02.565 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] auditStatus=null, keyword=null, merchantId=null, pageNum=1, pageSize=10
+2026-07-07 17:29:02.609 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.AuditController - [商品审核列表] 成功, total=198, pageSize=10
+2026-07-07 17:29:03.308 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:29:03.315 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:29:03.321 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:29:03.321 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:29:03.321 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:29:03.324 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:29:03.376 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:29:03.476 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:29:03.481 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:30:51.780 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:30:51.782 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:30:51.782 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:30:51.787 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:30:51.787 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:30:51.803 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:30:51.824 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:30:51.936 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:30:51.952 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:30:59.177 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:30:59.182 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:30:59.185 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:30:59.188 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:30:59.188 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:30:59.191 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:30:59.216 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:30:59.297 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:30:59.305 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:31:08.160 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:31:08.163 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:31:08.168 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:31:08.168 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:31:08.170 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:31:08.171 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:31:08.228 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:31:08.312 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:31:08.314 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:34:02.503 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:34:02.506 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:34:02.508 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:34:02.509 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:34:02.509 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:34:02.515 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:34:02.542 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:34:02.630 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:34:02.635 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-07 17:34:28.528 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-07 17:34:28.530 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-07 17:34:28.532 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-07 17:34:28.533 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-07 17:34:28.533 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-07 17:34:28.533 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-07 17:34:28.561 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-07 17:34:28.655 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-07 17:34:28.657 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:02:21.288 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 请求体: username=operator01
+2026-07-08 09:02:22.246 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.AdminAuthController - [管理员登录] 成功, username=operator01, adminId=1
+2026-07-08 09:02:24.560 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:02:24.561 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:02:24.561 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:02:24.561 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:02:24.563 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:02:24.570 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:02:24.651 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-08 09:02:24.774 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:02:24.778 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:02:40.628 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 请求体: phone=17782224503, smsCode=123456
+2026-07-08 09:02:40.659 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.m.MerchantAuthController - [商家登录] 成功, phone=17782224503, merchantStatus=1
+2026-07-08 09:02:41.002 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] parentId=null
+2026-07-08 09:02:41.009 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2004, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-08 09:02:41.012 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.m.MerchantGoodsController - [分类列表] 成功, count=6
+2026-07-08 09:02:41.185 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2004, total=28, pageSize=15
+2026-07-08 09:02:46.058 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2004, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=2, pageSize=15
+2026-07-08 09:02:46.101 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2004, total=28, pageSize=13
+2026-07-08 09:02:48.082 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] merchantId=2004, keyword=null, categoryId=null, status=null, auditStatus=null, pageNum=1, pageSize=15
+2026-07-08 09:02:48.134 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.m.MerchantGoodsController - [商品列表] 成功, merchantId=2004, total=28, pageSize=15
+2026-07-08 09:07:53.892 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:07:53.893 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:07:53.896 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:07:53.896 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:07:53.896 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:07:53.897 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:07:53.934 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-08 09:07:54.057 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:07:54.060 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:26:54.613 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:26:54.615 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:26:54.615 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:26:54.613 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:26:54.618 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:26:54.625 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:26:54.987 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-08 09:26:55.013 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:26:55.023 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:29:02.918 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-08 09:29:02.968 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=7
+2026-07-08 09:29:05.225 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:29:05.238 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:29:05.239 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:29:05.241 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:29:05.242 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:29:05.244 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:29:05.284 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率 sortOrder=desc page=null pageSize=null
+2026-07-08 09:29:05.401 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:29:05.402 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:45:30.171 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:45:30.179 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:45:30.180 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:45:30.181 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:45:30.183 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:45:30.183 [http-nio-0.0.0.0-8080-exec-1] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:45:30.230 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率
+2026-07-08 09:45:30.349 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:45:30.352 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:48:38.667 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:48:38.668 [http-nio-0.0.0.0-8080-exec-5] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:48:38.679 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:48:38.680 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:48:38.680 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:48:38.681 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:48:38.729 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率
+2026-07-08 09:48:38.846 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 09:48:38.848 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:58:19.325 [http-nio-0.0.0.0-8080-exec-4] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家分层
+2026-07-08 09:58:19.327 [http-nio-0.0.0.0-8080-exec-3] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家排行 month=null
+2026-07-08 09:58:19.327 [http-nio-0.0.0.0-8080-exec-6] INFO  c.s.b.c.admin.DashboardController - [运营看板] 平台抽成
+2026-07-08 09:58:19.327 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览数据
+2026-07-08 09:58:19.328 [http-nio-0.0.0.0-8080-exec-7] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家入驻趋势
+2026-07-08 09:58:19.328 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.admin.DashboardController - [运营看板] 类目占比
+2026-07-08 09:58:19.418 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率
+2026-07-08 09:58:19.513 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=desc page=null pageSize=null
+2026-07-08 09:58:19.528 [http-nio-0.0.0.0-8080-exec-2] INFO  c.s.b.c.admin.DashboardController - [运营看板] 概览: totalSales=545174.30, totalOrders=184, totalUsers=20
+2026-07-08 10:02:03.599 [http-nio-0.0.0.0-8080-exec-10] INFO  c.s.b.c.admin.DashboardController - [运营看板] 商家评价星级 sortOrder=asc page=1 pageSize=15
+2026-07-08 10:02:05.270 [http-nio-0.0.0.0-8080-exec-9] INFO  c.s.b.c.admin.DashboardController - [运营看板] 售后申请率
+2026-07-08 10:02:05.942 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] keyword=null, pageNum=1, pageSize=10
+2026-07-08 10:02:06.015 [http-nio-0.0.0.0-8080-exec-8] INFO  c.s.b.c.a.AdminAfterSaleController - [管理员售后-申诉列表] 成功, total=7

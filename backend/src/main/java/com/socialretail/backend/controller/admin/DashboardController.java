@@ -3,13 +3,23 @@ package com.socialretail.backend.controller.admin;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.socialretail.backend.common.Result;
 import com.socialretail.backend.entity.member.Merchant;
+import com.socialretail.backend.entity.order.AfterSale;
 import com.socialretail.backend.entity.order.Order;
+import com.socialretail.backend.entity.order.OrderItem;
 import com.socialretail.backend.entity.order.PlatformAccountSummary;
 import com.socialretail.backend.entity.order.PlatformRevenueDetail;
+import com.socialretail.backend.entity.product.Category;
+import com.socialretail.backend.entity.product.ProductCategoryRelation;
+import com.socialretail.backend.entity.review.OrderReview;
 import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.order.AfterSaleMapper;
+import com.socialretail.backend.mapper.order.OrderItemMapper;
 import com.socialretail.backend.mapper.order.OrderMapper;
 import com.socialretail.backend.mapper.order.PlatformAccountSummaryMapper;
 import com.socialretail.backend.mapper.order.PlatformRevenueDetailMapper;
+import com.socialretail.backend.mapper.product.CategoryMapper;
+import com.socialretail.backend.mapper.product.ProductCategoryRelationMapper;
+import com.socialretail.backend.mapper.review.OrderReviewMapper;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +47,21 @@ public class DashboardController {
 
     @Resource
     private PlatformRevenueDetailMapper platformRevenueDetailMapper;
+
+    @Resource
+    private OrderItemMapper orderItemMapper;
+
+    @Resource
+    private ProductCategoryRelationMapper productCategoryRelationMapper;
+
+    @Resource
+    private CategoryMapper categoryMapper;
+
+    @Resource
+    private AfterSaleMapper afterSaleMapper;
+
+    @Resource
+    private OrderReviewMapper orderReviewMapper;
 
     private static final DateTimeFormatter MONTH_FMT = DateTimeFormatter.ofPattern("yyyy-MM");
 
@@ -243,44 +268,135 @@ public class DashboardController {
             merchantSales.merge(o.getMerchantId(), amount, BigDecimal::add);
         }
 
-        long head = 0, waist = 0, tail = 0;
+        long micro = 0, tail = 0, waist = 0, head = 0;
         for (BigDecimal sales : merchantSales.values()) {
-            if (sales.compareTo(BigDecimal.valueOf(10000)) > 0) head++;
-            else if (sales.compareTo(BigDecimal.valueOf(1000)) >= 0) waist++;
-            else tail++;
+            if (sales.compareTo(BigDecimal.valueOf(100000)) > 0) head++;
+            else if (sales.compareTo(BigDecimal.valueOf(10000)) >= 0) waist++;
+            else if (sales.compareTo(BigDecimal.valueOf(1000)) >= 0) tail++;
+            else micro++;
         }
 
+        // 统计小微商家（包含无销售额的商家）
+        List<Merchant> allMerchants = merchantMapper.selectList(new LambdaQueryWrapper<Merchant>().eq(Merchant::getStatus, 1));
+        long merchantsWithSales = micro + tail + waist + head;
+        long merchantsWithoutSales = allMerchants.size() - merchantsWithSales;
+        micro += merchantsWithoutSales;
+
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("head", head);
-        result.put("waist", waist);
+        result.put("micro", micro);
         result.put("tail", tail);
+        result.put("waist", waist);
+        result.put("head", head);
         return Result.ok(result);
     }
 
-    // ========== 平台抽成收入 ==========
+    // ========== 平台抽成收入（月/季/年三维度，含环比/同比） ==========
     @GetMapping("/commission")
     public Result<Map<String, Object>> commission() {
         log.info("[运营看板] 平台抽成");
-        PlatformAccountSummary summary = platformAccountSummaryMapper.selectById(1);
-        List<PlatformRevenueDetail> details = platformRevenueDetailMapper.selectList(null);
+        List<Order> allOrders = orderMapper.selectList(null);
 
-        BigDecimal commissionTotal = details.stream()
-                .filter(d -> "COMMISSION".equals(d.getType()))
-                .map(d -> d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        LocalDate now = LocalDate.now();
 
-        BigDecimal subsidyTotal = details.stream()
-                .filter(d -> "SUBSIDY".equals(d.getType()))
-                .map(d -> d.getAmount() != null ? d.getAmount().abs() : BigDecimal.ZERO)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        // 月维度
+        Map<String, Object> monthData = buildPeriodWithGrowth(allOrders,
+                now.minusDays(30), now,           // 本月
+                now.minusDays(60), now.minusDays(30),  // 上月(环比)
+                now.minusDays(395), now.minusDays(365) // 去年同月(同比)
+        );
 
-        BigDecimal netIncome = commissionTotal.subtract(subsidyTotal);
+        // 季度维度
+        Map<String, Object> quarterData = buildPeriodWithGrowth(allOrders,
+                now.minusDays(90), now,            // 本季度
+                now.minusDays(180), now.minusDays(90),  // 上季度(环比)
+                now.minusDays(455), now.minusDays(365)  // 去年同季度(同比)
+        );
+
+        // 年度维度
+        Map<String, Object> yearData = buildPeriodWithGrowth(allOrders,
+                now.minusDays(365), now,           // 本年
+                now.minusDays(730), now.minusDays(365), // 上年(环比)
+                null, null                         // 年维度不计算同比
+        );
 
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("commission", commissionTotal.toString());
-        result.put("subsidy", subsidyTotal.toString());
-        result.put("netIncome", netIncome.toString());
+        result.put("month", monthData);
+        result.put("quarter", quarterData);
+        result.put("year", yearData);
         return Result.ok(result);
+    }
+
+    /** 计算指定区间的佣金、补贴、净收入 */
+    private Map<String, Object> calcCommissionRange(List<Order> orders, LocalDate since, LocalDate until) {
+        BigDecimal commissionTotal = BigDecimal.ZERO;
+        BigDecimal subsidyTotal = BigDecimal.ZERO;
+
+        for (Order o : orders) {
+            if (o.getStatus() == null || o.getStatus() != 4) continue;
+            if (o.getPayTime() == null) continue;
+            LocalDate payDate = o.getPayTime().toLocalDate();
+            if (payDate.isBefore(since) || !payDate.isBefore(until)) continue;
+            if (o.getCommission() != null) commissionTotal = commissionTotal.add(o.getCommission());
+            if (o.getPlatformSubsidy() != null) subsidyTotal = subsidyTotal.add(o.getPlatformSubsidy());
+        }
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("commission", commissionTotal.toString());
+        data.put("subsidy", subsidyTotal.toString());
+        data.put("netIncome", commissionTotal.subtract(subsidyTotal).toString());
+        return data;
+    }
+
+    /** 构建含环比/同比数据的周期数据 */
+    private Map<String, Object> buildPeriodWithGrowth(List<Order> orders,
+                                                       LocalDate curFrom, LocalDate curTo,
+                                                       LocalDate prevFrom, LocalDate prevTo,
+                                                       LocalDate yoyFrom, LocalDate yoyTo) {
+        Map<String, Object> result = calcCommissionRange(orders, curFrom, curTo);
+
+        // 环比
+        Map<String, Object> prevData = null;
+        String prevGrowth = null;
+        if (prevFrom != null && prevTo != null) {
+            prevData = calcCommissionRange(orders, prevFrom, prevTo);
+            prevGrowth = calcGrowthPercent(getNetIncome(result), getNetIncome(prevData));
+        }
+        result.put("prevPeriod", prevData != null ? prevData : Collections.emptyMap());
+        result.put("prevGrowth", prevGrowth != null ? prevGrowth : "暂无数据");
+
+        // 同比
+        String yoyGrowth = null;
+        if (yoyFrom != null && yoyTo != null) {
+            Map<String, Object> yoyData = calcCommissionRange(orders, yoyFrom, yoyTo);
+            yoyGrowth = calcGrowthPercent(getNetIncome(result), getNetIncome(yoyData));
+        }
+        result.put("yoyGrowth", yoyGrowth != null ? yoyGrowth : "暂无数据");
+
+        return result;
+    }
+
+    private BigDecimal getNetIncome(Map<String, Object> data) {
+        try {
+            return new BigDecimal((String) data.get("netIncome"));
+        } catch (Exception e) {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    /** 计算涨幅百分比：(current - previous) / previous * 100 */
+    private String calcGrowthPercent(BigDecimal current, BigDecimal previous) {
+        if (previous.compareTo(BigDecimal.ZERO) == 0) {
+            return current.compareTo(BigDecimal.ZERO) > 0 ? "新增" : "0.00%";
+        }
+        BigDecimal growth = current.subtract(previous)
+                .divide(previous, 4, RoundingMode.HALF_UP)
+                .multiply(BigDecimal.valueOf(100));
+        return growth.setScale(2, RoundingMode.HALF_UP).toString() + "%";
+    }
+
+    /** 已废弃，保留兼容 */
+    private Map<String, Object> calcCommission(List<Order> orders, LocalDate since) {
+        return calcCommissionRange(orders, since, LocalDate.now().plusDays(1));
     }
 
     // ========== 类目销售额占比 ==========
@@ -288,19 +404,37 @@ public class DashboardController {
     public Result<List<Map<String, Object>>> categoryProportion() {
         log.info("[运营看板] 类目占比");
 
-        // 从PlatformRevenueDetail按类目聚合（简化：使用description字段或type）
-        List<PlatformRevenueDetail> details = platformRevenueDetailMapper.selectList(
-                new LambdaQueryWrapper<PlatformRevenueDetail>()
-                        .eq(PlatformRevenueDetail::getType, "COMMISSION"));
+        // Get all orders with items
+        List<Order> orders = orderMapper.selectList(null);
 
-        // 按description聚合
+        // Build first-level category sales map
         Map<String, BigDecimal> catSales = new LinkedHashMap<>();
-        for (PlatformRevenueDetail d : details) {
-            String desc = d.getDescription() != null ? d.getDescription() : "其他";
-            // 简化类目名
-            String cat = extractCategory(desc);
-            BigDecimal amt = d.getAmount() != null ? d.getAmount() : BigDecimal.ZERO;
-            catSales.merge(cat, amt, BigDecimal::add);
+
+        for (Order order : orders) {
+            if (order.getStatus() == null || order.getStatus() < 2 || order.getStatus() == 5) continue;
+            List<OrderItem> items = orderItemMapper.selectList(
+                    new LambdaQueryWrapper<OrderItem>().eq(OrderItem::getOrderId, order.getId()));
+
+            for (OrderItem item : items) {
+                if (item.getProductId() == null) continue;
+                // Find category for this product through product_category_relation
+                List<ProductCategoryRelation> rels = productCategoryRelationMapper.selectList(
+                        new LambdaQueryWrapper<ProductCategoryRelation>().eq(ProductCategoryRelation::getProductId, item.getProductId()));
+
+                for (ProductCategoryRelation rel : rels) {
+                    Category cat = categoryMapper.selectById(rel.getCategoryId());
+                    if (cat == null) continue;
+                    // Find first-level category
+                    Category parentCat = (cat.getParentId() != null && cat.getParentId() > 0)
+                            ? categoryMapper.selectById(cat.getParentId()) : cat;
+                    if (parentCat == null) continue;
+                    String catName = parentCat.getName() != null ? parentCat.getName() : "其他";
+                    BigDecimal amount = item.getPrice() != null
+                            ? item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity() != null ? item.getQuantity() : 1))
+                            : BigDecimal.ZERO;
+                    catSales.merge(catName, amount, BigDecimal::add);
+                }
+            }
         }
 
         List<Map<String, Object>> result = catSales.entrySet().stream()
@@ -316,20 +450,176 @@ public class DashboardController {
         return Result.ok(result);
     }
 
+    // ========== 售后申请率（按月折线图+环比） ==========
+    @GetMapping("/after-sale-rate")
+    public Result<Map<String, Object>> afterSaleRate() {
+        log.info("[运营看板] 售后申请率");
+
+        List<Order> allOrders = orderMapper.selectList(null);
+        List<AfterSale> allAfterSales = afterSaleMapper.selectList(null);
+
+        LocalDate now = LocalDate.now();
+        List<Map<String, Object>> monthly = new ArrayList<>();
+
+        // 只取近3个月
+        for (int i = 2; i >= 0; i--) {
+            LocalDate monthStart = now.minusMonths(i).withDayOfMonth(1);
+            LocalDate monthEnd = monthStart.plusMonths(1);
+
+            long ordersInMonth = allOrders.stream()
+                    .filter(o -> o.getStatus() != null && o.getStatus() == 4 && o.getCreateTime() != null)
+                    .filter(o -> {
+                        LocalDate ct = o.getCreateTime().toLocalDate();
+                        return !ct.isBefore(monthStart) && ct.isBefore(monthEnd);
+                    })
+                    .count();
+
+            long afterSalesInMonth = allAfterSales.stream()
+                    .filter(a -> a.getApplyTime() != null)
+                    .filter(a -> {
+                        LocalDate at = a.getApplyTime().toLocalDate();
+                        return !at.isBefore(monthStart) && at.isBefore(monthEnd);
+                    })
+                    .count();
+
+            String rate = ordersInMonth > 0
+                    ? new BigDecimal(afterSalesInMonth).multiply(BigDecimal.valueOf(100))
+                            .divide(BigDecimal.valueOf(ordersInMonth), 2, RoundingMode.HALF_UP).toString()
+                    : "0.00";
+
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("month", monthStart.toString().substring(0, 7));
+            item.put("orderCount", ordersInMonth);
+            item.put("afterSaleCount", afterSalesInMonth);
+            item.put("rate", rate);
+            monthly.add(item);
+        }
+
+        // 当前月 vs 上月
+        Map<String, Object> cur = monthly.get(monthly.size() - 1);
+        Map<String, Object> prev = monthly.size() > 1 ? monthly.get(monthly.size() - 2) : null;
+
+        String curRate = (String) cur.get("rate");
+        String prevRate = prev != null ? (String) prev.get("rate") : "0";
+
+        BigDecimal curBd = new BigDecimal(curRate);
+        BigDecimal prevBd = new BigDecimal(prevRate);
+        String growth = prevBd.compareTo(BigDecimal.ZERO) > 0
+                ? curBd.subtract(prevBd).divide(prevBd, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
+                : (curBd.compareTo(BigDecimal.ZERO) > 0 ? "新增" : "0%");
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("monthly", monthly);
+        result.put("currentRate", curRate + "%");
+        result.put("prevRate", prev != null ? prevRate + "%" : "暂无数据");
+        result.put("growth", growth);
+        result.put("currentMonth", cur.get("month"));
+
+        return Result.ok(result);
+    }
+
+    // ========== 商家评价星级 ==========
+    @GetMapping("/merchant-rating")
+    public Result<Map<String, Object>> merchantRating(
+            @RequestParam(defaultValue = "desc") String sortOrder,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) {
+        log.info("[运营看板] 商家评价星级 sortOrder={} page={} pageSize={}", sortOrder, page, pageSize);
+
+        List<OrderReview> allReviews = orderReviewMapper.selectList(null);
+
+        // 总体贝叶斯评分
+        long totalCount = allReviews.size();
+        long totalSum = 0;
+        for (OrderReview r : allReviews) {
+            if (r.getRating() != null) {
+                totalSum += r.getRating();
+            }
+        }
+        double overallBayesian = totalCount > 0
+                ? new BigDecimal(totalSum + 40).divide(new BigDecimal(totalCount + 10), 1, RoundingMode.HALF_UP).doubleValue()
+                : 0.0;
+
+        // 按商家统计
+        Map<Long, long[]> merchantStats = new LinkedHashMap<>(); // [sum, count]
+        for (OrderReview r : allReviews) {
+            if (r.getMerchantId() == null || r.getRating() == null) continue;
+            long[] stats = merchantStats.computeIfAbsent(r.getMerchantId(), k -> new long[2]);
+            stats[0] += r.getRating();
+            stats[1]++;
+        }
+
+        // 获取商家名称映射和联系信息
+        Map<Long, Merchant> merchantMap = new HashMap<>();
+        if (!merchantStats.isEmpty()) {
+            List<Merchant> merchants = merchantMapper.selectBatchIds(merchantStats.keySet());
+            for (Merchant m : merchants) {
+                merchantMap.put(m.getId(), m);
+            }
+        }
+
+        List<Map<String, Object>> merchantList = new ArrayList<>();
+        for (Map.Entry<Long, long[]> entry : merchantStats.entrySet()) {
+            long mid = entry.getKey();
+            long[] stats = entry.getValue();
+            long sum = stats[0];
+            long count = stats[1];
+
+            double avgRating = count > 0
+                    ? new BigDecimal(sum).divide(new BigDecimal(count), 1, RoundingMode.HALF_UP).doubleValue()
+                    : 0.0;
+            double bayesianRating = count > 0
+                    ? new BigDecimal(sum + 40).divide(new BigDecimal(count + 10), 1, RoundingMode.HALF_UP).doubleValue()
+                    : 0.0;
+
+            Merchant m = merchantMap.get(mid);
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("merchantId", mid);
+            item.put("merchantName", m != null && m.getMerchantName() != null ? m.getMerchantName() : "商家" + mid);
+            item.put("contactName", m != null ? m.getContactName() : "");
+            item.put("contactPhone", m != null ? m.getContactPhone() : "");
+            item.put("avgRating", avgRating);
+            item.put("bayesianRating", bayesianRating);
+            item.put("reviewCount", count);
+            merchantList.add(item);
+        }
+
+        // 按avgRating排序
+        if ("asc".equals(sortOrder)) {
+            merchantList.sort(Comparator.comparingDouble(m -> ((Number) m.get("avgRating")).doubleValue()));
+        } else {
+            merchantList.sort((a, b) -> Double.compare(
+                    ((Number) b.get("avgRating")).doubleValue(),
+                    ((Number) a.get("avgRating")).doubleValue()));
+        }
+
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("overallRating", overallBayesian);
+
+        // 分页支持
+        if (page != null && pageSize != null && page > 0 && pageSize > 0) {
+            int total = merchantList.size();
+            int fromIndex = (page - 1) * pageSize;
+            int toIndex = Math.min(fromIndex + pageSize, total);
+            if (fromIndex < total) {
+                data.put("merchants", merchantList.subList(fromIndex, toIndex));
+            } else {
+                data.put("merchants", new ArrayList<>());
+            }
+            data.put("total", total);
+            data.put("pages", (int) Math.ceil((double) total / pageSize));
+            data.put("current", page);
+        } else {
+            data.put("merchants", merchantList);
+        }
+
+        return Result.ok(data);
+    }
+
     private String getMonthFromOrder(Order o) {
         if (o.getCreateTime() != null) return o.getCreateTime().format(MONTH_FMT);
         if (o.getPayTime() != null) return o.getPayTime().format(MONTH_FMT);
         return null;
-    }
-
-    private String extractCategory(String desc) {
-        if (desc == null) return "其他";
-        if (desc.contains("坚果") || desc.contains("零食")) return "坚果零食";
-        if (desc.contains("水果") || desc.contains("生鲜") || desc.contains("脐橙") || desc.contains("苹果") || desc.contains("奇异果")) return "生鲜水果";
-        if (desc.contains("饮料") || desc.contains("气泡") || desc.contains("酸奶") || desc.contains("果汁") || desc.contains("水")) return "饮料饮品";
-        if (desc.contains("榨菜") || desc.contains("粉") || desc.contains("面") || desc.contains("米") || desc.contains("调味") || desc.contains("酱油")) return "粮油调味";
-        if (desc.contains("鸭脖") || desc.contains("鸡爪") || desc.contains("凤爪") || desc.contains("卤") || desc.contains("牛肉")) return "卤味熟食";
-        return "其他";
     }
 }
 

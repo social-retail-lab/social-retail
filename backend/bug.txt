@@ -1,564 +1,91 @@
+INFO] -------------------------------------------------------------
 [ERROR] COMPILATION ERROR :
 [INFO] -------------------------------------------------------------
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[5,50] 无法访问com.socialretail.backend.service.promotion.CouponService
-  错误的源文件: H:\asocial\social-retail\backend\src\main\java\com\socialretail\backend\service\promotion\CouponService.java
-    文件不包含类com.socialretail.backend.service.promotion.CouponService
-    请删除该文件或确保该文件位于正确的源路径子目录中。
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[5,49] 找不到符号
-  符号:   类 SeckillActivity
-  位置: 程序包 com.socialretail.backend.entity.promotion
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[7,49] 找不到符号
-  符号:   类 SeckillActivityMapper
-  位置: 程序包 com.socialretail.backend.mapper.promotion
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[20,19] 找不到符号
-  符号:   类 SeckillActivityMapper
-  位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[23,31] 找不到符号
-  符号:   类 SeckillActivityMapper
-  位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[4,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[23,13] 找不到符号
-  符号:   类 SeckillActivityMapper
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[25,13] 找不到符号
-  符号:   类 SeckillProductMapper
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[30,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[39,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[64,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[92,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[109,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[3,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[27,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[33,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[45,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[57,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[64,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[71,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[14,44] 程序包com.socialretail.backend.entity.user不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[20,46] 找不到符号
-  符号:   类 MemberUserMapper
-  位置: 程序包 com.socialretail.backend.mapper.member
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[43,45] 此处需要接口
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[46,13] 找不到符号
-  符号:   类 MemberUserMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.MerchantServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[3,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[16,19] 找不到符号
-  符号:   类 CouponService
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[18,34] 找不到符号
-  符号:   类 CouponService
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[23,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[31,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[36,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[42,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[48,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[54,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[60,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AuditService.java:[7,49] 程序包com.socialretail.backend.common.exception不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[5,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[24,13] 找不到符号
-  符号:   类 SeckillActivityMapper
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[26,13] 找不到符号
-  符号:   类 SeckillProductMapper
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[31,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[54,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[71,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[88,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[120,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[132,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[141,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[153,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[8,49] 程序包com.socialretail.backend.common.exception不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[10,46] 程序包com.socialretail.backend.entity.system不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[11,44] 程序包com.socialretail.backend.entity.user不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[13,46] 程序包com.socialretail.backend.mapper.system不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[14,44] 程序包com.socialretail.backend.mapper.user不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[31,13] 找不到符号
-  符号:   类 AfterSaleMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[37,13] 找不到符号
-  符号:   类 OrderItemMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[40,13] 找不到符号
-  符号:   类 PaymentMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[43,13] 找不到符号
-  符号:   类 OrderStatusLogMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[46,13] 找不到符号
-  符号:   类 UserMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[52,13] 找不到符号
-  符号:   类 NotificationMapper
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[469,45] 找不到符号
-  符号:   类 AfterSale
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[485,46] 找不到符号
-  符号:   类 AfterSale
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[513,59] 找不到符号
-  符号:   类 AfterSale
-  位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[3,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[35,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[41,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[47,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[54,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[59,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[67,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[75,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[81,12] 找不到符号
-  符号:   类 Result
-  位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantEarningsController.java:[41,15] 找不到符号
-  符号:   方法 required()
-  位置: @interface jakarta.annotation.Resource
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[37,37] 找不到符号
-  符号:   类 SeckillActivity
-  位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[38,21] 找不到符号
-  符号:   变量 SeckillActivity
-  位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[39,21] 找不到符号
-  符号:   变量 SeckillActivity
-  位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[40,22] 找不到符号
-  符号:   变量 SeckillActivity
-  位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[16,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[26,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[32,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[38,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[27,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[27,49] 找不到符号
-  符号:   方法 getUsername()
-  位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[29,53] 找不到符号
-  符号:   方法 getUsername()
-  位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[29,72] 找不到符号
-  符号:   方法 getPassword()
-  位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[30,13] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[30,64] 找不到符号
-  符号:   方法 getUsername()
-  位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[31,23] 找不到符号
-  符号:   方法 getAdminInfo()
-  位置: 类型为com.socialretail.backend.vo.LoginVO的变量 vo
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[31,51] 找不到符号
-  符号:   方法 getAdminInfo()
-  位置: 类型为com.socialretail.backend.vo.LoginVO的变量 vo
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[34,13] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[34,60] 找不到符号
-  符号:   方法 getUsername()
-  位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[41,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[48,9] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[51,13] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[51,74] 找不到符号
-  符号:   方法 getUsername()
-  位置: 类型为com.socialretail.backend.vo.AdminInfoVO的变量 vo
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[54,13] 找不到符号
-  符号:   变量 log
-  位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[38,51] 找不到符号
-  符号:   方法 getPassword()
-  位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[41,24] 找不到符号
-  符号:   方法 getStatus()
-  位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[41,55] 找不到符号
-  符号:   方法 getStatus()
-  位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[44,20] 找不到符号
-  符号:   方法 setLastLoginTime(java.time.LocalDateTime)
-  位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[47,63] 找不到符号
-  符号:   方法 getId()
-  位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[47,90] 找不到符号
-  符号:   方法 getRole()
-  位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[49,22] 找不到符号
-  符号:   方法 setAdminType(java.lang.String)
-  位置: 类型为com.socialretail.backend.vo.AdminInfoVO的变量 adminInfo
-[INFO] 100 errors
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[3,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[5,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[6,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[7,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[8,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[9,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[10,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[12,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,3] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,5] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,7] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[57,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[57,54] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[58,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[58,61] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[59,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[59,39] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[60,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[60,39] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[61,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[61,45] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[62,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[62,45] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[63,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[63,28] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[64,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[64,48] 需要<标识符>
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[64,49] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[66,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[66,17] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[67,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[67,17] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,4] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,7] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,16] 需要';'
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[118,2] 进行语法分析时已到达文件结尾
+[INFO] 38 errors
 [INFO] -------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD FAILURE
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  16.365 s
-[INFO] Finished at: 2026-07-06T11:28:32+08:00
+[INFO] Total time:  15.615 s
+[INFO] Finished at: 2026-07-06T22:59:47+08:00
 [INFO] ------------------------------------------------------------------------
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project backend: Compilation failure: Compilation failure:
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[5,50] 无法访问com.socialretail.backend.service.promotion.CouponService
-[ERROR]   错误的源文件: H:\asocial\social-retail\backend\src\main\java\com\socialretail\backend\service\promotion\CouponService.java
-[ERROR]     文件不包含类com.socialretail.backend.service.promotion.CouponService
-[ERROR]     请删除该文件或确保该文件位于正确的源路径子目录中。
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[5,49] 找不到符号
-[ERROR]   符号:   类 SeckillActivity
-[ERROR]   位置: 程序包 com.socialretail.backend.entity.promotion
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[7,49] 找不到符号
-[ERROR]   符号:   类 SeckillActivityMapper
-[ERROR]   位置: 程序包 com.socialretail.backend.mapper.promotion
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[20,19] 找不到符号
-[ERROR]   符号:   类 SeckillActivityMapper
-[ERROR]   位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[23,31] 找不到符号
-[ERROR]   符号:   类 SeckillActivityMapper
-[ERROR]   位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[4,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[23,13] 找不到符号
-[ERROR]   符号:   类 SeckillActivityMapper
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[25,13] 找不到符号
-[ERROR]   符号:   类 SeckillProductMapper
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[30,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[39,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[64,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[92,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantSeckillController.java:[109,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[3,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[27,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[33,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[45,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[57,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[64,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminPromotionController.java:[71,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[14,44] 程序包com.socialretail.backend.entity.user不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[20,46] 找不到符号
-[ERROR]   符号:   类 MemberUserMapper
-[ERROR]   位置: 程序包 com.socialretail.backend.mapper.member
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[43,45] 此处需要接口
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/MerchantServiceImpl.java:[46,13] 找不到符号
-[ERROR]   符号:   类 MemberUserMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.MerchantServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[3,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[16,19] 找不到符号
-[ERROR]   符号:   类 CouponService
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[18,34] 找不到符号
-[ERROR]   符号:   类 CouponService
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[23,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[31,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[36,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[42,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[48,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[54,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminCouponController.java:[60,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminCouponController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AuditService.java:[7,49] 程序包com.socialretail.backend.common.exception不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[5,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[24,13] 找不到符号
-[ERROR]   符号:   类 SeckillActivityMapper
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[26,13] 找不到符号
-[ERROR]   符号:   类 SeckillProductMapper
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[31,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[54,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[71,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[88,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[120,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[132,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[141,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminSeckillController.java:[153,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminSeckillController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[8,49] 程序包com.socialretail.backend.common.exception不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[10,46] 程序包com.socialretail.backend.entity.system不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[11,44] 程序包com.socialretail.backend.entity.user不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[13,46] 程序包com.socialretail.backend.mapper.system不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[14,44] 程序包com.socialretail.backend.mapper.user不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[31,13] 找不到符号
-[ERROR]   符号:   类 AfterSaleMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[37,13] 找不到符号
-[ERROR]   符号:   类 OrderItemMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[40,13] 找不到符号
-[ERROR]   符号:   类 PaymentMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[43,13] 找不到符号
-[ERROR]   符号:   类 OrderStatusLogMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[46,13] 找不到符号
-[ERROR]   符号:   类 UserMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[52,13] 找不到符号
-[ERROR]   符号:   类 NotificationMapper
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[469,45] 找不到符号
-[ERROR]   符号:   类 AfterSale
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[485,46] 找不到符号
-[ERROR]   符号:   类 AfterSale
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/merchant/impl/AfterSaleServiceImpl.java:[513,59] 找不到符号
-[ERROR]   符号:   类 AfterSale
-[ERROR]   位置: 类 com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[3,46] 程序包com.socialretail.backend.common.result不存在
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[35,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[41,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[47,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[54,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[59,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[67,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[75,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantPromotionController.java:[81,12] 找不到符号
-[ERROR]   符号:   类 Result
-[ERROR]   位置: 类 com.socialretail.backend.controller.merchant.MerchantPromotionController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/merchant/MerchantEarningsController.java:[41,15] 找不到符号
-[ERROR]   符号:   方法 required()
-[ERROR]   位置: @interface jakarta.annotation.Resource
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[37,37] 找不到符号
-[ERROR]   符号:   类 SeckillActivity
-[ERROR]   位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[38,21] 找不到符号
-[ERROR]   符号:   变量 SeckillActivity
-[ERROR]   位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[39,21] 找不到符号
-[ERROR]   符号:   变量 SeckillActivity
-[ERROR]   位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/task/ActivityExpiryTask.java:[40,22] 找不到符号
-[ERROR]   符号:   变量 SeckillActivity
-[ERROR]   位置: 类 com.socialretail.backend.task.ActivityExpiryTask
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[16,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[26,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[32,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/handler/GlobalExceptionHandler.java:[38,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.handler.GlobalExceptionHandler
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[27,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[27,49] 找不到符号
-[ERROR]   符号:   方法 getUsername()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[29,53] 找不到符号
-[ERROR]   符号:   方法 getUsername()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[29,72] 找不到符号
-[ERROR]   符号:   方法 getPassword()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[30,13] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[30,64] 找不到符号
-[ERROR]   符号:   方法 getUsername()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[31,23] 找不到符号
-[ERROR]   符号:   方法 getAdminInfo()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.LoginVO的变量 vo
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[31,51] 找不到符号
-[ERROR]   符号:   方法 getAdminInfo()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.LoginVO的变量 vo
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[34,13] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[34,60] 找不到符号
-[ERROR]   符号:   方法 getUsername()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminLoginRequest的变量 req
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[41,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[48,9] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[51,13] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[51,74] 找不到符号
-[ERROR]   符号:   方法 getUsername()
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminInfoVO的变量 vo
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAuthController.java:[54,13] 找不到符号
-[ERROR]   符号:   变量 log
-[ERROR]   位置: 类 com.socialretail.backend.controller.admin.AdminAuthController
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[38,51] 找不到符号
-[ERROR]   符号:   方法 getPassword()
-[ERROR]   位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[41,24] 找不到符号
-[ERROR]   符号:   方法 getStatus()
-[ERROR]   位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[41,55] 找不到符号
-[ERROR]   符号:   方法 getStatus()
-[ERROR]   位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[44,20] 找不到符号
-[ERROR]   符号:   方法 setLastLoginTime(java.time.LocalDateTime)
-[ERROR]   位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[47,63] 找不到符号
-[ERROR]   符号:   方法 getId()
-[ERROR]   位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[47,90] 找不到符号
-[ERROR]   符号:   方法 getRole()
-[ERROR]   位置: 类型为com.socialretail.backend.entity.member.OperationAdmin的变量 opAdmin
-[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/service/admin/AdminService.java:[49,22] 找不到符号
-[ERROR]   符号:   方法 setAdminType(java.lang.String)
-[ERROR]   位置: 类型为com.socialretail.backend.vo.AdminInfoVO的变量 adminInfo
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[3,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[5,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[6,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[7,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[8,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[9,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[10,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[12,1] 需要 class、interface、enum 或 record
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,3] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,5] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[56,7] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[57,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[57,54] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[58,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[58,61] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[59,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[59,39] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[60,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[60,39] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[61,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[61,45] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[62,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[62,45] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[63,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[63,28] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[64,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[64,48] 需要<标识符>
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[64,49] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[66,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[66,17] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[67,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[67,17] 不是语句
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,1] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,4] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,7] 非法的表达式开始
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[116,16] 需要';'
+[ERROR] /H:/asocial/social-retail/backend/src/main/java/com/socialretail/backend/controller/admin/AdminAfterSaleController.java:[118,2] 进行语法分析时已到达文件结尾
 [ERROR] -> [Help 1]
 [ERROR]
 [ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.

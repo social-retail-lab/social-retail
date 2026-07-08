@@ -178,7 +178,11 @@ CREATE TABLE IF NOT EXISTS `cart` (
   `user_id` BIGINT DEFAULT NULL COMMENT '用户ID',
   `sku_id` BIGINT DEFAULT NULL COMMENT 'SkuID',
   `quantity` INT DEFAULT NULL COMMENT '购买数量',
+  `distributor_product_id` BIGINT DEFAULT NULL COMMENT '分销员推广商品ID',
+  `attribution_expires_at` DATETIME DEFAULT NULL COMMENT '归属有效期',
+  `promotion_code` VARCHAR(50) DEFAULT NULL COMMENT '分销推广码',
   PRIMARY KEY (`id`),
+  KEY `idx_cart_distribution` (`distributor_product_id`, `attribution_expires_at`),
   CONSTRAINT `fk_cart_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_cart_sku` FOREIGN KEY (`sku_id`) REFERENCES `sku` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='购物车表';

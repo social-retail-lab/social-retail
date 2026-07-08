@@ -9,7 +9,7 @@ public interface MerchantCouponService {
     // 商家管理自己的优惠卷
     MerchantCoupon createCoupon(Long merchantId, MerchantCoupon coupon, List<Map<String, BigDecimal>> tiers);
     List<MerchantCoupon> listCoupons(Long merchantId);
-    MerchantCoupon updateCoupon(Long merchantId, Long couponId, MerchantCoupon coupon);
+    MerchantCoupon updateCoupon(Long merchantId, Long couponId, MerchantCoupon coupon, List<Map<String, BigDecimal>> tiers);
     void disableCoupon(Long merchantId, Long couponId);
     void enableCoupon(Long merchantId, Long couponId);
 }
