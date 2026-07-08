@@ -3,13 +3,6 @@
     <div class="login-card">
       <h2>社交新零售管理后台</h2>
       <div class="form-item">
-        <label>管理员身份</label>
-        <select v-model="adminType" class="select-input">
-          <option value="SYSTEM">系统管理员</option>
-          <option value="OPERATION">运营管理员</option>
-        </select>
-      </div>
-      <div class="form-item">
         <label>账号</label>
         <input v-model="username" placeholder="请输入管理员账号" />
       </div>
@@ -28,7 +21,6 @@ import { useRouter } from 'vue-router'
 import { adminLogin } from '@/api/admin'
 
 const router = useRouter()
-const adminType = ref('SYSTEM')
 const username = ref('')
 const password = ref('')
 
@@ -40,10 +32,9 @@ const handleLogin = async () => {
   const res = await adminLogin({ username: username.value, password: password.value })
   if (res.code === 0) {
     localStorage.setItem('adminToken', res.data.token)
-    localStorage.setItem('adminType', res.data.role || adminType.value)
+    localStorage.setItem('adminType', res.data.role || 'OPERATION')
     localStorage.setItem('adminInfo', JSON.stringify(res.data))
-    const role = res.data.role || adminType.value
-    router.push(role === 'SYSTEM' ? '/users' : '/dashboard')
+    router.push('/dashboard')
   } else {
     alert(res.message)
   }
@@ -81,7 +72,7 @@ h2 {
   font-size: 14px;
   color: #4E5969;
 }
-.form-item input, .select-input {
+.form-item input {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
@@ -89,7 +80,7 @@ h2 {
   border-radius: 4px;
   font-size: 14px;
 }
-.form-item input:focus, .select-input:focus {
+.form-item input:focus {
   outline: none;
   border-color: #165DFF;
 }

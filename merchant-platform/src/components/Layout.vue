@@ -109,10 +109,9 @@ const menus = [
   { path: '/audit-requests', label: '审核请求', dot: 'auditRequest' },
   { path: '/goods', label: '商品管理' },
   { path: '/orders', label: '订单管理', badge: 'order' },
-  { path: '/pickup/verify', label: '门店核销' },
-  { path: '/pickup/manage', label: '自提点管理' },
+  { path: '/pickup', label: '门店核销' },
   { path: '/after-sale', label: '售后管理', badge: 'afterSale' },
-  { path: '/distribution', label: '分销设置' },
+  { path: '/reviews', label: '用户评价' },
   { path: '/promotion', label: '店铺促销' },
   { path: '/earnings', label: '我的收益' }
 ]

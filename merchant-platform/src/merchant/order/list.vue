@@ -217,7 +217,20 @@ const loadData = async () => {
     const res = await getOrderList(params)
     if (res.code === 0) {
       const list = res.data?.list || res.data?.records || (Array.isArray(res.data) ? res.data : [])
+      // 待接单(1)和待备货(2)置顶
+      list.sort((a: any, b: any) => {
+        const aPriority = (a.status === 1 || a.status === 2) ? 0 : 1
+        const bPriority = (b.status === 1 || b.status === 2) ? 0 : 1
+        if (aPriority !== bPriority) return aPriority - bPriority
+        return 0
+      })
       orderList.value = list
+      // 待接单和待备货默认展开
+      list.forEach((o: any) => {
+        if (o.status === 1 || o.status === 2) {
+          expandedOrders[o.orderId] = true
+        }
+      })
       totalCount.value = res.data?.total || list.length
       totalPages.value = Math.max(1, Math.ceil(totalCount.value / pageSize.value))
     } else {
@@ -513,8 +526,9 @@ watch(activeTab, () => {
 }
 
 .quantity {
-  font-size: 12px;
-  color: #8C8C8C;
+  font-size: 18px;
+  font-weight: 700;
+  color: #FF4D4F;
 }
 
 .order-footer {
@@ -655,5 +669,5 @@ watch(activeTab, () => {
 .dp-spec { font-size: 12px; color: #999; margin-top: 4px; }
 .dp-right { text-align: right; }
 .dp-price { color: #E66100; font-weight: 600; font-size: 13px; }
-.dp-qty { font-size: 12px; color: #999; margin-left: 8px; }
+.dp-qty { font-size: 18px; font-weight: 700; color: #FF4D4F; margin-left: 8px; }
 </style>

@@ -108,7 +108,8 @@ const hasDot = (key: string) => dot.value[key] === true
 
 const markRead = async () => {
   if (currentPath.value === '/merchant-audit' || currentPath.value === '/product-audit' ||
-      currentPath.value === '/info-change' || currentPath.value === '/after-sale-appeal') {
+      currentPath.value === '/info-change' || currentPath.value === '/after-sale-appeal' ||
+      currentPath.value === '/after-sale-ranking' || currentPath.value === '/merchant-rating-ranking') {
     try {
       await axios.post('/api/admin/notifications/mark-read', {})
       dot.value['audit'] = false
@@ -153,15 +154,24 @@ const operationMenus = [
       { path: '/merchant-audit', label: '商家入驻审核' },
       { path: '/product-audit', label: '商品审核', badge: 'audit' },
       { path: '/info-change', label: '信息审核' },
-      { path: '/distributor-audit', label: '分销员审核' }
+      { path: '/distributor-audit', label: '分销员审核' },
+      { path: '/review-audit', label: '评价申诉审核' }
     ]
   },
-  { path: '/after-sale-appeal', label: '售后处理' },
+  { 
+    label: '售后管理',
+    children: [
+      { path: '/after-sale-appeal', label: '售后处理' },
+      { path: '/after-sale-ranking', label: '售后率排行' },
+      { path: '/merchant-rating-ranking', label: '商家星级评价排行' }
+    ]
+  },
   { path: '/orders', label: '订单管理' },
   { 
     label: '营销管理',
     children: [
       { path: '/seckill', label: '秒杀活动' },
+      { path: '/promotion', label: '大促满减活动' },
       { path: '/coupon', label: '优惠券管理' },
       { path: '/distribution', label: '分销管理' }
     ]

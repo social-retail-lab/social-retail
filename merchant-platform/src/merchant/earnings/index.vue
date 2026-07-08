@@ -175,7 +175,7 @@
     <div v-if="showCommissionModal" class="modal-mask" @click.self="showCommissionModal = false">
       <div class="commission-modal-content">
         <div class="modal-header">
-          <h3>平台阶梯式佣金收费细则（V1.0）</h3>
+          <h3>平台阶梯式佣金收费细则（V1.1）</h3>
           <button class="close-btn" @click="showCommissionModal = false">×</button>
         </div>
         <div class="commission-modal-body">
@@ -184,19 +184,31 @@
             <p>平台收费由 <b>基础技术服务费 + 类目差异化费率</b> 两部分构成。最终佣金 = 商品实付金额（不含运费）× 类目佣金率。单笔订单佣金设有封顶值，超出部分不再收取。</p>
           </div>
           <div class="rule-section">
-            <h4>二、阶梯收费标准（按店铺月销售额）</h4>
+            <h4>二、商家分层规则</h4>
             <table class="commission-table">
-              <thead><tr><th>月销售额区间（元）</th><th>标准佣金率</th><th>单笔订单封顶（元）</th></tr></thead>
+              <thead><tr><th>月销售额区间（元）</th><th>商家层级</th></tr></thead>
               <tbody>
-                <tr><td>0 ~ 10,000（试运营期）</td><td>1.0%</td><td>20</td></tr>
-                <tr><td>10,001 ~ 50,000（成长期）</td><td>2.5%</td><td>50</td></tr>
-                <tr><td>50,001 ~ 200,000（成熟期）</td><td>4.0%</td><td>80</td></tr>
-                <tr><td>200,001 以上（头部商家）</td><td>5.0%</td><td>100</td></tr>
+                <tr><td>0 ~ 1,000</td><td>小微商家（试运营期）</td></tr>
+                <tr><td>1,001 ~ 10,000</td><td>尾部商家</td></tr>
+                <tr><td>10,001 ~ 100,000</td><td>腰部商家</td></tr>
+                <tr><td>100,001 以上</td><td>头部商家</td></tr>
               </tbody>
             </table>
           </div>
           <div class="rule-section">
-            <h4>三、类目差异化调整系数</h4>
+            <h4>三、阶梯收费标准（按店铺月销售额）</h4>
+            <table class="commission-table">
+              <thead><tr><th>月销售额区间（元）</th><th>标准佣金率</th><th>单笔订单封顶（元）</th></tr></thead>
+              <tbody>
+                <tr><td>0 ~ 1,000（试运营期）</td><td>1.0%</td><td>10</td></tr>
+                <tr><td>1,001 ~ 10,000（尾部商家）</td><td>2.5%</td><td>50</td></tr>
+                <tr><td>10,001 ~ 100,000（腰部商家）</td><td>4.0%</td><td>80</td></tr>
+                <tr><td>100,001 以上（头部商家）</td><td>5.0%</td><td>100</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="rule-section">
+            <h4>四、类目差异化调整系数</h4>
             <p>在阶梯费率基础上，乘以类目系数（四舍五入保留两位小数）：</p>
             <table class="commission-table">
               <thead><tr><th>类目</th><th>调整系数</th></tr></thead>
@@ -210,7 +222,7 @@
             <p class="formula">计算公式：实际佣金率 = 阶梯基准费率 × 类目调整系数</p>
           </div>
           <div class="rule-section">
-            <h4>四、特殊场景规则</h4>
+            <h4>五、特殊场景规则</h4>
             <p><b>支付通道费：</b>所有订单另收 0.6% 支付手续费（由第三方支付机构收取，平台代扣，不计入平台收入）。</p>
             <p><b>促销订单：</b>使用平台官方大促券（如"满200减30"）产生的订单，佣金按优惠后实付金额计算，且该部分订单的佣金率按原档位的8折执行；使用店铺券的订单，佣金按券后实付金额计算（即原价 - 店铺券面额），佣金率按原档位正常执行，不打折。</p>
             <p><b>支付优先级：</b>订单结算时先计算店铺优惠卷，再计算平台优惠卷。大促满减卷与固定金额卷可同时使用（先满减、后固定金额）。订单使用优惠卷后最低需支付0.01元。</p>
@@ -219,7 +231,7 @@
             <p><b>月销售额达标回溯：</b>当月实际销售额达到更高阶梯时，当月所有订单按新阶梯统一补差结算（而非仅增量部分）。</p>
           </div>
           <div class="rule-section">
-            <h4>五、违规与争议处理</h4>
+            <h4>六、违规与争议处理</h4>
             <p>商家若存在刷单、虚假交易等行为，当月佣金率直接按最高档（5%）封顶执行，且不予退还。</p>
             <p>佣金争议申诉期为账单生成后 7个工作日，超时视为认可。</p>
           </div>

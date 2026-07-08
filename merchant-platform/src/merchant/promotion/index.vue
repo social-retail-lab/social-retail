@@ -4,6 +4,7 @@
     <div class="tab-bar">
       <button :class="['tab', { active: activeTab === 'platform' }]" @click="activeTab = 'platform'">平台促销活动</button>
       <button :class="['tab', { active: activeTab === 'coupon' }]" @click="activeTab = 'coupon'">店铺优惠券</button>
+      <button :class="['tab', { active: activeTab === 'distribution' }]" @click="activeTab = 'distribution'">分销设置</button>
     </div>
 
     <!-- ==================== 左 Tab：平台促销活动 ==================== -->
@@ -82,6 +83,78 @@
             </table>
             <div v-else class="empty-state"><div class="empty-text">暂无秒杀商品，点击"添加商品"参与</div></div>
           </div>
+        </div>
+      </div>
+    </template>
+
+    <!-- ==================== Tab：分销设置 ==================== -->
+    <template v-if="activeTab === 'distribution'">
+      <div class="section-card">
+        <h3 class="section-title">添加分销商品</h3>
+        <div class="setting-form">
+          <div class="form-item dist-form-item">
+            <label>商品ID</label>
+            <input v-model="distProductId" type="number" placeholder="请输入已上架的商品ID" class="input" />
+            <button class="btn-search" @click="searchDistProduct">查找</button>
+          </div>
+          <div v-if="distSelectedProduct" class="found-product">
+            <span class="found-label">已找到商品：</span>
+            <span class="found-name">{{ distSelectedProduct.title }}</span>
+          </div>
+          <div v-if="distSelectError" class="error-text">{{ distSelectError }}</div>
+
+          <div class="form-item slider-item" v-if="distSelectedProduct">
+            <label>分销比例</label>
+            <div class="slider-wrapper">
+              <button class="slider-btn" @click="distRatio = Math.max(1, distRatio - 1)" :disabled="distRatio <= 1">−</button>
+              <div class="slider-track-wrapper">
+                <input type="range" v-model.number="distRatio" min="1" max="50" step="1" class="slider" />
+                <div class="slider-ticks">
+                  <span v-for="t in [1, 10, 20, 30, 40, 50]" :key="t" class="tick" :style="{ left: ((t - 1) / 49 * 100) + '%' }">{{ t }}%</span>
+                </div>
+              </div>
+              <button class="slider-btn" @click="distRatio = Math.min(50, distRatio + 1)" :disabled="distRatio >= 50">+</button>
+            </div>
+            <div class="ratio-display">
+              <span class="ratio-value">{{ distRatio }}</span>
+              <span class="ratio-unit">%</span>
+            </div>
+          </div>
+
+          <button class="btn-add" @click="addDistProduct" :disabled="!distSelectedProduct">添加到分销列表</button>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <h3 class="section-title">已设置分销商品 <span class="count">({{ distList.length }})</span></h3>
+        <table class="data-table dist-table" v-if="distList.length > 0">
+          <thead>
+            <tr>
+              <th>商品ID</th>
+              <th>商品名称</th>
+              <th>分销比例</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in distList" :key="item.productId">
+              <td>{{ item.productId }}</td>
+              <td>{{ item.productName }}</td>
+              <td>
+                <div class="ratio-cell">
+                  <button class="mini-btn" @click="adjustDistRatio(item, -1)" :disabled="(item.commissionRate || item.ratio) <= 1">−</button>
+                  <span class="ratio-text">{{ item.commissionRate || item.ratio }}%</span>
+                  <button class="mini-btn" @click="adjustDistRatio(item, 1)" :disabled="(item.commissionRate || item.ratio) >= 50">+</button>
+                </div>
+              </td>
+              <td>
+                <button class="btn-remove" @click="removeDistProduct(item)">移除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div v-else class="empty-state">
+          <div class="empty-text">暂无分销商品，请在上方添加</div>
         </div>
       </div>
     </template>
@@ -209,6 +282,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import request from '@/utils/request'
 import {
   getPlatformPromotions, joinPromotion,
   getMerchantCoupons, createMerchantCoupon, updateMerchantCoupon, disableMerchantCoupon, enableMerchantCoupon,
@@ -333,7 +407,66 @@ const saveSeckillProduct = async () => {
 }
 const handleSeckillRemove = async (p: SeckillProduct) => { if (!confirm(`确定移除商品 ${p.productId} 吗？`)) return; try { await deleteSeckillProduct(p.id); loadSeckillProducts() } catch (e: any) { alert(e?.response?.data?.msg || '移除失败') } }
 
-onMounted(() => { loadPlatformPromotions(); loadCoupons(); loadSeckillActivities() })
+// ========== 分销设置 ==========
+interface DistItem { id: number; productId: number; productName: string; commissionRate: number; ratio?: number; status: number }
+const distProductId = ref('')
+const distRatio = ref(5)
+const distSelectedProduct = ref<any>(null)
+const distSelectError = ref('')
+const distList = ref<DistItem[]>([])
+
+const loadDistList = async () => {
+  try {
+    const res = await request.get('/merchant/distribution/products')
+    if (res.code === 0) distList.value = res.data || []
+  } catch (e: any) { console.error('[分销] 加载列表失败:', e.message) }
+}
+
+const searchDistProduct = async () => {
+  distSelectError.value = ''
+  distSelectedProduct.value = null
+  const id = Number(distProductId.value)
+  if (!id || id <= 0) { distSelectError.value = '请输入有效的商品ID'; return }
+  try {
+    const res = await request.get(`/merchant/distribution/product-info/${id}`)
+    if (res.code === 0) distSelectedProduct.value = res.data
+    else distSelectError.value = res.message || '未找到该商品'
+  } catch { distSelectError.value = '查询商品失败，请检查商品ID' }
+}
+
+const addDistProduct = async () => {
+  if (!distSelectedProduct.value) return
+  try {
+    const res = await request.post('/merchant/distribution/products', {
+      productId: distSelectedProduct.value.id,
+      commissionRate: distRatio.value
+    })
+    if (res.code === 0) {
+      distSelectedProduct.value = null
+      distProductId.value = ''
+      distRatio.value = 5
+      await loadDistList()
+    } else { alert(res.message || '添加失败') }
+  } catch (e: any) { alert('添加失败: ' + (e.message || '网络错误')) }
+}
+
+const adjustDistRatio = async (item: DistItem, delta: number) => {
+  const newRate = Math.max(1, Math.min(50, item.commissionRate + delta))
+  try {
+    const res = await request.put(`/merchant/distribution/products/${item.id}`, { commissionRate: newRate })
+    if (res.code === 0) item.commissionRate = newRate
+  } catch (e: any) { console.error('[分销] 更新比例失败:', e.message) }
+}
+
+const removeDistProduct = async (item: DistItem) => {
+  if (!confirm(`确认移除商品 "${item.productName}" 的分销设置？`)) return
+  try {
+    const res = await request.delete(`/merchant/distribution/products/${item.id}`)
+    if (res.code === 0) distList.value = distList.value.filter(d => d.id !== item.id)
+  } catch (e: any) { alert('删除失败: ' + (e.message || '网络错误')) }
+}
+
+onMounted(() => { loadPlatformPromotions(); loadCoupons(); loadSeckillActivities(); loadDistList() })
 </script>
 
 <style scoped>
@@ -411,4 +544,35 @@ onMounted(() => { loadPlatformPromotions(); loadCoupons(); loadSeckillActivities
 .activity-selector { display:flex; align-items:center; gap:10px; }
 .selector-label { font-size:14px; color:#4E5969; white-space:nowrap; }
 .selector-input { flex:1; max-width:500px; padding:8px 10px; border:1px solid #dcdcdc; border-radius:4px; font-size:13px; color:#1D2129; }
+
+/* 分销设置 */
+.dist-form-item { display: flex; flex-direction: row; align-items: center; gap: 10px; }
+.setting-form { display: flex; flex-direction: column; gap: 16px; }
+.input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; width: 160px; font-size: 14px; }
+.btn-search { padding: 8px 16px; background: #E66100; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; margin-left: 10px; }
+.found-product { background: #F6FFED; padding: 8px 12px; border-radius: 4px; font-size: 13px; }
+.found-label { color: #999; }
+.found-name { color: #333; font-weight: 600; }
+.error-text { color: #FF4D4F; font-size: 13px; }
+.slider-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+.slider-wrapper { display: flex; align-items: center; gap: 12px; width: 100%; }
+.slider-btn { width: 36px; height: 36px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; color: #555; }
+.slider-btn:hover { background: #f5f5f5; }
+.slider-btn:disabled { opacity: 0.4; cursor: default; }
+.slider-track-wrapper { flex: 1; position: relative; }
+.slider { width: 100%; height: 6px; -webkit-appearance: none; appearance: none; background: #e0e0e0; border-radius: 3px; outline: none; }
+.slider::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: #E66100; border-radius: 50%; cursor: pointer; border: 2px solid white; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.slider-ticks { position: relative; height: 18px; margin-top: 4px; }
+.tick { position: absolute; transform: translateX(-50%); font-size: 10px; color: #bbb; }
+.ratio-display { display: flex; align-items: baseline; gap: 4px; margin-left: 70px; }
+.ratio-value { font-size: 28px; font-weight: bold; color: #E66100; }
+.ratio-unit { font-size: 16px; color: #E66100; font-weight: 600; }
+.btn-add { padding: 10px 24px; background: #E66100; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; align-self: flex-start; }
+.btn-add:disabled { opacity: 0.5; cursor: default; }
+.count { font-weight: normal; color: #999; font-size: 14px; }
+.ratio-cell { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.mini-btn { width: 26px; height: 26px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 14px; color: #555; }
+.mini-btn:hover { background: #f5f5f5; }
+.ratio-text { font-size: 15px; font-weight: 600; color: #E66100; min-width: 40px; }
+.btn-remove { padding: 4px 12px; background: #FFF2F0; color: #FF4D4F; border: 1px solid #FFCCC7; border-radius: 4px; cursor: pointer; font-size: 12px; }
 </style>

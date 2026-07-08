@@ -48,14 +48,9 @@ const routes = [
         component: () => import('@/merchant/order/list.vue')
       },
       {
-        path: '/pickup/verify',
+        path: '/pickup',
         name: '门店核销',
-        component: () => import('@/merchant/pickup/verify.vue')
-      },
-      {
-        path: '/pickup/manage',
-        name: '自提点管理',
-        component: () => import('@/merchant/pickup/manage.vue')
+        component: () => import('@/merchant/pickup/index.vue')
       },
       {
         path: '/after-sale',
@@ -63,14 +58,14 @@ const routes = [
         component: () => import('@/merchant/after-sale/list.vue')
       },
       {
+        path: '/reviews',
+        component: () => import('@/merchant/reviews/index.vue'),
+        meta: { title: '用户评价' }
+      },
+      {
         path: '/earnings',
         name: '我的收益',
         component: () => import('@/merchant/earnings/index.vue')
-      },
-      {
-        path: '/distribution',
-        name: '分销设置',
-        component: () => import('@/merchant/distribution/index.vue')
       },
       {
         path: '/promotion',

@@ -38,7 +38,6 @@
             <td class="td-sn">{{ order.orderSn }}</td>
             <td>
               <div>{{ order.userName || ('用户' + order.userId) }}</div>
-              <div class="text-sm">{{ order.userPhone || '-' }}</div>
             </td>
             <td>{{ order.merchantName || ('商家' + order.merchantId) }}</td>
             <td>{{ order.totalQuantity || 0 }}件</td>
@@ -80,7 +79,6 @@
               <div class="detail-item"><span class="key">订单号：</span><span class="val">{{ detailData.orderSn }}</span></div>
               <div class="detail-item"><span class="key">订单状态：</span><span :class="['status-tag', getStatusClass(detailData.status)]">{{ getStatusText(detailData.status) }}</span></div>
               <div class="detail-item"><span class="key">用户：</span><span class="val">{{ detailData.userName || ('用户' + detailData.userId) }}</span></div>
-              <div class="detail-item"><span class="key">手机：</span><span class="val">{{ detailData.userPhone || '-' }}</span></div>
               <div class="detail-item"><span class="key">商家：</span><span class="val">{{ detailData.merchantName || ('商家' + detailData.merchantId) }}</span></div>
               <div class="detail-item"><span class="key">金额：</span><span class="val price">¥{{ (detailData.payAmount || 0).toFixed(2) }}</span></div>
               <div class="detail-item"><span class="key">配送方式：</span><span class="val">{{ getDeliveryText(detailData.deliveryType) }}</span></div>
