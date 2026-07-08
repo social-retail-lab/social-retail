@@ -1,2 +1,16 @@
+# Maven
+.m2/
+**/.m2/
+target/
+**/target/
+
+# IDE
+.vscode/
 .idea/
+
+# Node
+node_modules/
+dist/
+
+# Local config
 backend/src/main/resources/application-local.properties
