@@ -1,0 +1,394 @@
+// 通用样式混入
+
+// 弹性布局 - 水平居中
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// 弹性布局 - 水平两端对齐
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+// 弹性布局 - 垂直居中
+@mixin flex-col-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// 弹性布局 - 左对齐
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+// 弹性布局 - 右对齐
+@mixin flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+// 文字省略 - 单行
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 文字省略 - 多行
+@mixin text-ellipsis-multi($lines: 2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+}
+
+// 圆角
+@mixin rounded($radius: $radius-md) {
+  border-radius: $radius;
+}
+
+// 圆形
+@mixin circle {
+  border-radius: 50%;
+}
+
+// 阴影
+@mixin shadow($type: 'sm') {
+  @if $type == 'sm' {
+    box-shadow: $shadow-sm;
+  } @else if $type == 'md' {
+    box-shadow: $shadow-md;
+  } @else if $type == 'lg' {
+    box-shadow: $shadow-lg;
+  }
+}
+
+// 边框
+@mixin border($color: $border-color) {
+  border: 2rpx solid $color;
+}
+
+// 边框底部
+@mixin border-bottom($color: $border-color) {
+  border-bottom: 2rpx solid $color;
+}
+
+// 边框顶部
+@mixin border-top($color: $border-color) {
+  border-top: 2rpx solid $color;
+}
+
+// 背景色
+@mixin bg($color: $bg-white) {
+  background-color: $color;
+}
+
+// 文字颜色
+@mixin text-color($color: $text-primary) {
+  color: $color;
+}
+
+// 字体大小
+@mixin font-size($size: $font-md) {
+  font-size: $size;
+}
+
+// 字体粗细
+@mixin font-weight($weight: 'normal') {
+  @if $weight == 'normal' {
+    font-weight: 400;
+  } @else if $weight == 'medium' {
+    font-weight: 500;
+  } @else if $weight == 'bold' {
+    font-weight: 700;
+  }
+}
+
+// 占位图
+@mixin placeholder {
+  background: $bg-grey;
+  border-radius: $radius-sm;
+}
+
+// 按钮基础样式
+@mixin button-base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-md;
+  font-size: $font-md;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  
+  &:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+  }
+}
+
+// 主题按钮
+@mixin button-primary {
+  @include button-base;
+  background: $primary-color;
+  color: $text-white;
+  
+  &:active {
+    background: $primary-dark;
+  }
+}
+
+// 次要按钮
+@mixin button-secondary {
+  @include button-base;
+  background: $bg-page;
+  color: $text-secondary;
+}
+
+// 禁用按钮
+@mixin button-disabled {
+  @include button-base;
+  background: $text-placeholder;
+  color: $text-white;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+// 卡片基础样式
+@mixin card-base {
+  background: $bg-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+}
+
+// 毛玻璃效果
+@mixin glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20rpx);
+}
+
+// 渐变背景
+@mixin gradient-primary {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-action 100%);
+}
+
+// 渐变文字
+@mixin gradient-text {
+  background: linear-gradient(135deg, $primary-color 0%, $primary-action 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// ============ 现代化玻璃拟态(2026 高级感) ============
+@mixin glassmorphism {
+  background: $glass-bg;
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border: 2rpx solid $glass-border;
+  box-shadow: $shadow-md, inset 0 2rpx 0 rgba(255, 255, 255, 0.25);
+}
+
+// 深色玻璃(用于深色背景上的卡片)
+@mixin glassmorphism-dark {
+  background: $glass-bg-dark;
+  backdrop-filter: blur(40rpx) saturate(180%);
+  -webkit-backdrop-filter: blur(40rpx) saturate(180%);
+  border: 2rpx solid rgba(255, 255, 255, 0.08);
+  box-shadow: $shadow-lg;
+}
+
+// ============ 现代化卡片(分层阴影 + 圆角) ============
+@mixin card-modern {
+  background: $bg-card;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  transition: transform $duration-base $ease-out-quart, box-shadow $duration-base $ease-out-quart;
+  overflow: hidden;
+}
+
+// 可点击卡片(悬浮抬升动效)
+@mixin card-interactive {
+  @include card-modern;
+
+  &:active {
+    transform: scale(0.97) translateY(2rpx);
+    box-shadow: $shadow-xs;
+  }
+}
+
+// ============ 按钮微动效 ============
+// 主按钮(带渐变 + 阴影 + 按压反馈)
+@mixin btn-modern-primary {
+  background: $gradient-warm;
+  color: #FFFFFF;
+  border-radius: $radius-full;
+  box-shadow: $shadow-primary;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    transform: scale(0.96);
+    box-shadow: $shadow-sm;
+  }
+}
+
+// 次按钮(玻璃拟态描边)
+@mixin btn-modern-ghost {
+  background: rgba(255, 106, 0, 0.08);
+  color: $color-primary;
+  border: 2rpx solid rgba(255, 106, 0, 0.3);
+  border-radius: $radius-full;
+  transition: all $duration-fast $ease-out-quart;
+
+  &:active {
+    background: rgba(255, 106, 0, 0.16);
+    transform: scale(0.96);
+  }
+}
+
+// ============ 渐变背景工具 ============
+@mixin gradient-warm {
+  background: $gradient-warm;
+}
+
+@mixin gradient-sunset {
+  background: $gradient-sunset;
+}
+
+@mixin gradient-gold {
+  background: $gradient-gold;
+}
+
+@mixin gradient-dark {
+  background: $gradient-dark;
+}
+
+// ============ 文字层次 ============
+// 大标题(显示型)
+@mixin text-display {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: $ink-900;
+  letter-spacing: -0.5rpx;
+  line-height: 1.2;
+}
+
+// 主标题
+@mixin text-h1 {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: $ink-900;
+  letter-spacing: -0.3rpx;
+}
+
+// 副标题
+@mixin text-h2 {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: $ink-800;
+}
+
+// 正文(强调)
+@mixin text-body-strong {
+  font-size: 28rpx;
+  font-weight: 500;
+  color: $ink-800;
+}
+
+// 正文(常规)
+@mixin text-body {
+  font-size: 28rpx;
+  font-weight: 400;
+  color: $text-main;
+}
+
+// 辅助文字
+@mixin text-caption {
+  font-size: 24rpx;
+  font-weight: 400;
+  color: $text-weak;
+}
+
+// ============ 动效入场动画 ============
+// 淡入上移(常用于卡片入场)
+@mixin anim-fade-up {
+  animation: fadeUp $duration-slow $ease-out-quart both;
+}
+
+// 淡入缩放(常用于弹窗)
+@mixin anim-fade-scale {
+  animation: fadeScale $duration-base $ease-out-back both;
+}
+
+// 左侧滑入(常用于侧边栏)
+@mixin anim-slide-left {
+  animation: slideLeft $duration-slow $ease-out-quart both;
+}
+
+// ============ 骨架屏 ============
+@mixin skeleton {
+  background: linear-gradient(90deg, $neutral-100 25%, $neutral-200 37%, $neutral-100 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+}
+
+// ============ 硬件加速(用于动画元素避免卡顿) ============
+@mixin gpu-accelerate {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+// ============ 关键帧动画定义 ============
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideLeft {
+  from {
+    opacity: 0;
+    transform: translateX(60rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
