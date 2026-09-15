@@ -139,10 +139,16 @@
 
       <view v-else class="footer-right">
         <view class="price-info">
-          <text class="price-label">合计：</text>
-          <text class="price-value">¥{{ cartStore.selectedTotal.toFixed(2) }}</text>
+          <view class="price-row">
+            <text class="price-label">合计：</text>
+            <text class="price-value">¥{{ displayPayAmount.toFixed(2) }}</text>
+            <text v-if="hasDiscount" class="price-discount">已优惠¥{{ totalDiscount.toFixed(2) }}</text>
+          </view>
+          <view v-if="benefitHints.length > 0" class="benefit-hints">
+            <text v-for="(hint, idx) in benefitHints" :key="idx" class="benefit-hint">{{ hint }}</text>
+          </view>
         </view>
-        <view 
+        <view
           class="checkout-btn"
           :class="{ 'btn-disabled': !cartStore.hasSelectedItems }"
           @click="handleCheckout"
@@ -157,7 +163,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
 import { useCart } from '@/hooks/useCart'
@@ -170,11 +176,50 @@ const {
   loadDeleteItem,
   loadDeleteSelectedItems,
   loadDeleteInvalidItems,
+  loadSelectionPreview,
   loadCheckout
 } = useCart()
 
 const refreshing = ref(false)
 const isInvalidExpand = ref(false)
+
+const displayPayAmount = computed(() => {
+  if (cartStore.previewPayAmount != null) return cartStore.previewPayAmount
+  return cartStore.selectedTotal
+})
+
+const totalDiscount = computed(() => {
+  if (cartStore.previewTotalDiscount > 0) return cartStore.previewTotalDiscount
+  return 0
+})
+
+const hasDiscount = computed(() => totalDiscount.value > 0)
+
+const couponHint = computed(() => {
+  const info = cartStore.previewCouponInfo
+  if (!info) return ''
+  const parts = []
+  if (info.platformCoupon) {
+    parts.push(`平台券-${info.platformCoupon.discountAmount.toFixed(2)}元`)
+  }
+  if (info.merchantCoupon) {
+    parts.push(`商家券-${info.merchantCoupon.discountAmount.toFixed(2)}元`)
+  }
+  return parts.join(' / ')
+})
+
+const pointsHint = computed(() => {
+  const info = cartStore.previewPointsInfo
+  if (!info || !(info.usedPoints > 0) || !(info.deductionAmount > 0)) return ''
+  return `${info.usedPoints}积分抵${info.deductionAmount.toFixed(2)}元`
+})
+
+const benefitHints = computed(() => {
+  const hints = []
+  if (couponHint.value) hints.push(couponHint.value)
+  if (pointsHint.value) hints.push(pointsHint.value)
+  return hints
+})
 
 const goShopping = () => {
   uni.switchTab({ url: '/pagesSub/goods/category/categoryHome' })
@@ -200,6 +245,7 @@ const handleToggleGroupSelect = (group) => {
     item.checked = newValue
   })
   cartStore.updateAllSelectedStatus()
+  loadSelectionPreview()
 }
 
 const toggleManageMode = () => {
@@ -212,10 +258,12 @@ const toggleInvalidExpand = () => {
 
 const handleToggleSelect = (cartItemId) => {
   cartStore.toggleSelect(cartItemId)
+  loadSelectionPreview()
 }
 
 const handleToggleAllSelect = () => {
   cartStore.toggleAllSelect()
+  loadSelectionPreview()
 }
 
 const handlePlus = (item) => {
@@ -293,6 +341,7 @@ const handleCheckout = () => {
 const onRefresh = async () => {
   refreshing.value = true
   await loadCartData()
+  loadSelectionPreview()
   refreshing.value = false
 }
 
@@ -306,6 +355,13 @@ onMounted(() => {
 onShow(() => {
   loadCartData()
 })
+
+watch(
+  () => [cartStore.selectedCount, cartStore.selectedTotal],
+  () => {
+    loadSelectionPreview()
+  }
+)
 </script>
 
 <style lang="scss" scoped>
@@ -761,7 +817,13 @@ onShow(() => {
 
   .price-info {
     display: flex;
-    align-items: baseline;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .price-row {
+      display: flex;
+      align-items: baseline;
+    }
 
     .price-label {
       font-size: 26rpx;
@@ -772,6 +834,29 @@ onShow(() => {
       font-size: 36rpx;
       color: $color-primary-danger;
       font-weight: 600;
+    }
+
+    .price-discount {
+      font-size: 22rpx;
+      color: $color-primary;
+      margin-left: 12rpx;
+    }
+
+    .benefit-hints {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      margin-top: 4rpx;
+
+      .benefit-hint {
+        font-size: 20rpx;
+        color: $color-primary;
+        background: rgba($color-primary, 0.08);
+        padding: 2rpx 10rpx;
+        border-radius: 4rpx;
+        margin-left: 8rpx;
+        margin-bottom: 2rpx;
+      }
     }
   }
 

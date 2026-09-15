@@ -21,7 +21,6 @@ import com.socialretail.backend.mapper.order.OrderStatusLogMapper;
 import com.socialretail.backend.service.merchant.PickupPointService;
 import com.socialretail.backend.service.merchant.PickupService;
 import com.socialretail.backend.service.merchant.impl.AfterSaleServiceImpl;
-import com.socialretail.backend.service.merchant.impl.EarningsServiceImpl;
 import com.socialretail.backend.service.merchant.impl.MerchantOrderServiceImpl;
 import com.socialretail.backend.vo.*;
 import jakarta.annotation.Resource;
@@ -58,9 +57,6 @@ public class MerchantOrderController {
 
     @Resource
     private AfterSaleServiceImpl afterSaleService;
-
-    @Resource
-    private EarningsServiceImpl earningsService;
 
     @Resource
     private DeliveryMapper deliveryMapper;
@@ -546,68 +542,7 @@ public class MerchantOrderController {
         }
     }
 
-    // ==================== 17. 收益列表 ====================
-
-    @GetMapping("/earnings")
-    public Result<Map<String, Object>> getEarningsList(HttpServletRequest request,
-                                                        @RequestParam(required = false) Integer status,
-                                                        @RequestParam(defaultValue = "1") int pageNum,
-                                                        @RequestParam(defaultValue = "10") int pageSize) {
-        Long merchantId = (Long) request.getAttribute("merchantId");
-        log.info("[收益列表] merchantId={}, status={}, pageNum={}, pageSize={}",
-                merchantId, status, pageNum, pageSize);
-        try {
-            Map<String, Object> result = earningsService.getEarningsList(merchantId, status, pageNum, pageSize);
-            log.info("[收益列表] 成功, merchantId={}, total={}, totalAvailable={}",
-                    merchantId, result.get("total"), result.get("totalAvailable"));
-            return Result.success(result);
-        } catch (RuntimeException e) {
-            log.warn("[收益列表] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
-            throw e;
-        }
-    }
-
-    // ==================== 18. 提现申请 ====================
-
-    @PostMapping("/earnings/withdraw")
-    public Result<Map<String, Object>> withdraw(HttpServletRequest request,
-                                                 @RequestBody WithdrawRequest req) {
-        Long merchantId = (Long) request.getAttribute("merchantId");
-        log.info("[提现申请] merchantId={}, bankCardNumber={}, accountName={}, bankName={}",
-                merchantId, req.getBankCardNumber(), req.getAccountName(), req.getBankName());
-        try {
-            Map<String, Object> result = earningsService.withdraw(
-                    merchantId, req.getBankCardNumber(), req.getAccountName(), req.getBankName());
-            log.info("[提现申请] 成功, merchantId={}, withdrawalId={}, amount={}",
-                    merchantId, result.get("withdrawalId"), result.get("amount"));
-            return Result.success(result);
-        } catch (RuntimeException e) {
-            log.warn("[提现申请] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
-            throw e;
-        }
-    }
-
-    // ==================== 19. 提现记录 ====================
-
-    @GetMapping("/earnings/withdraw-records")
-    public Result<PageResult<Map<String, Object>>> getWithdrawalRecords(HttpServletRequest request,
-                                                                        @RequestParam(defaultValue = "1") int pageNum,
-                                                                        @RequestParam(defaultValue = "10") int pageSize) {
-        Long merchantId = (Long) request.getAttribute("merchantId");
-        log.info("[提现记录] merchantId={}, pageNum={}, pageSize={}", merchantId, pageNum, pageSize);
-        try {
-            PageResult<Map<String, Object>> pageResult = earningsService.getWithdrawalRecords(
-                    merchantId, pageNum, pageSize);
-            log.info("[提现记录] 成功, merchantId={}, total={}, count={}",
-                    merchantId, pageResult.getTotal(), pageResult.getList().size());
-            return Result.success(pageResult);
-        } catch (RuntimeException e) {
-            log.warn("[提现记录] 失败, merchantId={}, 原因: {}", merchantId, e.getMessage());
-            throw e;
-        }
-    }
-
-    // ==================== 20. 自提点列表 ====================
+    // ==================== 17. 自提点列表 ====================
 
     @GetMapping("/pickup-points")
     public Result<List<Map<String, Object>>> listPickupPoints(HttpServletRequest request) {

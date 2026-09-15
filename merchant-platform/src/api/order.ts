@@ -1,12 +1,34 @@
 import request from '@/utils/request'
 
 // ========== 登录/商家信息 ==========
-export const merchantLogin = (data: { phone: string; password: string }) => {
+export const merchantLogin = (data: { phone: string; password: string; smsCode?: string }) => {
   return request.post('/merchant/auth/login', data)
 }
 
 export const getMerchantInfo = () => {
   return request.get('/merchant/info')
+}
+
+// ========== 入驻申请 ==========
+export const submitMerchantApplication = (data: {
+  applyType?: number
+  shopName: string
+  contactName: string
+  contactPhone: string
+  shopAddress: string
+  companyName?: string
+  licenseNumber?: string
+  licenseImage?: string
+  foodPermitNumber?: string
+  foodPermitImage?: string
+  idCardFront?: string
+  idCardBack?: string
+}) => {
+  return request.post('/merchant/applications', data)
+}
+
+export const getApplicationStatus = () => {
+  return request.get('/merchant/applications/status')
 }
 
 // ========== 订单 ==========

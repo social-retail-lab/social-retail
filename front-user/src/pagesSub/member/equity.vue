@@ -82,6 +82,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { useMember } from '@/hooks/useMember'
 import { onShow } from '@dcloudio/uni-app'
 import { useMemberStore } from '@/store/member'
@@ -119,7 +120,7 @@ const isCurrentLevel = (level) => {
 
 // 返回上一页
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pagesSub/member/memberHome')
 }
 
 onShow(() => {

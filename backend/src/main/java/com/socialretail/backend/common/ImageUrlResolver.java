@@ -62,6 +62,17 @@ public class ImageUrlResolver {
                     + UriUtils.encodePath(relative, StandardCharsets.UTF_8);
         }
 
+        // Relative paths like "product/xxx.jpg" that aren't upload temp files
+        // are static seed-data resources, not user uploads
+        String stripped = lowerValue.replaceFirst("^/+", "");
+        if (stripped.contains("/")
+                && !stripped.startsWith("temp/")
+                && !stripped.startsWith("uploads/")) {
+            String staticRelative = normalizedValue.replaceFirst("^/+", "");
+            return requestBaseUrl() + "/static/"
+                    + UriUtils.encodePath(staticRelative, StandardCharsets.UTF_8);
+        }
+
         String relative = relativeUploadPath(value);
         if (!StringUtils.hasText(relative) || relative.contains("..")) {
             return value;

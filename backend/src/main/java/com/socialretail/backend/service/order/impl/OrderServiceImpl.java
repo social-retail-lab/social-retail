@@ -520,6 +520,7 @@ public class OrderServiceImpl implements OrderService {
         response.setStatus(OrderStatus.userStatusCode(order.getStatus()));
         response.setStatusText(OrderStatus.userStatusText(order.getStatus(), order.getDeliveryType()));
         response.setDeliveryType(Objects.equals(order.getDeliveryType(), PICKUP) ? "PICKUP" : "DELIVERY");
+        response.setPickupCode(order.getPickupCode());
         response.setTotalAmount(order.getTotalAmount());
         response.setDiscountAmount(zeroIfNull(order.getDiscountAmount()));
         response.setDeliveryFee(zeroIfNull(order.getDeliveryFee()));

@@ -7,6 +7,7 @@ import com.socialretail.backend.dto.request.social.DistributorApplyRequest;
 import com.socialretail.backend.dto.request.social.DistributorWithdrawRequest;
 import com.socialretail.backend.dto.request.social.ShareLinkRequest;
 import com.socialretail.backend.dto.response.social.DistributorResponses;
+import com.socialretail.backend.service.social.AiCopywritingService;
 import com.socialretail.backend.service.social.CommissionService;
 import com.socialretail.backend.service.social.DistributorService;
 import jakarta.validation.Valid;
@@ -24,17 +25,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @Validated
 @RestController
 @RequestMapping("/api/distributor")
 public class DistributorController {
     private final DistributorService distributorService;
     private final CommissionService commissionService;
+    private final AiCopywritingService aiCopywritingService;
 
     public DistributorController(DistributorService distributorService,
-                                 CommissionService commissionService) {
+                                 CommissionService commissionService,
+                                 AiCopywritingService aiCopywritingService) {
         this.distributorService = distributorService;
         this.commissionService = commissionService;
+        this.aiCopywritingService = aiCopywritingService;
     }
 
     @PostMapping("/apply")
@@ -95,6 +101,14 @@ public class DistributorController {
             @RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId,
             @PathVariable @Positive Long distributorProductId) {
         return Result.success(distributorService.myProductDetail(userId, distributorProductId));
+    }
+
+    @PostMapping("/my-products/{distributorProductId}/generate-copywriting")
+    public Result<Map<String, String>> generateCopywriting(
+            @RequestAttribute(JwtInterceptor.USER_ID_ATTRIBUTE) Long userId,
+            @PathVariable @Positive Long distributorProductId) {
+        String copywriting = aiCopywritingService.generateCopywriting(userId, distributorProductId);
+        return Result.success("生成成功", Map.of("copywriting", copywriting));
     }
 
     @PatchMapping("/my-products/{distributorProductId}/disable")

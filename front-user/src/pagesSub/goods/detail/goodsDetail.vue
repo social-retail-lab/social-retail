@@ -337,6 +337,10 @@ const selectedSpecs = ref({})
 const showSkuPopup = ref(false)
 const quantity = ref(1)
 
+// 当前页面的商品ID和推广码（用于登录回跳）
+const currentProductId = ref('')
+const currentPromotionCode = ref('')
+
 const { loadProductDetail, loadProductSkus } = useGoods()
 const { loadAddToCart, cartStore, loadCartData } = useCart()
 const {
@@ -393,6 +397,32 @@ const specOptions = computed(() => {
   })
   return specs
 })
+
+// 归一化 SKU 规格数据：后端 spec 是 Map（对象），specs 是 JSON 字符串
+// 前端统一用 specs 作为对象使用
+const normalizeSkuSpecs = (list) => {
+  if (!Array.isArray(list)) return []
+  return list.map(sku => {
+    // 优先用 spec（Map 对象）
+    if (sku.spec && typeof sku.spec === 'object' && !Array.isArray(sku.spec)) {
+      return { ...sku, specs: sku.spec }
+    }
+    // specs 是 JSON 字符串时解析为对象
+    if (typeof sku.specs === 'string' && sku.specs.trim()) {
+      try {
+        const parsed = JSON.parse(sku.specs)
+        return { ...sku, specs: (parsed && typeof parsed === 'object') ? parsed : {} }
+      } catch {
+        return { ...sku, specs: {} }
+      }
+    }
+    // specs 已是对象则直接用
+    if (sku.specs && typeof sku.specs === 'object') {
+      return sku
+    }
+    return { ...sku, specs: {} }
+  })
+}
 
 const goBack = () => {
   const pages = getCurrentPages()
@@ -515,6 +545,16 @@ const confirmAddCart = async () => {
     return
   }
 
+  // 未登录：保存回跳路径（含推广码），跳转登录页
+  if (!userStore.isLogin) {
+    const promotionCode = currentPromotionCode.value || uni.getStorageSync('promotionCode') || ''
+    const redirectUrl = `/pages/product/detail?id=${currentProductId.value}` +
+      (promotionCode ? `&promotionCode=${promotionCode}` : '')
+    uni.setStorageSync('loginRedirectUrl', redirectUrl)
+    uni.navigateTo({ url: '/pages/login/login' })
+    return
+  }
+
   // 携带缓存的推广码（分销归因从加入购物车开始保留 7 天）
   const promotionCode = uni.getStorageSync('promotionCode') || ''
   await loadAddToCart(skuId, quantity.value, promotionCode || null)
@@ -524,6 +564,10 @@ const confirmAddCart = async () => {
 const confirmBuy = async () => {
   if (!userStore.isLogin) {
     uni.showToast({ title: '请先登录', icon: 'none' })
+    const promotionCode = currentPromotionCode.value || uni.getStorageSync('promotionCode') || ''
+    const redirectUrl = `/pages/product/detail?id=${currentProductId.value}` +
+      (promotionCode ? `&promotionCode=${promotionCode}` : '')
+    uni.setStorageSync('loginRedirectUrl', redirectUrl)
     setTimeout(() => {
       uni.navigateTo({ url: '/pages/login/login' })
     }, 1000)
@@ -609,8 +653,8 @@ const loadProductData = async (productId, promotionCode = '') => {
     }
     
     if (detailData.skuList && detailData.skuList.length > 0) {
-      skuList.value = detailData.skuList
-      const availableSku = detailData.skuList.find(s => s.stock > 0)
+      skuList.value = normalizeSkuSpecs(detailData.skuList)
+      const availableSku = skuList.value.find(s => s.stock > 0)
       if (availableSku) {
         selectSku(availableSku)
       }
@@ -651,6 +695,10 @@ onMounted(() => {
   const options = currentPage.options || {}
   const productId = options.id || options.productId
   const promotionCode = options.promotionCode || ''
+
+  // 存储当前页面参数，供加购/购买时构造登录回跳URL
+  currentProductId.value = productId || ''
+  currentPromotionCode.value = promotionCode || ''
 
   // 推广码处理：URL 参数优先，保存到缓存；无 URL 参数时从缓存读取
   if (promotionCode) {

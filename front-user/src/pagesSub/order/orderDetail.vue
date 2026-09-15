@@ -20,6 +20,12 @@
           <text class="countdown-label">支付剩余时间</text>
           <text class="countdown-text">{{ countdownText }}</text>
         </view>
+        <!-- 自提取货码：已支付的自提订单在状态栏醒目展示 -->
+        <view v-if="isPickupOrder && displayPickupCode" class="status-pickup-code" @click="copyPickupCode">
+          <text class="status-pickup-label">取货码</text>
+          <text class="status-pickup-value">{{ displayPickupCode }}</text>
+          <text class="status-pickup-copy">复制</text>
+        </view>
       </view>
 
       <!-- 2. 收货/自提信息模块 -->
@@ -50,6 +56,17 @@
               <text class="pickup-value">{{ orderDetail.pickupPointInfo.businessHours }}</text>
             </view>
           </view>
+        </view>
+        <!-- 自提取货码（已支付的自提订单才有码） -->
+        <view v-if="isPickupOrder && displayPickupCode" class="pickup-code-box" @click="copyPickupCode">
+          <view class="pickup-code-left">
+            <text class="pickup-code-icon">🔑</text>
+            <view class="pickup-code-text">
+              <text class="pickup-code-label">取货码</text>
+              <text class="pickup-code-tip">到店出示此码完成取货（点击复制）</text>
+            </view>
+          </view>
+          <text class="pickup-code-value">{{ displayPickupCode }}</text>
         </view>
       </view>
 
@@ -381,7 +398,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { onShow, onHide } from '@dcloudio/uni-app'
-import { showToast, getValidImageUrl } from '@/utils/common'
+import { showToast, getValidImageUrl, safeBack } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 import { useAfterSale } from '@/hooks/useAfterSale'
 
@@ -467,6 +484,18 @@ const orderDetail = ref({
 // 价格明细（兼容数据可能为空）
 const priceDetail = computed(() => orderDetail.value.priceDetail || {})
 
+// 是否自提订单（兼容后端返回字符串 "PICKUP" 和归一化后的数字 2）
+const isPickupOrder = computed(() => {
+  const dt = orderDetail.value.deliveryType
+  return dt === 2 || dt === 'PICKUP'
+})
+
+// 自提码（仅已支付自提订单有值）
+const displayPickupCode = computed(() => {
+  const code = orderDetail.value.pickupCode
+  return code ? String(code) : ''
+})
+
 // 是否展示优惠券&积分卡片
 const hasCouponOrPoints = computed(() => {
   const coupon = orderDetail.value.couponInfo
@@ -541,6 +570,14 @@ const maskPhone = (phone) => {
   return str.slice(0, 3) + '****' + str.slice(-4)
 }
 
+const copyPickupCode = () => {
+  if (!displayPickupCode.value) return
+  uni.setClipboardData({
+    data: displayPickupCode.value,
+    success: () => uni.showToast({ title: '取货码已复制', icon: 'none' })
+  })
+}
+
 const formatCountdown = (seconds) => {
   if (seconds <= 0) return '已超时'
   const h = Math.floor(seconds / 3600)
@@ -609,7 +646,7 @@ const stopStatusPolling = () => {
 }
 
 const handleBack = () => {
-  uni.navigateBack()
+  safeBack('/pagesSub/order/orderList')
 }
 
 // 拉取订单详情
@@ -634,6 +671,11 @@ const fetchOrderDetailData = async () => {
       ...data,
       priceDetail: { ...orderDetail.value.priceDetail, ...(data.priceDetail || {}) }
     }
+
+    // 归一化 deliveryType：后端返回 "PICKUP"/"DELIVERY" 字符串，前端模板按 1/2 判断
+    const dt = orderDetail.value.deliveryType
+    if (dt === 'PICKUP') orderDetail.value.deliveryType = 2
+    else if (dt === 'DELIVERY') orderDetail.value.deliveryType = 1
 
     if (orderDetail.value.status === 'WAIT_PAY') {
       startCountdown()
@@ -887,6 +929,38 @@ onUnmounted(() => {
       font-family: monospace;
     }
   }
+
+  .status-pickup-code {
+    display: flex;
+    align-items: center;
+    margin-top: 24rpx;
+    padding: 20rpx 40rpx;
+    background: rgba(255, 255, 255, 0.22);
+    border-radius: 40rpx;
+
+    .status-pickup-label {
+      font-size: 26rpx;
+      color: rgba(255, 255, 255, 0.9);
+      margin-right: 16rpx;
+    }
+
+    .status-pickup-value {
+      font-size: 56rpx;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: 10rpx;
+      line-height: 1;
+    }
+
+    .status-pickup-copy {
+      font-size: 24rpx;
+      color: rgba(255, 255, 255, 0.9);
+      margin-left: 20rpx;
+      padding: 6rpx 18rpx;
+      border: 2rpx solid rgba(255, 255, 255, 0.6);
+      border-radius: 24rpx;
+    }
+  }
 }
 
 .card-container {
@@ -981,6 +1055,51 @@ onUnmounted(() => {
         color: $text-sub;
       }
     }
+  }
+}
+
+.pickup-code-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 20rpx;
+  padding: 24rpx 28rpx;
+  background: linear-gradient(135deg, #fff7e6 0%, #ffe7ba 100%);
+  border: 2rpx dashed #ff9900;
+  border-radius: 16rpx;
+
+  .pickup-code-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .pickup-code-icon {
+    font-size: 40rpx;
+    margin-right: 16rpx;
+  }
+
+  .pickup-code-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pickup-code-label {
+    font-size: 26rpx;
+    color: #8c5a00;
+    font-weight: 600;
+  }
+
+  .pickup-code-tip {
+    font-size: 22rpx;
+    color: #b8860b;
+    margin-top: 4rpx;
+  }
+
+  .pickup-code-value {
+    font-size: 56rpx;
+    font-weight: 800;
+    color: #ff4d4f;
+    letter-spacing: 8rpx;
   }
 }
 

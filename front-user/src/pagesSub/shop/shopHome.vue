@@ -272,6 +272,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, computed } from 'vue'
 import { onLoad, onShow, onUnload, onPullDownRefresh } from '@dcloudio/uni-app'
 import { useShop } from '@/hooks/useShop'
@@ -324,11 +325,7 @@ const formatSoldCount = (count) => {
 
 // 返回上一页
 const goBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pages/index/index')
 }
 
 // ============ 搜索相关(2.9.6) ============

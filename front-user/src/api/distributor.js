@@ -111,6 +111,16 @@ export const enablePromotionProductApi = (distributorProductId) => {
   })
 }
 
+// ============ 5.2.8 AI 生成推广文案 ============
+// POST /api/distributor/my-products/{distributorProductId}/generate-copywriting
+// 根据商品信息调用 DeepSeek 生成适合社交分享的推广文案
+export const generateCopywritingApi = (distributorProductId) => {
+  return request({
+    url: `/api/distributor/my-products/${distributorProductId}/generate-copywriting`,
+    method: 'post'
+  })
+}
+
 // ============================================================
 // 5.3 佣金管理
 // ============================================================

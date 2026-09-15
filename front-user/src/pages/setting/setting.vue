@@ -117,6 +117,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { useUserStore } from "@/store/user"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -124,7 +125,7 @@ const userStore = useUserStore()
 const authHook = useAuth()
 
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/mine/mine')
 }
 
 const formatPhone = (phone) => {

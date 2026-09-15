@@ -103,4 +103,14 @@ public class NotificationController {
         notificationService.markAllAsRead(merchantId);
         return Result.success("ok");
     }
+
+    /** 按类型标记已读 */
+    @PostMapping("/notifications/mark-read")
+    public Result<String> markReadByType(@RequestBody Map<String, Object> body, HttpServletRequest request) {
+        Long merchantId = (Long) request.getAttribute("merchantId");
+        String type = (String) body.get("type");
+        log.info("[通知已读] merchantId={}, type={}", merchantId, type);
+        notificationService.markAllAsRead(merchantId);
+        return Result.success("ok");
+    }
 }

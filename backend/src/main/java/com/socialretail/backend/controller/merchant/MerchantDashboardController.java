@@ -49,7 +49,7 @@ public class MerchantDashboardController {
             new LambdaQueryWrapper<Order>()
                 .eq(Order::getMerchantId, merchantId)
                 .ge(Order::getCreateTime, todayStart)
-                .in(Order::getStatus, 1, 2, 3)
+                .in(Order::getStatus, 1, 2, 3, 4)
         ).stream().map(o -> o.getPayAmount() != null ? o.getPayAmount() : BigDecimal.ZERO)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
         result.put("todaySales", todaySales);
@@ -83,7 +83,7 @@ public class MerchantDashboardController {
             new LambdaQueryWrapper<Order>()
                 .eq(Order::getMerchantId, merchantId)
                 .ge(Order::getCreateTime, sevenDaysAgo)
-                .in(Order::getStatus, 1, 2, 3)
+                .in(Order::getStatus, 1, 2, 3, 4)
         );
         List<Long> orderIds = recentOrders.stream().map(Order::getId).collect(Collectors.toList());
         if (orderIds.isEmpty()) return Result.success(Collections.emptyList());
@@ -128,7 +128,7 @@ public class MerchantDashboardController {
                 new LambdaQueryWrapper<Order>()
                     .eq(Order::getMerchantId, merchantId)
                     .ge(Order::getCreateTime, start).lt(Order::getCreateTime, end)
-                    .in(Order::getStatus, 1, 2, 3)
+                    .in(Order::getStatus, 1, 2, 3, 4)
             ).stream().map(o -> o.getPayAmount() != null ? o.getPayAmount() : BigDecimal.ZERO)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
             Map<String, Object> d = new HashMap<>();
@@ -149,7 +149,7 @@ public class MerchantDashboardController {
                     .eq(Order::getMerchantId, merchantId)
                     .ge(Order::getCreateTime, weekStart.atStartOfDay())
                     .lt(Order::getCreateTime, weekEnd.atStartOfDay())
-                    .in(Order::getStatus, 1, 2, 3)
+                    .in(Order::getStatus, 1, 2, 3, 4)
             ).stream().map(o -> o.getPayAmount() != null ? o.getPayAmount() : BigDecimal.ZERO)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
             Map<String, Object> d = new HashMap<>();

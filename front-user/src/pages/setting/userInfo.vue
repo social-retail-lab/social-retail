@@ -57,7 +57,7 @@
 import { ref, onMounted } from "vue"
 import { useUserStore } from '@/store/user'
 import { useFile } from '@/hooks/useFile'
-import { showToast } from '@/utils/common'
+import { showToast, safeBack } from '@/utils/common'
 import { UPLOAD_TYPE } from '@/constants/file'
 
 const userStore = useUserStore()
@@ -74,7 +74,7 @@ onMounted(() => {
 })
 
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/setting/setting')
 }
 
 const chooseAvatar = () => {

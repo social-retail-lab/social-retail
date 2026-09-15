@@ -7,6 +7,7 @@ export const useCart = () => {
   const cartStore = useCartStore()
   const userStore = useUserStore()
   const debounceTimers = ref({})
+  const selectionPreviewTimer = ref(null)
   const loading = ref(false)
   const addLoading = ref(false)
   const invalidLoading = ref(false)
@@ -279,6 +280,30 @@ export const useCart = () => {
     })
   }
 
+  const loadSelectionPreview = () => {
+    if (!userStore.isLogin) {
+      cartStore.setCheckoutPreviewData(null)
+      return
+    }
+    if (selectionPreviewTimer.value) {
+      clearTimeout(selectionPreviewTimer.value)
+    }
+    const selected = cartStore.selectedItems
+    if (selected.length === 0) {
+      cartStore.setCheckoutPreviewData(null)
+      return
+    }
+    const cartItemIds = selected.map(item => item.cartItemId)
+    selectionPreviewTimer.value = setTimeout(async () => {
+      try {
+        await cartStore.fetchCheckoutPreview({ cartItemIds })
+      } catch (error) {
+        console.warn('选品预览失败:', error)
+        cartStore.setCheckoutPreviewData(null)
+      }
+    }, 350)
+  }
+
   const loadCheckout = async () => {
     if (!checkLogin()) {
       return
@@ -324,6 +349,9 @@ export const useCart = () => {
     Object.values(debounceTimers.value).forEach(timer => {
       clearTimeout(timer)
     })
+    if (selectionPreviewTimer.value) {
+      clearTimeout(selectionPreviewTimer.value)
+    }
   })
 
   return {
@@ -337,6 +365,7 @@ export const useCart = () => {
     loadDeleteItem,
     loadDeleteSelectedItems,
     loadDeleteInvalidItems,
+    loadSelectionPreview,
     loadCheckout
   }
 }

@@ -109,6 +109,7 @@
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useDistributor } from '@/hooks/useDistributor'
+import { safeBack } from '@/utils/common'
 
 const statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 20
 
@@ -146,11 +147,7 @@ const getStatusText = (status) => {
 }
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/distribution/distHome')
 }
 
 // 跳转提现申请页

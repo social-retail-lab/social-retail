@@ -16,6 +16,7 @@ public class OrderDetailResponse {
     private String status;
     private String statusText;
     private String deliveryType;
+    private String pickupCode;
     private BigDecimal totalAmount;
     private BigDecimal discountAmount;
     private BigDecimal deliveryFee;

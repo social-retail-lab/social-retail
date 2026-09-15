@@ -156,16 +156,29 @@ export const useGoods = () => {
       if (res) {
         return {
           productId: res.productId,
-          skuList: res.skuList.map(item => ({
-            skuId: item.skuId,
-            skuName: item.skuName,
-            specs: item.specs,
-            price: item.price,
-            originalPrice: item.originalPrice,
-            stock: item.stock,
-            lockedStock: item.lockedStock,
-            status: item.status
-          }))
+          skuList: res.skuList.map(item => {
+            // 后端 spec 是 Map 对象，specs 是 JSON 字符串；统一解析为对象
+            let specs = item.spec
+            if (!specs || typeof specs !== 'object' || Array.isArray(specs)) {
+              if (typeof item.specs === 'string' && item.specs.trim()) {
+                try { specs = JSON.parse(item.specs) } catch { specs = {} }
+              } else if (item.specs && typeof item.specs === 'object') {
+                specs = item.specs
+              } else {
+                specs = {}
+              }
+            }
+            return {
+              skuId: item.skuId,
+              skuName: item.skuName,
+              specs,
+              price: item.price,
+              originalPrice: item.originalPrice,
+              stock: item.stock,
+              lockedStock: item.lockedStock,
+              status: item.status
+            }
+          })
         }
       }
       return null

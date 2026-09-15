@@ -96,9 +96,15 @@ const handleClick = (banner, index) => {
       })
       break
     case 'activity':
-      // 活动页面
+      // 秒杀活动页面（seckillHome 自动加载当前活动）
       uni.navigateTo({
-        url: `/pagesSub/goods/seckill/seckillDetail?id=${banner.target_id}`
+        url: `/pagesSub/goods/seckill/seckillHome`
+      })
+      break
+    case 'distributor':
+      // 申请成为分销员
+      uni.navigateTo({
+        url: `/pagesSub/distribution/apply`
       })
       break
     case 'coupon':

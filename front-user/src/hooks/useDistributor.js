@@ -27,6 +27,7 @@ import {
   WITHDRAW_STATUS_TABS
 } from '@/constants/distributor'
 import { UPLOAD_TYPE } from '@/constants/file'
+import { generateCopywritingApi } from '@/api/distributor'
 
 export const useDistributor = () => {
   const distributorStore = useDistributorStore()
@@ -433,6 +434,19 @@ export const useDistributor = () => {
     }
   }
 
+  // 5.2.8 AI 生成推广文案
+  // 调用后端 DeepSeek 接口生成营销文案，返回文案文本或 null
+  const generateCopywriting = async (distributorProductId) => {
+    if (!distributorProductId) return null
+    try {
+      const res = await generateCopywritingApi(distributorProductId)
+      return res?.data?.copywriting || null
+    } catch (error) {
+      console.error('生成推广文案失败:', error)
+      return null
+    }
+  }
+
   // 复制推广链接到剪贴板
   const copyPromotionUrl = (url) => {
     if (!url) {
@@ -721,6 +735,7 @@ export const useDistributor = () => {
     loadPromotionProductDetail,
     disablePromotionProduct,
     enablePromotionProduct,
+    generateCopywriting,
     copyPromotionUrl,
     copyPromotionCode,
     saveQrCode,

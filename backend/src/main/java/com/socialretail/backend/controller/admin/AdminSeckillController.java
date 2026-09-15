@@ -67,6 +67,14 @@ public class AdminSeckillController {
         return Result.success(result);
     }
 
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    private LocalDateTime parseDateTime(String text) {
+        if (text == null || text.isEmpty()) return null;
+        String normalized = text.replace("T", " ");
+        return LocalDateTime.parse(normalized, FMT);
+    }
+
     @PostMapping
     public Result create(@RequestBody Map<String, Object> params) {
         String timeErr = validateSeckillTime(params);
@@ -74,11 +82,8 @@ public class AdminSeckillController {
 
         SeckillActivity a = new SeckillActivity();
         a.setTitle((String) params.get("title"));
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String st = (String) params.get("startTime");
-        if (st != null && !st.isEmpty()) a.setStartTime(LocalDateTime.parse(st, fmt));
-        String et = (String) params.get("endTime");
-        if (et != null && !et.isEmpty()) a.setEndTime(LocalDateTime.parse(et, fmt));
+        a.setStartTime(parseDateTime((String) params.get("startTime")));
+        a.setEndTime(parseDateTime((String) params.get("endTime")));
         a.setStatus(0);
         seckillActivityMapper.insert(a);
         return Result.success(a);
@@ -94,23 +99,19 @@ public class AdminSeckillController {
         String startTime = params.containsKey("startTime") ? (String) params.get("startTime") : null;
         String endTime = params.containsKey("endTime") ? (String) params.get("endTime") : null;
         if (startTime != null || endTime != null) {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String st = startTime != null ? startTime : (a.getStartTime() != null ? a.getStartTime().format(fmt) : null);
-            String et = endTime != null ? endTime : (a.getEndTime() != null ? a.getEndTime().format(fmt) : null);
-            if (st != null && et != null && st.compareTo(et) >= 0) {
+            String st = startTime != null ? startTime : (a.getStartTime() != null ? a.getStartTime().format(FMT) : null);
+            String et = endTime != null ? endTime : (a.getEndTime() != null ? a.getEndTime().format(FMT) : null);
+            if (st != null && et != null && st.replace("T", " ").compareTo(et.replace("T", " ")) >= 0) {
                 return Result.fail("结束时间必须晚于开始时间");
             }
         }
 
         if (params.containsKey("title")) a.setTitle((String) params.get("title"));
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         if (params.containsKey("startTime")) {
-            String st = (String) params.get("startTime");
-            if (st != null && !st.isEmpty()) a.setStartTime(LocalDateTime.parse(st, fmt));
+            a.setStartTime(parseDateTime((String) params.get("startTime")));
         }
         if (params.containsKey("endTime")) {
-            String et = (String) params.get("endTime");
-            if (et != null && !et.isEmpty()) a.setEndTime(LocalDateTime.parse(et, fmt));
+            a.setEndTime(parseDateTime((String) params.get("endTime")));
         }
         seckillActivityMapper.updateById(a);
         return Result.success(null);

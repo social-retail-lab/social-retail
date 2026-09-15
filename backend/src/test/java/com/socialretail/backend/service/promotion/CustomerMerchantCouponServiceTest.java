@@ -7,6 +7,7 @@ import com.socialretail.backend.entity.member.MerchantCouponUser;
 import com.socialretail.backend.mapper.member.MerchantCouponMapper;
 import com.socialretail.backend.mapper.member.MerchantCouponUserMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.promotion.MerchantCouponTierMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -63,7 +64,7 @@ class CustomerMerchantCouponServiceTest {
         when(merchantMapper.selectById(2001L)).thenReturn(merchant);
 
         CustomerMerchantCouponService service = new CustomerMerchantCouponService(
-                couponMapper, couponUserMapper, merchantMapper, transactionTemplate);
+                couponMapper, couponUserMapper, merchantMapper, mock(MerchantCouponTierMapper.class), transactionTemplate);
         MerchantCouponReceive first = service.receive(10007L, 6001L, "receive-key");
         MerchantCouponReceive repeated = service.receive(10007L, 6001L, "receive-key");
 

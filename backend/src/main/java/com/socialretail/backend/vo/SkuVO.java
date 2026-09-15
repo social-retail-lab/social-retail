@@ -8,19 +8,16 @@ import java.util.Map;
 
 public class SkuVO {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     private Long skuId;
     private Map<String, Object> spec;
     private BigDecimal price;
     private BigDecimal originalPrice;
     private Long seckillProductId;
     private Integer stock;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
-    private Long skuId;
     private String specs;
     private String specsText;
-    private BigDecimal price;
-    private Integer stock;
     private String skuCode;
 
     public SkuVO() {
@@ -45,6 +42,46 @@ public class SkuVO {
         this.skuId = skuId;
     }
 
+    public Map<String, Object> getSpec() {
+        return spec;
+    }
+
+    public void setSpec(Map<String, Object> spec) {
+        this.spec = spec;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public BigDecimal getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(BigDecimal originalPrice) {
+        this.originalPrice = originalPrice;
+    }
+
+    public Long getSeckillProductId() {
+        return seckillProductId;
+    }
+
+    public void setSeckillProductId(Long seckillProductId) {
+        this.seckillProductId = seckillProductId;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
     public String getSpecs() {
         return specs;
     }
@@ -61,22 +98,6 @@ public class SkuVO {
         this.specsText = specsText;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
     public String getSkuCode() {
         return skuCode;
     }
@@ -89,10 +110,13 @@ public class SkuVO {
     public String toString() {
         return "SkuVO{" +
             "skuId=" + skuId +
+            ", spec=" + spec +
+            ", price=" + price +
+            ", originalPrice=" + originalPrice +
+            ", seckillProductId=" + seckillProductId +
+            ", stock=" + stock +
             ", specs=" + specs +
             ", specsText=" + specsText +
-            ", price=" + price +
-            ", stock=" + stock +
             ", skuCode=" + skuCode +
             '}';
     }
@@ -103,15 +127,18 @@ public class SkuVO {
         if (o == null || getClass() != o.getClass()) return false;
         SkuVO that = (SkuVO) o;
         return java.util.Objects.equals(skuId, that.skuId)
+                && java.util.Objects.equals(spec, that.spec)
+                && java.util.Objects.equals(price, that.price)
+                && java.util.Objects.equals(originalPrice, that.originalPrice)
+                && java.util.Objects.equals(seckillProductId, that.seckillProductId)
+                && java.util.Objects.equals(stock, that.stock)
                 && java.util.Objects.equals(specs, that.specs)
                 && java.util.Objects.equals(specsText, that.specsText)
-                && java.util.Objects.equals(price, that.price)
-                && java.util.Objects.equals(stock, that.stock)
                 && java.util.Objects.equals(skuCode, that.skuCode);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(skuId, specs, specsText, price, stock, skuCode);
+        return java.util.Objects.hash(skuId, spec, price, originalPrice, seckillProductId, stock, specs, specsText, skuCode);
     }
 }

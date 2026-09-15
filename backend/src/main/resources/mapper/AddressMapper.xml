@@ -39,8 +39,7 @@
         SELECT <include refid="AddressColumns"/>
         FROM address
         WHERE user_id = #{userId}
-          AND is_default = 1
-        ORDER BY id DESC
+        ORDER BY COALESCE(is_default, 0) DESC, id DESC
         LIMIT 1
     </select>
 

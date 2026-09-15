@@ -62,7 +62,7 @@
             </view>
           </view>
           <view class="form-tip">
-            <text class="tip-text">最低提现金额 ¥10.00</text>
+            <text class="tip-text">提现金额不超过可提现佣金</text>
           </view>
         </view>
 
@@ -128,7 +128,7 @@
           </view>
           <view class="tip-item">
             <text class="tip-dot">·</text>
-            <text class="tip-content">提现金额最低 ¥10.00，最高不超过可提现佣金</text>
+            <text class="tip-content">提现金额不超过可提现佣金</text>
           </view>
           <view class="tip-item">
             <text class="tip-dot">·</text>
@@ -184,6 +184,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useDistributor } from '@/hooks/useDistributor'
@@ -216,7 +217,7 @@ const availableCommission = computed(() => {
 // 是否可提交
 const canSubmit = computed(() => {
   const amount = Number(formData.value.amount || 0)
-  return amount >= 10 &&
+  return amount > 0 &&
     amount <= availableCommission.value &&
     !!formData.value.bankName &&
     !!formData.value.bankCardNo &&
@@ -224,11 +225,7 @@ const canSubmit = computed(() => {
 })
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/distribution/distHome')
 }
 
 // 跳转提现记录

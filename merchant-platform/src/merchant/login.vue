@@ -37,9 +37,16 @@ const login = async () => {
   const res = await merchantLogin({ ...form.value, smsCode: '123456' })
   if (res.code === 0) {
     localStorage.setItem('merchantToken', res.data.token)
-    localStorage.setItem('merchantName', res.data.merchantName || '我的店铺')
+    localStorage.setItem('merchantStatus', String(res.data.merchantStatus ?? 0))
     localStorage.setItem('merchantInfo', JSON.stringify(res.data))
-    router.push('/goods')
+    const status = res.data.merchantStatus ?? 0
+    if (status === 0 || status === 3) {
+      router.push('/onboarding')
+    } else if (status === 1) {
+      router.push('/pending-review')
+    } else {
+      router.push('/dashboard')
+    }
   } else {
     alert(res.message)
   }

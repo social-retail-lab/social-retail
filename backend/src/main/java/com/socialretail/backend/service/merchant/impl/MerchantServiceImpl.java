@@ -177,14 +177,30 @@ public class MerchantServiceImpl implements MerchantService {
         loginVO.setExpireTime(jwtUtils.getExpireTime());
 
         if (merchant == null) {
-            loginVO.setMerchantStatus(0);
-        } else if (merchant.getStatus() == null || merchant.getStatus() == 0) {
-            loginVO.setMerchantStatus(1);
-            loginVO.setMerchantInfo(buildMerchantInfoVO(merchant));
-        } else if (merchant.getStatus() == 1) {
-            loginVO.setMerchantStatus(1);
+            // 无商家记录，检查是否有入驻申请
+            LambdaQueryWrapper<MerchantApply> applyWrapper = new LambdaQueryWrapper<>();
+            applyWrapper.eq(MerchantApply::getUserId, user.getId())
+                    .orderByDesc(MerchantApply::getApplyTime).last("LIMIT 1");
+            MerchantApply latestApply = merchantApplyMapper.selectOne(applyWrapper);
+            if (latestApply == null) {
+                // 0: 未提交入驻申请
+                loginVO.setMerchantStatus(0);
+            } else if (Integer.valueOf(0).equals(latestApply.getAuditStatus())) {
+                // 1: 入驻申请待审核
+                loginVO.setMerchantStatus(1);
+            } else if (Integer.valueOf(2).equals(latestApply.getAuditStatus())) {
+                // 3: 入驻申请被驳回，可重新申请
+                loginVO.setMerchantStatus(3);
+            } else {
+                // 申请已通过但商家记录尚未创建（异常状态，视为待审核）
+                loginVO.setMerchantStatus(1);
+            }
+        } else if (merchant.getStatus() != null && merchant.getStatus() == 1) {
+            // 2: 已审核通过的商家
+            loginVO.setMerchantStatus(2);
             loginVO.setMerchantInfo(buildMerchantInfoVO(merchant));
         } else {
+            // 商家记录存在但状态非1（如暂停/关闭等），返回实际状态
             loginVO.setMerchantStatus(merchant.getStatus());
             loginVO.setMerchantInfo(buildMerchantInfoVO(merchant));
         }

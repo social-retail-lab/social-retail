@@ -109,6 +109,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useComment } from '@/hooks/useComment'
@@ -130,11 +131,7 @@ const commentList = computed(() => commentStore.myComments)
 const hasMore = computed(() => commentStore.myCommentsPage < commentStore.myCommentsPages)
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pages/mine/mine')
 }
 
 // 状态文案

@@ -14,6 +14,17 @@ export function useAuth() {
   let loginTimer = null
   let bindTimer = null
 
+  // 登录成功后统一跳转：优先回跳到推广链接来源页，否则去首页
+  const redirectAfterLogin = () => {
+    const redirect = uni.getStorageSync('loginRedirectUrl')
+    if (redirect) {
+      uni.removeStorageSync('loginRedirectUrl')
+      uni.redirectTo({ url: redirect })
+    } else {
+      uni.reLaunch({ url: '/pages/index/index' })
+    }
+  }
+
   const startTimer = (type, seconds) => {
     if (type === 'login') {
       if (loginTimer) clearInterval(loginTimer)
@@ -95,7 +106,7 @@ export function useAuth() {
           userStore.setUserInfo(loginRes)
           showToast('注册成功，已自动登录')
           setTimeout(() => {
-            uni.reLaunch({ url: '/pages/index/index' })
+            redirectAfterLogin()
           }, 1000)
         } else {
           // 登录接口未返回数据，跳转到登录页让用户手动登录
@@ -128,7 +139,7 @@ export function useAuth() {
         userStore.setUserInfo(res)
         showToast('登录成功')
         setTimeout(() => {
-          uni.reLaunch({ url: '/pages/index/index' })
+          redirectAfterLogin()
         }, 1000)
       }
     } catch (error) {
@@ -161,7 +172,7 @@ export function useAuth() {
           userStore.setUserInfo(bindRes)
           showToast("微信登录成功")
           setTimeout(() => {
-            uni.reLaunch({ url: "/pages/index/index" })
+            redirectAfterLogin()
           }, 1000)
         } else {
           bindVisible.value = true
@@ -189,7 +200,7 @@ export function useAuth() {
         uni.hideLoading()
         showToast(res.isNewUser ? "注册绑定成功" : "绑定登录成功")
         setTimeout(() => {
-          uni.reLaunch({ url: "/pages/index/index" })
+          redirectAfterLogin()
         }, 1000)
       } else {
         uni.hideLoading()

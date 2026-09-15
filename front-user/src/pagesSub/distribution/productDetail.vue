@@ -120,6 +120,44 @@
         </view>
       </view>
 
+      <!-- AI 推广文案 -->
+      <view class="ai-card">
+        <view class="card-header">
+          <view class="header-line"></view>
+          <text class="card-title">AI 推广文案</text>
+          <view class="header-line"></view>
+        </view>
+
+        <!-- 生成按钮 -->
+        <view
+          v-if="!copywriting && !generatingCopy"
+          class="ai-generate-btn"
+          @click="handleGenerateCopywriting"
+        >
+          <text class="ai-icon">✨</text>
+          <text class="ai-btn-text">AI 生成推广文案</text>
+        </view>
+
+        <!-- 生成中 -->
+        <view v-if="generatingCopy" class="ai-loading">
+          <view class="loading-spinner-small"></view>
+          <text class="ai-loading-text">AI 正在创作文案...</text>
+        </view>
+
+        <!-- 文案展示 -->
+        <view v-if="copywriting" class="ai-result">
+          <text class="ai-copy-text">{{ copywriting }}</text>
+          <view class="ai-actions">
+            <view class="ai-action-btn ai-copy-action" @click="handleCopyCopywriting">
+              <text class="action-text">复制文案</text>
+            </view>
+            <view class="ai-action-btn ai-regenerate-action" @click="handleGenerateCopywriting">
+              <text class="action-text">重新生成</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
       <!-- 历史佣金记录 -->
       <view class="commission-card">
         <view class="card-header">
@@ -226,6 +264,7 @@ import { ref, computed } from 'vue'
 import { onLoad, onUnload, onShow } from '@dcloudio/uni-app'
 import { useDistributor } from '@/hooks/useDistributor'
 import SharePromotionPopup from '@/components/business/SharePromotionPopup.vue'
+import { safeBack } from '@/utils/common'
 
 const statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 20
 
@@ -235,6 +274,7 @@ const {
   disablePromotionProduct,
   enablePromotionProduct,
   generateShareLink,
+  generateCopywriting,
   copyPromotionUrl,
   copyPromotionCode,
   saveQrCode,
@@ -255,6 +295,10 @@ const generatingLink = ref(false)
 // 分享弹窗
 const sharePopupVisible = ref(false)
 const shareData = ref(null) // 推广链接数据（用于二维码展示）
+
+// AI 推广文案
+const copywriting = ref('')
+const generatingCopy = ref(false)
 
 // 佣金记录（来自详情接口的 commissionRecords 字段）
 const commissionPage = ref(1)
@@ -336,11 +380,7 @@ const getCommissionStyle = (status) => {
 
 // ============ 事件处理 ============
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/distribution/myProducts')
 }
 
 const handleRetry = () => {
@@ -414,6 +454,35 @@ const onShareLinkSuccess = (data) => {
   if (data) {
     shareData.value = data
   }
+}
+
+// AI 生成推广文案
+const handleGenerateCopywriting = async () => {
+  if (generatingCopy.value || !distributorProductId.value) return
+  generatingCopy.value = true
+  copywriting.value = ''
+  const text = await generateCopywriting(distributorProductId.value)
+  generatingCopy.value = false
+  if (text) {
+    copywriting.value = text
+    uni.showToast({ title: '文案生成成功', icon: 'success' })
+  } else {
+    uni.showToast({ title: '文案生成失败，请稍后重试', icon: 'none' })
+  }
+}
+
+// 复制 AI 文案
+const handleCopyCopywriting = () => {
+  if (!copywriting.value) {
+    uni.showToast({ title: '文案尚未生成', icon: 'none' })
+    return
+  }
+  uni.setClipboardData({
+    data: copywriting.value,
+    success: () => {
+      uni.showToast({ title: '文案已复制', icon: 'success' })
+    }
+  })
 }
 
 // 取消推广
@@ -796,6 +865,119 @@ onUnload(() => {
       font-size: 24rpx;
       color: $color-primary;
       font-weight: 500;
+    }
+  }
+}
+
+// ============ AI 推广文案卡片 ============
+.ai-card {
+  margin: 16rpx 24rpx;
+  background: $bg-card;
+  border-radius: 24rpx;
+  padding: 32rpx 24rpx;
+  box-shadow: $shadow-sm;
+}
+
+.ai-generate-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 28rpx 0;
+  background: linear-gradient(135deg, rgba(124, 92, 246, 0.12) 0%, rgba(255, 106, 0, 0.12) 100%);
+  border-radius: 16rpx;
+  border: 2rpx dashed rgba(124, 92, 246, 0.4);
+
+  &:active {
+    opacity: 0.7;
+    transform: scale(0.98);
+  }
+
+  .ai-icon {
+    font-size: 36rpx;
+  }
+
+  .ai-btn-text {
+    font-size: 28rpx;
+    font-weight: 600;
+    color: #7C5CF6;
+  }
+}
+
+.ai-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0;
+
+  .loading-spinner-small {
+    width: 48rpx;
+    height: 48rpx;
+    border: 4rpx solid $neutral-200;
+    border-top-color: #7C5CF6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 16rpx;
+  }
+
+  .ai-loading-text {
+    font-size: 24rpx;
+    color: $text-weak;
+  }
+}
+
+.ai-result {
+  .ai-copy-text {
+    display: block;
+    font-size: 26rpx;
+    color: $text-main;
+    line-height: 1.7;
+    padding: 20rpx;
+    background: $bg-page-light;
+    border-radius: 12rpx;
+    margin-bottom: 20rpx;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .ai-actions {
+    display: flex;
+    gap: 16rpx;
+  }
+
+  .ai-action-btn {
+    flex: 1;
+    height: 72rpx;
+    border-radius: 36rpx;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:active {
+      opacity: 0.7;
+      transform: scale(0.97);
+    }
+
+    .action-text {
+      font-size: 26rpx;
+      font-weight: 500;
+    }
+  }
+
+  .ai-copy-action {
+    background: linear-gradient(135deg, #7C5CF6 0%, #9F7BFF 100%);
+    box-shadow: 0 6rpx 16rpx rgba(124, 92, 246, 0.3);
+
+    .action-text {
+      color: #FFFFFF;
+    }
+  }
+
+  .ai-regenerate-action {
+    background: rgba(124, 92, 246, 0.1);
+
+    .action-text {
+      color: #7C5CF6;
     }
   }
 }

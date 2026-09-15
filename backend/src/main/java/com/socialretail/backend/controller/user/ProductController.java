@@ -9,6 +9,8 @@ import com.socialretail.backend.vo.ProductCardVO;
 import com.socialretail.backend.vo.ProductSkuListVO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -51,5 +53,15 @@ public class ProductController {
     public Result<PageResult<ProductCardVO>> searchProducts(
             @Valid @ModelAttribute ProductQueryDTO dto) {
         return Result.success(productService.searchProducts(dto));
+    }
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
+
+    @GetMapping("/test/db")
+    public Object test(){
+        return jdbcTemplate.queryForList(
+                "select count(*) count from product"
+        );
     }
 }

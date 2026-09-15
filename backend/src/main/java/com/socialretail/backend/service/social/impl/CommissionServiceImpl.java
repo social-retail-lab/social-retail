@@ -1,5 +1,6 @@
 package com.socialretail.backend.service.social.impl;
 
+import com.socialretail.backend.common.ImageUrlResolver;
 import com.socialretail.backend.common.PageResult;
 import com.socialretail.backend.common.exception.BusinessException;
 import com.socialretail.backend.dto.request.social.CommissionCalcRequest;
@@ -29,9 +30,11 @@ import java.util.LinkedHashMap;
 @Service
 public class CommissionServiceImpl implements CommissionService {
     private final JdbcTemplate jdbc;
+    private final ImageUrlResolver imageUrlResolver;
 
-    public CommissionServiceImpl(JdbcTemplate jdbc) {
+    public CommissionServiceImpl(JdbcTemplate jdbc, ImageUrlResolver imageUrlResolver) {
         this.jdbc = jdbc;
+        this.imageUrlResolver = imageUrlResolver;
     }
 
     @Override
@@ -42,7 +45,7 @@ public class CommissionServiceImpl implements CommissionService {
         Long total = jdbc.queryForObject("SELECT COUNT(*) " + from.sql(), Long.class, from.args().toArray());
         List<Object> args = pageArgs(from.args(), page, pageSize);
         List<DistributorResponses.PromotionOrder> list = jdbc.query("""
-                SELECT cr.id commission_id, cr.order_id, o.order_sn, mdp.merchant_id,
+                SELECT cr.id commission_id, cr.order_id, o.order_sn, p.merchant_id,
                   m.merchant_name, p.id product_id, p.title product_name, p.main_image,
                   o.pay_amount order_amount, mdp.commission_rate, cr.commission_amount,
                   cr.status, o.complete_time order_finish_time,
@@ -51,7 +54,7 @@ public class CommissionServiceImpl implements CommissionService {
                 (rs, n) -> new DistributorResponses.PromotionOrder(
                         rs.getLong("commission_id"), rs.getLong("order_id"), rs.getString("order_sn"),
                         rs.getLong("merchant_id"), rs.getString("merchant_name"), rs.getLong("product_id"),
-                        rs.getString("product_name"), rs.getString("main_image"), rs.getBigDecimal("order_amount"),
+                        rs.getString("product_name"), imageUrlResolver.resolve(rs.getString("main_image")), rs.getBigDecimal("order_amount"),
                         rs.getBigDecimal("commission_rate"), rs.getBigDecimal("commission_amount"),
                         rs.getInt("status"), rs.getInt("status") == 1 ? "已结算" : "冻结中",
                         time(rs.getTimestamp("order_finish_time")), time(rs.getTimestamp("settle_time"))),
@@ -260,7 +263,7 @@ public class CommissionServiceImpl implements CommissionService {
                 FROM commission_record cr
                 JOIN distributor_product dp ON dp.id=cr.distributor_product_id
                 JOIN merchant_distribution_product mdp ON mdp.id=dp.distribution_product_id
-                JOIN product p ON p.id=mdp.product_id JOIN merchant m ON m.id=mdp.merchant_id
+                JOIN product p ON p.id=mdp.product_id JOIN merchant m ON m.id=p.merchant_id
                 JOIN `order` o ON o.id=cr.order_id WHERE cr.distributor_id=?
                 """);
         List<Object> args = new ArrayList<>(List.of(distributorId));

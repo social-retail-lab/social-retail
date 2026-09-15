@@ -103,7 +103,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
-import { showToast, getValidImageUrl } from '@/utils/common'
+import { showToast, getValidImageUrl, safeBack } from '@/utils/common'
 import CustomTabBar from '@/components/global/CustomTabBar.vue'
 import { useOrder } from '@/hooks/useOrder'
 
@@ -124,11 +124,7 @@ const tabs = [
 ]
 
 const handleBack = () => {
-  uni.navigateBack({
-    fail: () => {
-      uni.switchTab({ url: '/pages/index/index' })
-    }
-  })
+  safeBack('/pages/mine/mine')
 }
 
 const goShopping = () => {

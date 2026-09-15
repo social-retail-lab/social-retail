@@ -68,6 +68,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { useMember } from '@/hooks/useMember'
 import { ref, computed } from 'vue'
 import { onShow, onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app'
@@ -94,7 +95,7 @@ const tabs = [
 ]
 
 const handleBack = () => {
-  uni.navigateBack()
+  safeBack('/pagesSub/member/point/pointMall')
 }
 
 const isIncome = (log) => {

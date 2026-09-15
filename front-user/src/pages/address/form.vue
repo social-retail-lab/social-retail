@@ -140,6 +140,7 @@ import { ref, reactive, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useAddress } from '@/hooks/useAddress'
 import { useAddressStore } from '@/store/address'
+import { safeBack } from '@/utils/common'
 
 const addressHook = useAddress()
 const addressStore = useAddressStore()
@@ -190,7 +191,7 @@ const fillAddressFromStore = async () => {
 }
 
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/address/list')
 }
 
 const handleDefaultChange = (e) => {

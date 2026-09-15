@@ -77,7 +77,8 @@ const validateOrderPreviewParams = (data) => {
   if (data?.usePoints !== undefined) {
     params.usePoints = !!data.usePoints
     if (data.usePoints) {
-      params.usePointsAmount = data?.usePointsAmount !== undefined ? Number(data.usePointsAmount) || 0 : null
+      const pointsAmount = Number(data?.usePointsAmount)
+      params.usePointsAmount = pointsAmount > 0 ? pointsAmount : null
     }
   }
   

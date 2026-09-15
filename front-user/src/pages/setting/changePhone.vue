@@ -57,6 +57,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, onUnmounted } from "vue"
 import { useUserProfile } from "@/hooks/useUserProfile"
 
@@ -66,7 +67,7 @@ const newPhone = ref('')
 const code = ref('')
 
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/setting/setting')
 }
 
 const handleSendCode = () => {

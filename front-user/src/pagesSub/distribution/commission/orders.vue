@@ -138,6 +138,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, computed } from 'vue'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import { useDistributor } from '@/hooks/useDistributor'
@@ -174,11 +175,7 @@ const getStatusStyle = (status) => {
 }
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/distribution/distHome')
 }
 
 // 搜索

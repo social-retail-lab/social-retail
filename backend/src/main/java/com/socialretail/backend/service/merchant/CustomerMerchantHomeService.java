@@ -20,9 +20,11 @@ import com.socialretail.backend.entity.member.MerchantCouponUser;
 import com.socialretail.backend.entity.product.Product;
 import com.socialretail.backend.entity.product.Sku;
 import com.socialretail.backend.entity.order.PickupPoint;
+import com.socialretail.backend.entity.promotion.MerchantCouponTier;
 import com.socialretail.backend.mapper.member.MerchantCouponMapper;
 import com.socialretail.backend.mapper.member.MerchantCouponUserMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.promotion.MerchantCouponTierMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.mapper.order.PickupPointMapper;
@@ -51,6 +53,7 @@ public class CustomerMerchantHomeService {
     private final SkuMapper skuMapper;
     private final MerchantCouponMapper couponMapper;
     private final MerchantCouponUserMapper couponUserMapper;
+    private final MerchantCouponTierMapper couponTierMapper;
     private final PickupPointMapper pickupPointMapper;
     private final ImageUrlResolver imageUrlResolver;
 
@@ -59,6 +62,7 @@ public class CustomerMerchantHomeService {
                                        SkuMapper skuMapper,
                                        MerchantCouponMapper couponMapper,
                                        MerchantCouponUserMapper couponUserMapper,
+                                       MerchantCouponTierMapper couponTierMapper,
                                        PickupPointMapper pickupPointMapper,
                                        ImageUrlResolver imageUrlResolver) {
         this.merchantMapper = merchantMapper;
@@ -66,6 +70,7 @@ public class CustomerMerchantHomeService {
         this.skuMapper = skuMapper;
         this.couponMapper = couponMapper;
         this.couponUserMapper = couponUserMapper;
+        this.couponTierMapper = couponTierMapper;
         this.pickupPointMapper = pickupPointMapper;
         this.imageUrlResolver = imageUrlResolver;
     }
@@ -194,12 +199,27 @@ public class CustomerMerchantHomeService {
                             .in(MerchantCouponUser::getCouponId, couponIds))
                     .forEach(record -> receivedCouponIds.add(record.getCouponId()));
         }
-        return coupons.stream().map(coupon -> new MerchantCouponSummary(
-                coupon.getId(), coupon.getTitle(), coupon.getType(), couponTypeText(coupon.getType()),
-                money(coupon.getMinConsume()), money(coupon.getDiscountAmount()),
-                Math.max(zero(coupon.getTotalCount()) - zero(coupon.getReceivedCount()), 0),
-                coupon.getPerUserLimit(), receivedCouponIds.contains(coupon.getId()),
-                coupon.getValidStart(), coupon.getValidEnd())).toList();
+        return coupons.stream().map(coupon -> {
+            BigDecimal minConsume = money(coupon.getMinConsume());
+            BigDecimal discountAmount = money(coupon.getDiscountAmount());
+            if (coupon.getType() != null && coupon.getType() == 2) {
+                List<MerchantCouponTier> tiers = couponTierMapper.selectList(
+                        Wrappers.<MerchantCouponTier>lambdaQuery()
+                                .eq(MerchantCouponTier::getCouponId, coupon.getId())
+                                .orderByAsc(MerchantCouponTier::getMinAmount)
+                                .last("LIMIT 1"));
+                if (!tiers.isEmpty()) {
+                    minConsume = money(tiers.get(0).getMinAmount());
+                    discountAmount = money(tiers.get(0).getDiscountAmount());
+                }
+            }
+            return new MerchantCouponSummary(
+                    coupon.getId(), coupon.getTitle(), coupon.getType(), couponTypeText(coupon.getType()),
+                    minConsume, discountAmount,
+                    Math.max(zero(coupon.getTotalCount()) - zero(coupon.getReceivedCount()), 0),
+                    coupon.getPerUserLimit(), receivedCouponIds.contains(coupon.getId()),
+                    coupon.getValidStart(), coupon.getValidEnd());
+        }).toList();
     }
 
     private Merchant requireMerchant(Long merchantId) {

@@ -108,6 +108,7 @@
 import { useMember } from '@/hooks/useMember'
 import { ref, computed } from 'vue'
 import { onShow, onReachBottom, onPullDownRefresh } from '@dcloudio/uni-app'
+import { safeBack } from '@/utils/common'
 
 const { memberStore, loadGrowthLogs, loadMemberInfo } = useMember()
 
@@ -183,7 +184,7 @@ const growthProgress = computed(() => {
 
 // 返回上一页
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pagesSub/member/memberHome')
 }
 
 // 切换类型

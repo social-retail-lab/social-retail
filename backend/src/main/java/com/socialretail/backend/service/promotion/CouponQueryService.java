@@ -194,8 +194,8 @@ public class CouponQueryService {
                                      BigDecimal amount, LocalDateTime now) {
         if (!Integer.valueOf(1).equals(type)) return "仅支持满减券";
         if (!Integer.valueOf(1).equals(status)) return "优惠券当前不可用";
-        if (start == null || now.isBefore(start)) return "优惠券尚未生效";
-        if (end == null || now.isAfter(end)) return "优惠券已过期";
+        if (start != null && now.isBefore(start)) return "优惠券尚未生效";
+        if (end != null && now.isAfter(end)) return "优惠券已过期";
         if (amount.compareTo(money(minimum)) < 0) return "未满足最低消费金额";
         return null;
     }

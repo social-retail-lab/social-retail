@@ -70,11 +70,11 @@
           </div>
           <div class="form-item">
             <label>开始时间</label>
-            <input v-model="dialog.form.startTime" class="form-input" placeholder="yyyy-MM-dd HH:mm:ss" />
+            <DateTimePicker v-model="dialog.form.startTime" />
           </div>
           <div class="form-item">
             <label>结束时间</label>
-            <input v-model="dialog.form.endTime" class="form-input" placeholder="yyyy-MM-dd HH:mm:ss" />
+            <DateTimePicker v-model="dialog.form.endTime" />
           </div>
         </div>
         <div class="dialog-footer">
@@ -129,6 +129,7 @@ import {
   deleteSeckill
 } from '@/api/marketing'
 import request from '@/utils/request'
+import DateTimePicker from '@/components/DateTimePicker.vue'
 
 // ==================== 工具函数 ====================
 const formatAmount = (val: any): string => {

@@ -119,6 +119,8 @@ const menus = [
 const logout = () => {
   localStorage.removeItem('merchantToken')
   localStorage.removeItem('merchantName')
+  localStorage.removeItem('merchantStatus')
+  localStorage.removeItem('merchantInfo')
   router.push('/login')
 }
 </script>

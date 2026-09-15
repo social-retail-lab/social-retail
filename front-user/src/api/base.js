@@ -42,12 +42,23 @@ const request = (options) => {
 
   const requestHeader = { ...defaultHeader, ...headers }
 
+  // GET请求：将params合并到data，uni.request会把data作为query string发送
+  let requestData = data
+  if (method.toUpperCase() === 'GET' && params && Object.keys(params).length > 0) {
+    const cleanParams = {}
+    Object.keys(params).forEach(k => {
+      if (params[k] !== null && params[k] !== undefined && params[k] !== '') {
+        cleanParams[k] = params[k]
+      }
+    })
+    requestData = { ...cleanParams, ...data }
+  }
+
   return new Promise((resolve, reject) => {
     uni.request({
       url: `${baseUrl}${url}`,
       method,
-      data,
-      params,
+      data: requestData,
       header: requestHeader,
       success: (res) => {
         const { data: responseData, statusCode } = res

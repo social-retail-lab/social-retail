@@ -106,7 +106,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAfterSale } from '@/hooks/useAfterSale'
-import { getValidImageUrl, formatPrice } from '@/utils/common'
+import { getValidImageUrl, formatPrice, safeBack } from '@/utils/common'
 import {
   AFTER_SALE_TABS,
   getAfterSaleStatusClass,
@@ -137,7 +137,7 @@ const statusTabs = AFTER_SALE_TABS
 const getStatusClass = (status) => getAfterSaleStatusClass(status)
 
 const handleBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/mine/mine')
 }
 
 const goOrderList = () => {

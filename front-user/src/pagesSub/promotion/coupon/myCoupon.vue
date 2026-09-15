@@ -117,6 +117,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, computed } from 'vue'
 import { onLoad, onShow, onUnload } from '@dcloudio/uni-app'
 import { useCoupon } from '@/hooks/useCoupon'
@@ -180,11 +181,7 @@ const formatValidity = (coupon) => {
 
 // 返回上一页
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pages/mine/mine')
 }
 
 // 切换状态 Tab

@@ -477,7 +477,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { showToast, getValidImageUrl } from '@/utils/common'
+import { showToast, getValidImageUrl, safeBack } from '@/utils/common'
 import { useOrder } from '@/hooks/useOrder'
 import { useAddress } from '@/hooks/useAddress'
 import { useCart } from '@/hooks/useCart'
@@ -500,8 +500,8 @@ const platformCouponUserId = ref(null)
 const useMerchantCoupon = ref(true)
 const merchantCouponUserId = ref(null)
 
-// 积分抵扣
-const usePoints = ref(false)
+// 积分抵扣（默认开启以自动计算最优价格；用户可手动关闭）
+const usePoints = ref(true)
 const usePointsAmount = ref('')
 
 // 活动上下文
@@ -640,7 +640,7 @@ const formatSkuSpecs = (skuSpecs) => {
 }
 
 const handleBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/index/index')
 }
 
 // ==================== previewToken 过期管理 ====================
@@ -695,13 +695,23 @@ defineExpose({
 })
 
 const selectPickupPoint = async () => {
-  // 从 cartItemIds 匹配的购物车商品获取 merchantId（不能取 cartList[0]，可能不是当前结算商品）
-  const targetCartItem = cartHook.cartStore.cartList?.find(
-    item => cartItemIds.value.includes(item.cartItemId)
-  )
-  const merchantId = previewData.value.itemList?.[0]?.merchantId
-    || targetCartItem?.merchantId
-    || null
+  // 优先从预览数据取 merchantId（配送模式下预览已包含 itemList）
+  let merchantId = previewData.value.itemList?.[0]?.merchantId || null
+
+  // 否则从购物车列表匹配的结算商品取（不能取 cartList[0]，可能不是当前结算商品）
+  if (!merchantId) {
+    let targetCartItem = cartHook.cartStore.cartList?.find(
+      item => cartItemIds.value.includes(item.cartItemId)
+    )
+    // 立即购买等场景下 cartList 未加载，先拉取一次购物车
+    if (!targetCartItem && cartItemIds.value.length > 0) {
+      await cartHook.loadCartData()
+      targetCartItem = cartHook.cartStore.cartList?.find(
+        item => cartItemIds.value.includes(item.cartItemId)
+      )
+    }
+    merchantId = targetCartItem?.merchantId || null
+  }
 
   if (!merchantId) {
     showToast('无法获取商家信息')
@@ -872,8 +882,12 @@ const onRemarkBlur = () => {
 
 // ==================== 默认地址加载 ====================
 const fetchDefaultAddress = async () => {
-  const res = await addressHook.loadDefaultAddress()
-  // 只有当返回的地址有有效 addressId 时才设置
+  let res = await addressHook.loadDefaultAddress()
+  // 没有默认地址时，回退到地址列表第一条（列表已按 is_default DESC, id DESC 排序）
+  if (!res || !res.addressId) {
+    const list = await addressHook.loadAddressList()
+    res = (list && list.length > 0) ? list[0] : null
+  }
   if (res && res.addressId) {
     addressInfo.value = {
       addressId: res.addressId,
@@ -1025,7 +1039,12 @@ const submitOrder = async () => {
 // ==================== 立即购买处理 ====================
 const handleBuyNow = async (skuId, quantity) => {
   try {
-    const result = await cartHook.cartStore.addCartItem({ skuId, quantity })
+    const promotionCode = uni.getStorageSync('promotionCode') || ''
+    const params = { skuId, quantity }
+    if (promotionCode) {
+      params.promotionCode = promotionCode
+    }
+    const result = await cartHook.cartStore.addCartItem(params)
     if (result && (result.cartItemId || result.cartId)) {
       const cartItemId = result.cartItemId || result.cartId
       // 后端可能对相同 SKU 累加数量（如购物车已有2件，立即购买1件→变成3件）
@@ -1099,6 +1118,23 @@ const initOrderData = async () => {
   // 配送方式下加载默认地址
   if (deliveryType.value === 1) {
     await fetchDefaultAddress()
+    // 没有任何收货地址：提示添加并跳过预览（预览会因缺地址而 400）
+    if (!addressId.value) {
+      uni.showModal({
+        title: '提示',
+        content: '您还没有收货地址，请先添加',
+        confirmText: '去添加',
+        cancelText: '返回',
+        success: (modalRes) => {
+          if (modalRes.confirm) {
+            uni.navigateTo({ url: '/pages/address/form' })
+          } else {
+            safeBack('/pages/index/index')
+          }
+        }
+      })
+      return
+    }
   }
 
   if (cartItemIds.value.length > 0) {

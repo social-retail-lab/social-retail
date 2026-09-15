@@ -79,8 +79,8 @@ public class PlatformCouponPricingService {
             Coupon coupon = couponMapper.selectById(userCoupon.getCouponId());
             if (coupon == null || !Integer.valueOf(1).equals(coupon.getType())
                     || !Integer.valueOf(1).equals(coupon.getStatus())
-                    || coupon.getValidStart() == null || coupon.getValidEnd() == null
-                    || now.isBefore(coupon.getValidStart()) || now.isAfter(coupon.getValidEnd())
+                    || (coupon.getValidStart() != null && now.isBefore(coupon.getValidStart()))
+                    || (coupon.getValidEnd() != null && now.isAfter(coupon.getValidEnd()))
                     || amount.compareTo(money(coupon.getMinConsume())) < 0) continue;
             result.add(new Entry(userCoupon, coupon));
         }

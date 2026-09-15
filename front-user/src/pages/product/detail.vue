@@ -5,11 +5,8 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 
-// 兼容后端生成的旧版推广链接路径 /pages/product/detail
-// 自动重定向到真实商品详情页 /pagesSub/goods/detail/goodsDetail
 onLoad((options) => {
   const opts = options || {}
   const params = Object.keys(opts)
@@ -20,13 +17,15 @@ onLoad((options) => {
     ? `/pagesSub/goods/detail/goodsDetail?${params}`
     : '/pagesSub/goods/detail/goodsDetail'
 
-  console.log('推广链接重定向:', targetUrl)
+  // 保存推广码到本地存储（URL 参数优先）
+  if (opts.promotionCode) {
+    uni.setStorageSync('promotionCode', opts.promotionCode)
+  }
 
-  // 使用 redirectTo 替换当前页面，避免页面栈中残留中转页
+  // 免登录浏览：直接重定向到商品详情页
   uni.redirectTo({
     url: targetUrl,
     fail: () => {
-      // 如果 redirectTo 失败（如目标页是 tabBar），使用 reLaunch
       uni.reLaunch({ url: targetUrl })
     }
   })

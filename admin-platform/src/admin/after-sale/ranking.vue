@@ -2,6 +2,7 @@
   <div class="ranking-page">
     <div class="page-header">
       <h2>售后率排行</h2>
+      <p class="formula-hint">商家售后率采用贝叶斯平滑：售后单数 ÷ (完成订单数 + 10) × 100%，虚拟10单避免小样本失真</p>
     </div>
 
     <div class="table-container">
@@ -12,7 +13,9 @@
             <th>商家名字</th>
             <th>联系人名字</th>
             <th>联系电话</th>
-            <th>售后率</th>
+            <th>完成订单数</th>
+            <th>售后单数</th>
+            <th>售后率(贝叶斯)</th>
           </tr>
         </thead>
         <tbody>
@@ -21,12 +24,14 @@
             <td>{{ item.merchantName }}</td>
             <td>{{ item.contactName || '-' }}</td>
             <td>{{ item.contactPhone || '-' }}</td>
+            <td>{{ item.orderCount }}</td>
+            <td>{{ item.afterSaleCount }}</td>
             <td>
-              <span class="rate-value">{{ item.rate }}</span>
+              <span class="rate-value">{{ item.rate }}%</span>
             </td>
           </tr>
           <tr v-if="list.length === 0 && !loading">
-            <td colspan="5" class="empty-cell">暂无数据</td>
+            <td colspan="7" class="empty-cell">暂无数据</td>
           </tr>
         </tbody>
       </table>
@@ -108,6 +113,12 @@ onMounted(fetchData)
 .page-header h2 {
   font-size: 20px;
   color: #1D2129;
+  margin: 0 0 6px 0;
+}
+
+.formula-hint {
+  font-size: 12px;
+  color: #86909C;
   margin: 0;
 }
 

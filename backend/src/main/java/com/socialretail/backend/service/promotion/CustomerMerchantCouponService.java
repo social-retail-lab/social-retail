@@ -8,9 +8,11 @@ import com.socialretail.backend.dto.promotion.PromotionApiModels.MerchantCouponR
 import com.socialretail.backend.entity.member.Merchant;
 import com.socialretail.backend.entity.member.MerchantCoupon;
 import com.socialretail.backend.entity.member.MerchantCouponUser;
+import com.socialretail.backend.entity.promotion.MerchantCouponTier;
 import com.socialretail.backend.mapper.member.MerchantCouponMapper;
 import com.socialretail.backend.mapper.member.MerchantCouponUserMapper;
 import com.socialretail.backend.mapper.member.MerchantMapper;
+import com.socialretail.backend.mapper.promotion.MerchantCouponTierMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -26,6 +28,7 @@ public class CustomerMerchantCouponService {
     private final MerchantCouponMapper couponMapper;
     private final MerchantCouponUserMapper merchantCouponUserMapper;
     private final MerchantMapper merchantMapper;
+    private final MerchantCouponTierMapper couponTierMapper;
     private final TransactionTemplate transactionTemplate;
 
     // No idempotency table exists in the required schema. This cache provides process-lifetime idempotency.
@@ -35,10 +38,12 @@ public class CustomerMerchantCouponService {
     public CustomerMerchantCouponService(MerchantCouponMapper couponMapper,
                                          MerchantCouponUserMapper merchantCouponUserMapper,
                                          MerchantMapper merchantMapper,
+                                         MerchantCouponTierMapper couponTierMapper,
                                          TransactionTemplate transactionTemplate) {
         this.couponMapper = couponMapper;
         this.merchantCouponUserMapper = merchantCouponUserMapper;
         this.merchantMapper = merchantMapper;
+        this.couponTierMapper = couponTierMapper;
         this.transactionTemplate = transactionTemplate;
     }
 
@@ -47,7 +52,6 @@ public class CustomerMerchantCouponService {
         List<MerchantCoupon> all = couponMapper.selectList(Wrappers.<MerchantCoupon>lambdaQuery()
                 .eq(MerchantCoupon::getMerchantId, merchantId)
                 .eq(MerchantCoupon::getStatus, 1)
-                .eq(MerchantCoupon::getType, 1)
                 .le(MerchantCoupon::getValidStart, now)
                 .ge(MerchantCoupon::getValidEnd, now)
                 .apply("received_count < total_count")
@@ -62,8 +66,22 @@ public class CustomerMerchantCouponService {
             int totalCount = zero(coupon.getTotalCount());
             int receivedCount = zero(coupon.getReceivedCount());
             int limit = zero(coupon.getPerUserLimit());
-            return new MerchantCouponItem(coupon.getId(), coupon.getTitle(), coupon.getType(), "满减券",
-                    money(coupon.getMinConsume()), money(coupon.getDiscountAmount()), totalCount,
+            BigDecimal minConsume = money(coupon.getMinConsume());
+            BigDecimal discountAmount = money(coupon.getDiscountAmount());
+            String typeText = Integer.valueOf(1).equals(coupon.getType()) ? "满减券" : "优惠券";
+            if (Integer.valueOf(2).equals(coupon.getType())) {
+                List<MerchantCouponTier> tiers = couponTierMapper.selectList(
+                        Wrappers.<MerchantCouponTier>lambdaQuery()
+                                .eq(MerchantCouponTier::getCouponId, coupon.getId())
+                                .orderByAsc(MerchantCouponTier::getMinAmount)
+                                .last("LIMIT 1"));
+                if (!tiers.isEmpty()) {
+                    minConsume = money(tiers.get(0).getMinAmount());
+                    discountAmount = money(tiers.get(0).getDiscountAmount());
+                }
+            }
+            return new MerchantCouponItem(coupon.getId(), coupon.getTitle(), coupon.getType(), typeText,
+                    minConsume, discountAmount, totalCount,
                     receivedCount, Math.max(totalCount - receivedCount, 0), limit,
                     receivedByUser >= limit, coupon.getValidStart(), coupon.getValidEnd());
         }).toList();
@@ -96,7 +114,7 @@ public class CustomerMerchantCouponService {
         MerchantCoupon coupon = couponMapper.selectByIdForUpdate(couponId);
         if (coupon == null) throw error(40481, HttpStatus.NOT_FOUND, "商家优惠券不存在", null);
         LocalDateTime now = LocalDateTime.now();
-        if (!Integer.valueOf(1).equals(coupon.getType())
+        if (!Integer.valueOf(1).equals(coupon.getType()) && !Integer.valueOf(2).equals(coupon.getType())
                 || !Integer.valueOf(1).equals(coupon.getStatus()) || coupon.getValidStart() == null
                 || now.isBefore(coupon.getValidStart())) {
             throw error(40983, HttpStatus.CONFLICT, "商家优惠券当前不可领取",

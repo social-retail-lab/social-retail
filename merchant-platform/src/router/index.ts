@@ -8,8 +8,18 @@ const routes = [
   },
   {
     path: '/register',
-    name: '商家入驻',
+    name: '商家注册',
     component: () => import('@/merchant/register.vue')
+  },
+  {
+    path: '/onboarding',
+    name: '入驻申请',
+    component: () => import('@/merchant/onboarding/index.vue')
+  },
+  {
+    path: '/pending-review',
+    name: '待审核',
+    component: () => import('@/merchant/pending-review/index.vue')
   },
   {
     path: '/',
@@ -81,15 +91,41 @@ const router = createRouter({
   routes
 })
 
+const PUBLIC_PATHS = ['/login', '/register', '/onboarding', '/pending-review']
+
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('merchantToken')
-  if (to.path === '/login' || to.path === '/register') {
-    return next()
-  }
+  const status = localStorage.getItem('merchantStatus')
+
   if (!token) {
+    if (to.path === '/login' || to.path === '/register') {
+      return next()
+    }
     return next('/login')
   }
+
+  // 已登录用户访问登录/注册页，按状态跳转
+  if (to.path === '/login' || to.path === '/register') {
+    return next(getRedirectByStatus(status))
+  }
+
+  // onboarding 和 pending-review 页面已登录即可访问
+  if (PUBLIC_PATHS.includes(to.path)) {
+    return next()
+  }
+
+  // 其他页面（Layout 下的功能页）只有 status=2 才能访问
+  if (status !== '2') {
+    return next(getRedirectByStatus(status))
+  }
+
   next()
 })
+
+function getRedirectByStatus(status: string | null) {
+  if (status === '1') return '/pending-review'
+  if (status === '0' || status === '3') return '/onboarding'
+  return '/dashboard'
+}
 
 export default router

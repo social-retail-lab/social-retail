@@ -450,10 +450,13 @@ public class DashboardController {
         return Result.ok(result);
     }
 
-    // ========== 售后申请率（按月折线图+环比） ==========
+    // ========== 售后申请率（按月折线图+环比 + 商家排行） ==========
     @GetMapping("/after-sale-rate")
-    public Result<Map<String, Object>> afterSaleRate() {
-        log.info("[运营看板] 售后申请率");
+    public Result<Map<String, Object>> afterSaleRate(
+            @RequestParam(required = false, defaultValue = "desc") String sortOrder,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer pageSize) {
+        log.info("[运营看板] 售后申请率 sortOrder={} page={} pageSize={}", sortOrder, page, pageSize);
 
         List<Order> allOrders = orderMapper.selectList(null);
         List<AfterSale> allAfterSales = afterSaleMapper.selectList(null);
@@ -461,7 +464,7 @@ public class DashboardController {
         LocalDate now = LocalDate.now();
         List<Map<String, Object>> monthly = new ArrayList<>();
 
-        // 只取近3个月
+        // ===== 平台总售后率（按月）— 公式不变 =====
         for (int i = 2; i >= 0; i--) {
             LocalDate monthStart = now.minusMonths(i).withDayOfMonth(1);
             LocalDate monthEnd = monthStart.plusMonths(1);
@@ -508,12 +511,73 @@ public class DashboardController {
                 ? curBd.subtract(prevBd).divide(prevBd, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP).toString() + "%"
                 : (curBd.compareTo(BigDecimal.ZERO) > 0 ? "新增" : "0%");
 
+        // ===== 商家单独售后率（贝叶斯平滑） =====
+        // 总订单数按 status=4 统计，售后数全量统计
+        Map<Long, Long> merchantOrderCounts = allOrders.stream()
+                .filter(o -> o.getStatus() != null && o.getStatus() == 4 && o.getMerchantId() != null)
+                .collect(Collectors.groupingBy(Order::getMerchantId, Collectors.counting()));
+
+        Map<Long, Long> merchantAfterSaleCounts = allAfterSales.stream()
+                .filter(a -> a.getMerchantId() != null)
+                .collect(Collectors.groupingBy(AfterSale::getMerchantId, Collectors.counting()));
+
+        Set<Long> allMerchantIds = new HashSet<>();
+        allMerchantIds.addAll(merchantOrderCounts.keySet());
+        allMerchantIds.addAll(merchantAfterSaleCounts.keySet());
+
+        Map<Long, Merchant> merchantMap = new HashMap<>();
+        if (!allMerchantIds.isEmpty()) {
+            for (Merchant m : merchantMapper.selectBatchIds(allMerchantIds)) {
+                merchantMap.put(m.getId(), m);
+            }
+        }
+
+        final int VIRTUAL_ORDERS = 10;
+        List<Map<String, Object>> merchantList = new ArrayList<>();
+        for (Long merchantId : allMerchantIds) {
+            long orderCount = merchantOrderCounts.getOrDefault(merchantId, 0L);
+            long afterSaleCount = merchantAfterSaleCounts.getOrDefault(merchantId, 0L);
+            // 贝叶斯公式: 售后订单数 / (总订单数 + 10) × 100%
+            BigDecimal bayesianRate = BigDecimal.valueOf(afterSaleCount)
+                    .multiply(BigDecimal.valueOf(100))
+                    .divide(BigDecimal.valueOf(orderCount + VIRTUAL_ORDERS), 2, RoundingMode.HALF_UP);
+
+            Merchant merchant = merchantMap.get(merchantId);
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("merchantId", merchantId);
+            item.put("merchantName", merchant != null ? merchant.getMerchantName() : "商家" + merchantId);
+            item.put("contactName", merchant != null ? merchant.getContactName() : null);
+            item.put("contactPhone", merchant != null ? merchant.getContactPhone() : null);
+            item.put("orderCount", orderCount);
+            item.put("afterSaleCount", afterSaleCount);
+            item.put("rate", bayesianRate.toString());
+            merchantList.add(item);
+        }
+
+        boolean desc = !"asc".equalsIgnoreCase(sortOrder);
+        merchantList.sort((a, b) -> {
+            BigDecimal rateA = new BigDecimal((String) a.get("rate"));
+            BigDecimal rateB = new BigDecimal((String) b.get("rate"));
+            return desc ? rateB.compareTo(rateA) : rateA.compareTo(rateB);
+        });
+
+        int total = merchantList.size();
+        int effectivePageSize = pageSize != null && pageSize > 0 ? pageSize : 15;
+        int effectivePage = page != null && page > 0 ? page : 1;
+        int fromIndex = Math.min((effectivePage - 1) * effectivePageSize, total);
+        int toIndex = Math.min(fromIndex + effectivePageSize, total);
+        List<Map<String, Object>> pagedMerchants = fromIndex < toIndex
+                ? new ArrayList<>(merchantList.subList(fromIndex, toIndex))
+                : Collections.emptyList();
+
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("monthly", monthly);
         result.put("currentRate", curRate + "%");
         result.put("prevRate", prev != null ? prevRate + "%" : "暂无数据");
         result.put("growth", growth);
         result.put("currentMonth", cur.get("month"));
+        result.put("merchants", pagedMerchants);
+        result.put("total", total);
 
         return Result.ok(result);
     }

@@ -175,6 +175,7 @@ import { ref, computed } from 'vue'
 import { onShow, onUnload } from '@dcloudio/uni-app'
 import { useDistributor } from '@/hooks/useDistributor'
 import SharePromotionPopup from '@/components/business/SharePromotionPopup.vue'
+import { safeBack } from '@/utils/common'
 
 const statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 20
 
@@ -242,11 +243,7 @@ const getStatusStyle = (status) => {
 
 // 事件处理
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/distribution/distHome')
 }
 
 const handleSearch = () => {

@@ -126,7 +126,7 @@
 import { reactive } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useComment } from '@/hooks/useComment'
-import { getValidImageUrl } from '@/utils/common'
+import { getValidImageUrl, safeBack } from '@/utils/common'
 
 const statusBarHeight = uni.getSystemInfoSync().statusBarHeight || 20
 
@@ -152,11 +152,7 @@ const productInfo = reactive({
 })
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pages/mine/mine')
 }
 
 // 切换匿名

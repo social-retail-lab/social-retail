@@ -149,6 +149,7 @@ import { ref, computed } from 'vue'
 import { onShow, onLoad } from '@dcloudio/uni-app'
 import { useAddress } from '@/hooks/useAddress'
 import { useAddressStore } from '@/store/address'
+import { safeBack } from '@/utils/common'
 
 const addressHook = useAddress()
 const addressStore = useAddressStore()
@@ -180,7 +181,7 @@ onLoad((options) => {
 })
 
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/mine/mine')
 }
 
 const loadList = async () => {

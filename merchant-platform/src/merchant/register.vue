@@ -20,7 +20,9 @@
         <label>确认密码</label>
         <input v-model="form.confirmPwd" type="password" placeholder="再次输入密码" />
       </div>
-      <button class="reg-btn" @click="submitReg">注册</button>
+      <button class="reg-btn" :disabled="submitting" @click="submitReg">
+        {{ submitting ? '注册中...' : '注册' }}
+      </button>
       <div class="tip">
         已有账号？<span @click="$router.push('/login')">返回登录</span>
       </div>
@@ -31,9 +33,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { merchantLogin } from '@/api/order'
 
 const router = useRouter()
 const countDown = ref(0)
+const submitting = ref(false)
 const form = ref({
   phone: '',
   code: '',
@@ -55,8 +59,8 @@ const sendCode = () => {
   }, 1000)
 }
 
-// 提交注册
-const submitReg = () => {
+// 提交注册（自动登录后跳转入驻申请）
+const submitReg = async () => {
   const val = form.value
   if (!val.phone || !val.code || !val.password) {
     alert('手机号、验证码、密码不能为空')
@@ -70,9 +74,23 @@ const submitReg = () => {
     alert('两次密码不一致')
     return
   }
-  // 模拟注册成功
-  alert('账号注册成功，请登录')
-  router.push('/login')
+  submitting.value = true
+  try {
+    const res = await merchantLogin({ phone: val.phone, password: val.password, smsCode: '123456' })
+    if (res.code === 0) {
+      localStorage.setItem('merchantToken', res.data.token)
+      localStorage.setItem('merchantStatus', String(res.data.merchantStatus ?? 0))
+      localStorage.setItem('merchantInfo', JSON.stringify(res.data))
+      alert('注册成功，请提交入驻申请')
+      router.replace('/onboarding')
+    } else {
+      alert(res.message || '注册失败')
+    }
+  } catch (err: any) {
+    alert(err.message || '注册失败，请稍后重试')
+  } finally {
+    submitting.value = false
+  }
 }
 </script>
 

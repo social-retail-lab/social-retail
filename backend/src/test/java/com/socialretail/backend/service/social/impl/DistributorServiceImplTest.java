@@ -31,9 +31,9 @@ class DistributorServiceImplTest {
     @Test
     void buildsFrontendProductPromotionUrlFromConfiguredBaseUrl() {
         assertEquals(
-                "http://172.20.10.2:5173/pages/product/detail?id=6014&promotionCode=PRxxx",
+                "http://localhost:5173/pages/product/detail?id=6014&promotionCode=PRxxx",
                 DistributorServiceImpl.buildPromotionUrl(
-                        "http://172.20.10.2:5173/", 6014L, "PRxxx"));
+                        "http://localhost:5173/", 6014L, "PRxxx"));
     }
 
     @Test
@@ -50,9 +50,9 @@ class DistributorServiceImplTest {
                 org.mockito.Mockito.mock(JdbcTemplate.class),
                 org.mockito.Mockito.mock(LocalImageStorageService.class),
                 org.mockito.Mockito.mock(ImageUrlResolver.class),
-                tempDir.toString(), "", "http://172.20.10.2:5173");
+                tempDir.toString(), "", "http://localhost:5173");
         String promotionUrl = DistributorServiceImpl.buildPromotionUrl(
-                "http://172.20.10.2:5173", 6014L, "PRxxx");
+                "http://localhost:5173", 6014L, "PRxxx");
 
         service.generateQr("PRxxx", promotionUrl);
 

@@ -122,6 +122,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, computed, onMounted } from 'vue'
 import { useComment } from '@/hooks/useComment'
 
@@ -143,11 +144,7 @@ const commentId = ref(null)
 const commentDetail = computed(() => commentStore.currentComment)
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/order/comment/myComments')
 }
 
 // 获取用户头像（匿名用户用默认头像）

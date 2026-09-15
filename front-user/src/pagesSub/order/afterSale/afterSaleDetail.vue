@@ -113,7 +113,7 @@ import { ref, computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useAfterSale } from '@/hooks/useAfterSale'
 import { useFile } from '@/hooks/useFile'
-import { getValidImageUrl, formatPrice } from '@/utils/common'
+import { getValidImageUrl, formatPrice, safeBack } from '@/utils/common'
 import {
   AFTER_SALE_STATUS,
   getAfterSaleStatusClass,
@@ -145,7 +145,7 @@ const canCancel = computed(() => detail.value && isAfterSaleCancellable(detail.v
 const canSupplyEvidence = computed(() => detail.value && detail.value.status === AFTER_SALE_STATUS.APPLYING)
 
 const handleBack = () => {
-  uni.navigateBack()
+  safeBack('/pagesSub/order/afterSaleList')
 }
 
 // 状态对应样式类(使用常量)

@@ -172,7 +172,7 @@ import { ref, computed } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useAfterSale } from '@/hooks/useAfterSale'
 import { useFile } from '@/hooks/useFile'
-import { showToast, getValidImageUrl, formatPrice } from '@/utils/common'
+import { showToast, getValidImageUrl, formatPrice, safeBack } from '@/utils/common'
 import {
   AFTER_SALE_TYPE,
   AFTER_SALE_TYPE_TEXT,
@@ -227,7 +227,7 @@ onLoad((options) => {
 })
 
 const handleBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/mine/mine')
 }
 
 // 退款金额失焦校验：保留两位小数 + 限制上限

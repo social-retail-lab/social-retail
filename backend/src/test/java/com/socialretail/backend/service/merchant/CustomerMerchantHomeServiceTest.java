@@ -15,6 +15,7 @@ import com.socialretail.backend.mapper.member.MerchantMapper;
 import com.socialretail.backend.mapper.product.ProductMapper;
 import com.socialretail.backend.mapper.product.SkuMapper;
 import com.socialretail.backend.mapper.order.PickupPointMapper;
+import com.socialretail.backend.mapper.promotion.MerchantCouponTierMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ class CustomerMerchantHomeServiceTest {
     @Mock private SkuMapper skuMapper;
     @Mock private MerchantCouponMapper couponMapper;
     @Mock private MerchantCouponUserMapper couponUserMapper;
+    @Mock private MerchantCouponTierMapper couponTierMapper;
     @Mock private PickupPointMapper pickupPointMapper;
     @Mock private ImageUrlResolver imageUrlResolver;
 
@@ -48,7 +50,7 @@ class CustomerMerchantHomeServiceTest {
     @BeforeEach
     void setUp() {
         service = new CustomerMerchantHomeService(merchantMapper, productMapper, skuMapper, couponMapper,
-                couponUserMapper, pickupPointMapper, imageUrlResolver);
+                couponUserMapper, couponTierMapper, pickupPointMapper, imageUrlResolver);
         lenient().when(imageUrlResolver.resolve(any()))
                 .thenAnswer(invocation -> invocation.getArgument(0));
     }

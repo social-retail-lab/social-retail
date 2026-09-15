@@ -28,6 +28,22 @@ export const useCartStore = defineStore('cart', () => {
     return selectedItems.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
   })
 
+  const previewPriceDetail = computed(() => checkoutPreviewData.value?.priceDetail || null)
+  const previewPayAmount = computed(() => previewPriceDetail.value?.payAmount ?? null)
+  const previewTotalDiscount = computed(() => {
+    if (!previewPriceDetail.value) return 0
+    const detail = previewPriceDetail.value
+    return (detail.seckillDiscount || 0)
+      + (detail.bargainDiscount || 0)
+      + (detail.promotionDiscount || 0)
+      + (detail.platformCouponDiscount || 0)
+      + (detail.merchantCouponDiscount || 0)
+      + (detail.pointsDeduction || 0)
+  })
+  const previewPointsInfo = computed(() => checkoutPreviewData.value?.pointsInfo || null)
+  const previewCouponInfo = computed(() => checkoutPreviewData.value?.couponInfo || null)
+  const previewAvailableCoupons = computed(() => checkoutPreviewData.value?.availableCoupons || null)
+
   const hasSelectedItems = computed(() => {
     return selectedItems.value.length > 0
   })
@@ -195,6 +211,12 @@ export const useCartStore = defineStore('cart', () => {
     selectedItems,
     selectedCount,
     selectedTotal,
+    previewPriceDetail,
+    previewPayAmount,
+    previewTotalDiscount,
+    previewPointsInfo,
+    previewCouponInfo,
+    previewAvailableCoupons,
     hasSelectedItems,
     toggleSelect,
     toggleAllSelect,

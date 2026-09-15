@@ -174,6 +174,7 @@
 import { ref, onUnmounted } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import { useAuth } from '@/hooks/useAuth'
+import { safeBack } from '@/utils/common'
 
 const {
   countdown,
@@ -211,7 +212,7 @@ const bindForm = ref({
 
 const agreeCheck = ref(false)
 
-const goBack = () => uni.navigateBack()
+const goBack = () => safeBack('/pages/index/index')
 const showAgreement = () => {}
 const showPrivacy = () => {}
 

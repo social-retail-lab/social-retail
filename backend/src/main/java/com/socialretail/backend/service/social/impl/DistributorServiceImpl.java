@@ -128,17 +128,17 @@ public class DistributorServiceImpl implements DistributorService {
         StringBuilder where = new StringBuilder(" WHERE mdp.status=1 AND p.status=1 AND m.status=1");
         List<Object> filters = new ArrayList<>();
         if (keyword != null && !keyword.isBlank()) { where.append(" AND p.title LIKE ?"); filters.add("%" + keyword.trim() + "%"); }
-        if (merchantId != null) { where.append(" AND mdp.merchant_id=?"); filters.add(merchantId); }
+        if (merchantId != null) { where.append(" AND p.merchant_id=?"); filters.add(merchantId); }
         String from = """
                 FROM merchant_distribution_product mdp JOIN product p ON p.id=mdp.product_id
-                JOIN merchant m ON m.id=mdp.merchant_id
+                JOIN merchant m ON m.id=p.merchant_id
                 LEFT JOIN (SELECT product_id, MIN(price) price FROM sku GROUP BY product_id) s ON s.product_id=p.id
                 """ + where;
         Long total = jdbc.queryForObject("SELECT COUNT(*) " + from, Long.class, filters.toArray());
         List<Object> args = new ArrayList<>(List.of(distributorId)); args.addAll(filters);
         args.add((page - 1) * pageSize); args.add(pageSize);
         List<DistributorResponses.AvailableProduct> list = jdbc.query("""
-                SELECT mdp.id distribution_product_id, mdp.merchant_id, m.merchant_name,
+                SELECT mdp.id distribution_product_id, p.merchant_id, m.merchant_name,
                   p.id product_id, p.title product_name, p.main_image, s.price, mdp.commission_rate,
                   EXISTS(SELECT 1 FROM distributor_product dp WHERE dp.distributor_id=?
                     AND dp.distribution_product_id=mdp.id) already_promoted
@@ -207,13 +207,13 @@ public class DistributorServiceImpl implements DistributorService {
         if (status != null) { filter.append(" AND dp.status=?"); args.add(status); }
         String from = """
                 FROM distributor_product dp JOIN merchant_distribution_product mdp ON mdp.id=dp.distribution_product_id
-                JOIN product p ON p.id=mdp.product_id JOIN merchant m ON m.id=mdp.merchant_id
+                JOIN product p ON p.id=mdp.product_id JOIN merchant m ON m.id=p.merchant_id
                 LEFT JOIN (SELECT product_id,MIN(price) price FROM sku GROUP BY product_id) s ON s.product_id=p.id
                 """ + filter;
         Long total = jdbc.queryForObject("SELECT COUNT(*) " + from, Long.class, args.toArray());
         args.add((page - 1) * pageSize); args.add(pageSize);
         List<DistributorResponses.MyProduct> list = jdbc.query("""
-                SELECT dp.id,dp.distribution_product_id,mdp.merchant_id,m.merchant_name,p.id product_id,
+                SELECT dp.id,dp.distribution_product_id,p.merchant_id,m.merchant_name,p.id product_id,
                   p.title product_name,p.main_image,s.price,mdp.commission_rate,dp.promotion_code,
                   dp.promotion_url,dp.qr_code,dp.status,dp.create_time
                 """ + from + " ORDER BY dp.create_time DESC,dp.id DESC LIMIT ?,?",
@@ -234,13 +234,13 @@ public class DistributorServiceImpl implements DistributorService {
         Long distributorId = number(requireDistributor(userId).get("id")).longValue();
         List<Map<String, Object>> rows = jdbc.queryForList("""
                 SELECT dp.id distributor_product_id, dp.distribution_product_id,
-                  mdp.merchant_id, m.merchant_name, p.id product_id, p.title product_name,
+                  p.merchant_id, m.merchant_name, p.id product_id, p.title product_name,
                   p.sub_title, p.main_image, s.price, mdp.commission_rate,
                   dp.promotion_code, dp.promotion_url, dp.qr_code, dp.status, dp.create_time
                 FROM distributor_product dp
                 JOIN merchant_distribution_product mdp ON mdp.id=dp.distribution_product_id
                 JOIN product p ON p.id=mdp.product_id
-                JOIN merchant m ON m.id=mdp.merchant_id
+                JOIN merchant m ON m.id=p.merchant_id
                 LEFT JOIN (SELECT product_id,MIN(price) price FROM sku GROUP BY product_id) s
                   ON s.product_id=p.id
                 WHERE dp.id=? AND dp.distributor_id=?

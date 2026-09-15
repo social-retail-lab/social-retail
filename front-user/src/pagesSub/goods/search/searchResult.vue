@@ -287,6 +287,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useGoods } from '@/hooks/useGoods'
+import { safeBack } from '@/utils/common'
 
 const { loadSearchProducts, loadBrandList, loadCategoryTree } = useGoods()
 
@@ -338,11 +339,7 @@ const formatPrice = (price) => {
 }
 
 const goBack = () => {
-  uni.navigateBack({
-    fail: () => {
-      uni.switchTab({ url: '/pages/index/index' })
-    }
-  })
+  safeBack('/pages/index/index')
 }
 
 const goShopping = () => {

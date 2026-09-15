@@ -62,6 +62,7 @@
 <script setup>
 import { ref } from "vue"
 import { useUserProfile } from "@/hooks/useUserProfile"
+import { safeBack } from '@/utils/common'
 
 const userProfileHook = useUserProfile()
 
@@ -70,7 +71,7 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 
 const goBack = () => {
-  uni.navigateBack()
+  safeBack('/pages/setting/setting')
 }
 
 const handleSubmit = () => {

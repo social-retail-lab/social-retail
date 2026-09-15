@@ -7,7 +7,13 @@ onLaunch(() => {
   initUserLogin()
 })
 
+// 首次 onShow 跳过登录检查，让目标页自行处理（支持直接打开推广链接等场景）
+let isFirstShow = true
 onShow(() => {
+  if (isFirstShow) {
+    isFirstShow = false
+    return
+  }
   checkLoginStatus()
 })
 
@@ -45,21 +51,25 @@ const checkLoginStatus = () => {
   const userStore = useUserStore()
   if (!userStore.isLogin) {
     const pages = getCurrentPages()
+    // 首次启动时页面栈为空，跳过检查，让页面 onLoad 自行处理登录逻辑
+    if (pages.length === 0) return
+
     const currentPage = pages[pages.length - 1]
     let currentRoute = currentPage?.route || ''
-    
+
     if (currentRoute.startsWith('/')) {
       currentRoute = currentRoute.slice(1)
     }
-    
+
     const publicPagePrefixes = [
       'pages/login/',
       'pages/index/',
+      'pages/product/',
       'pagesSub/goods/'
     ]
-    
+
     const isPublic = publicPagePrefixes.some(prefix => currentRoute.startsWith(prefix))
-    
+
     if (!isPublic) {
       uni.reLaunch({ url: '/pages/login/login' })
     }

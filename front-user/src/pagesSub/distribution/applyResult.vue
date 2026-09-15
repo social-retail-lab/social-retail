@@ -105,6 +105,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { computed } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import { useDistributor } from '@/hooks/useDistributor'
@@ -140,11 +141,7 @@ const statusGradient = computed(() => {
 })
 
 const handleBack = () => {
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pagesSub/distribution/distHome')
 }
 
 const goHome = () => {

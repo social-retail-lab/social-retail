@@ -131,7 +131,7 @@ import {
   COUPON_SOURCE_TEXT,
   isCouponAvailable
 } from '@/constants/coupon'
-import { formatPrice } from '@/utils/common'
+import { formatPrice, safeBack } from '@/utils/common'
 
 const {
   couponStore,
@@ -193,11 +193,7 @@ const formatValidity = (coupon) => {
 const handleBack = () => {
   clearSelectCouponParams()
   resetAvailableCoupons()
-  uni.navigateBack({
-    delta: 1,
-    animationType: 'slide-out-right',
-    animationDuration: 200
-  })
+  safeBack('/pages/index/index')
 }
 
 // 选择"不使用优惠券"

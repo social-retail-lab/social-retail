@@ -123,6 +123,21 @@ export const navigateBack = (delta = 1) => {
 }
 
 /**
+ * 安全返回上一页
+ * 当页面栈深度 > 1 时正常 navigateBack；否则（直接通过 URL 访问，无历史栈）
+ * 使用 reLaunch 跳转到 fallbackUrl，避免返回按钮点击无反应。
+ * @param {string} [fallbackUrl='/pages/index/index'] - 无历史栈时的兜底页面路径
+ */
+export const safeBack = (fallbackUrl = '/pages/index/index') => {
+  const pages = getCurrentPages()
+  if (pages.length > 1) {
+    navigateBack(1)
+  } else {
+    uni.reLaunch({ url: fallbackUrl })
+  }
+}
+
+/**
  * 重新加载当前页面
  */
 export const reLaunch = (url = '/pages/index/index') => {

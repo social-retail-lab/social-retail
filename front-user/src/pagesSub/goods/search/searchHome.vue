@@ -123,6 +123,7 @@
 </template>
 
 <script setup>
+import { safeBack } from '@/utils/common'
 import { ref, onMounted } from 'vue'
 
 const keyword = ref('')
@@ -247,13 +248,7 @@ const getRankClass = (index) => {
 }
 
 const handleBack = () => {
-  uni.navigateBack({
-    fail: () => {
-      uni.switchTab({
-        url: '/pages/index/index'
-      })
-    }
-  })
+  safeBack('/pages/index/index')
 }
 
 onMounted(() => {

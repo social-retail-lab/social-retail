@@ -1,6 +1,6 @@
 -- 历史推广链接/二维码修复脚本。
 -- 正式环境执行前，请将该变量替换为 app.frontend-base-url 的实际值。
-SET @frontend_base_url = 'http://172.20.10.2:5173';
+SET @frontend_base_url = 'http://localhost:5173';
 
 UPDATE distributor_product dp
 JOIN merchant_distribution_product mdp
